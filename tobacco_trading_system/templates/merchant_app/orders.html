@@ -1,0 +1,553 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Orders - Merchant Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .order-card {
+        border: 2px solid #e9ecef;
+        border-radius: var(--radius-lg);
+        transition: all 0.3s ease;
+        position: relative;
+    }
+    .order-card:hover {
+        border-color: var(--merchant-secondary);
+        transform: translateY(-2px);
+    }
+    .order-status {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+    }
+    .progress-ring {
+        width: 60px;
+        height: 60px;
+    }
+    .progress-circle {
+        stroke-dasharray: 157; /* 2 * PI * 25 */
+        stroke-dashoffset: 157;
+        transform: rotate(-90deg);
+        transform-origin: 50% 50%;
+        transition: stroke-dashoffset 0.5s ease;
+    }
+    .order-timeline {
+        position: relative;
+        padding-left: 2rem;
+    }
+    .timeline-item {
+        position: relative;
+        padding-bottom: 1rem;
+    }
+    .timeline-item:before {
+        content: '';
+        position: absolute;
+        left: -1.5rem;
+        top: 0.5rem;
+        width: 10px;
+        height: 10px;
+        background: var(--merchant-secondary);
+        border-radius: 50%;
+    }
+    .timeline-item:after {
+        content: '';
+        position: absolute;
+        left: -1.25rem;
+        top: 1rem;
+        width: 2px;
+        height: 100%;
+        background: #e9ecef;
+    }
+    .timeline-item:last-child:after {
+        display: none;
+    }
+    .client-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--merchant-light);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="h3 mb-0">Order Management</h1>
+        <p class="text-muted">Track and manage client orders</p>
+    </div>
+</div>
+
+<!-- Order Statistics -->
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-6">
+        <div class="merchant-card">
+            <div class="d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <div class="metric-value">{{ order_stats.pending }}</div>
+                    <div>Pending Orders</div>
+                </div>
+                <div class="metric-icon">
+                    <i class="bi bi-clock fs-1"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="merchant-card">
+            <div class="d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <div class="metric-value">{{ order_stats.processing }}</div>
+                    <div>Processing</div>
+                </div>
+                <div class="metric-icon">
+                    <i class="bi bi-gear fs-1"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="merchant-card">
+            <div class="d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <div class="metric-value">{{ order_stats.completed }}</div>
+                    <div>Completed</div>
+                </div>
+                <div class="metric-icon">
+                    <i class="bi bi-check-circle fs-1"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="merchant-card">
+            <div class="d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <div class="metric-value">${{ order_stats.total_value|floatformat:2 }}</div>
+                    <div>Total Value</div>
+                </div>
+                <div class="metric-icon">
+                    <i class="bi bi-currency-dollar fs-1"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="custom-card">
+            <div class="card-header-custom">
+                <h5 class="mb-0">Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <a href="{% url 'merchant_create_order' %}" class="btn btn-primary-custom w-100 mb-2">
+                            <i class="bi bi-plus-circle me-2"></i>New Order
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-outline-success w-100 mb-2" onclick="bulkProcess()">
+                            <i class="bi bi-gear me-2"></i>Bulk Process
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-outline-info w-100 mb-2" onclick="generateOrderReport()">
+                            <i class="bi bi-file-earmark-text me-2"></i>Order Report
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-outline-warning w-100 mb-2" onclick="exportOrders()">
+                            <i class="bi bi-download me-2"></i>Export Orders
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Orders Grid -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="custom-card">
+            <div class="card-header-custom">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Current Orders</h5>
+                    <div class="d-flex gap-2">
+                        <select class="form-select form-select-sm" onchange="filterOrders(this.value)">
+                            <option value="">All Orders</option>
+                            <option value="PENDING">Pending</option>
+                            <option value="PROCESSING">Processing</option>
+                            <option value="PARTIALLY_FILLED">Partially Filled</option>
+                            <option value="COMPLETED">Completed</option>
+                            <option value="CANCELLED">Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row" id="ordersGrid">
+                    {% for order in orders %}
+                    <div class="col-lg-6 mb-3 order-item" data-status="{{ order.status }}">
+                        <div class="order-card p-3">
+                            <span class="badge bg-{% if order.status == 'COMPLETED' %}success{% elif order.status == 'PROCESSING' %}primary{% elif order.status == 'PARTIALLY_FILLED' %}warning{% elif order.status == 'CANCELLED' %}danger{% else %}secondary{% endif %} order-status">
+                                {{ order.get_status_display }}
+                            </span>
+                            
+                            <div class="d-flex align-items-start mb-3">
+                                <div class="client-avatar me-3">
+                                    {{ order.client_name|first|upper }}
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="fw-bold mb-1">{{ order.order_number }}</h6>
+                                    <p class="text-muted mb-1">{{ order.client_name }}</p>
+                                    <small class="text-muted">Created: {{ order.created_at|date:"M d, Y" }}</small>
+                                </div>
+                                <div class="text-end">
+                                    {% widthratio order.filled_quantity order.requested_quantity 100 as progress %}
+                                    <svg class="progress-ring" viewBox="0 0 60 60">
+                                        <circle cx="30" cy="30" r="25" fill="none" stroke="#e9ecef" stroke-width="4"/>
+                                        <circle cx="30" cy="30" r="25" fill="none" stroke="var(--merchant-secondary)" stroke-width="4" 
+                                                class="progress-circle" style="stroke-dashoffset: {{ 157|sub:progress|mul:1.57 }}"/>
+                                        <text x="30" y="35" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--merchant-primary)">{{ progress }}%</text>
+                                    </svg>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <div class="small text-muted">Requested Quantity</div>
+                                    <div class="fw-bold">{{ order.requested_quantity|floatformat:0 }}kg</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="small text-muted">Target Price</div>
+                                    <div class="fw-bold">${{ order.target_price|floatformat:2 }}/kg</div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <div class="small text-muted">Filled Quantity</div>
+                                    <div class="fw-bold text-success">{{ order.filled_quantity|floatformat:0 }}kg</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="small text-muted">Delivery Date</div>
+                                    <div class="fw-bold {% if order.delivery_date < today %}text-danger{% elif order.delivery_date == today %}text-warning{% endif %}">
+                                        {{ order.delivery_date|date:"M d" }}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {% if order.custom_grade %}
+                            <div class="mb-3">
+                                <div class="small text-muted">Custom Grade</div>
+                                <div class="fw-bold">{{ order.custom_grade.custom_grade_name }}</div>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="progress mb-3" style="height: 6px;">
+                                <div class="progress-bar bg-{% if progress == 100 %}success{% elif progress > 50 %}primary{% else %}warning{% endif %}" 
+                                     style="width: {{ progress }}%"></div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="fw-bold text-primary">Total: ${{ order.requested_quantity|mul:order.target_price|floatformat:2 }}</div>
+                                </div>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-primary" onclick="viewOrder('{{ order.id }}')">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    {% if order.status == 'PENDING' or order.status == 'PROCESSING' %}
+                                    <button class="btn btn-outline-success" onclick="processOrder('{{ order.id }}')">
+                                        <i class="bi bi-gear"></i>
+                                    </button>
+                                    {% endif %}
+                                    <button class="btn btn-outline-info" onclick="communicateWithClient('{{ order.id }}')">
+                                        <i class="bi bi-chat"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-12">
+                        <div class="text-center text-muted py-5">
+                            <i class="bi bi-clipboard-x display-1"></i>
+                            <h5>No orders found</h5>
+                            <p>Create your first order to get started.</p>
+                            <a href="{% url 'merchant_create_order' %}" class="btn btn-primary-custom">
+                                <i class="bi bi-plus-circle me-2"></i>Create First Order
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Order Detail Modal -->
+<div class="modal fade" id="orderModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Order Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="orderDetails">
+                    <!-- Order details will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary-custom" id="updateOrderBtn">Update Order</button>
+                <button type="button" class="btn btn-success" id="fulfillOrderBtn">Mark Fulfilled</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Process Order Modal -->
+<div class="modal fade" id="processModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Process Order</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="processForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Quantity to Fill (kg)</label>
+                            <input type="number" class="form-control" name="fill_quantity" step="0.01" min="0" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Source Inventory</label>
+                            <select class="form-select" name="source_inventory" required>
+                                <option value="">Select Source</option>
+                                <!-- Populated from available inventory -->
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Quality Notes</label>
+                            <textarea class="form-control" name="quality_notes" rows="3"></textarea>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Expected Ship Date</label>
+                            <input type="date" class="form-control" name="ship_date" required>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary-custom" onclick="submitProcess()">Process Order</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function filterOrders(status) {
+    const items = document.querySelectorAll('.order-item');
+    items.forEach(item => {
+        if (status === '' || item.dataset.status === status) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+function viewOrder(orderId) {
+    fetch(`/merchant/api/orders/${orderId}/`)
+        .then(response => response.json())
+        .then(data => {
+            displayOrderDetails(data);
+            new bootstrap.Modal(document.getElementById('orderModal')).show();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            TIMBUtils.showNotification('Error loading order details', 'danger');
+        });
+}
+
+function displayOrderDetails(order) {
+    const detailsHtml = `
+        <div class="row">
+            <div class="col-md-6">
+                <h6>Order Information</h6>
+                <p><strong>Order Number:</strong> ${order.order_number}</p>
+                <p><strong>Client:</strong> ${order.client_name}</p>
+                <p><strong>Status:</strong> <span class="badge bg-primary">${order.status}</span></p>
+                <p><strong>Created:</strong> ${new Date(order.created_at).toLocaleDateString()}</p>
+                <p><strong>Delivery Date:</strong> ${new Date(order.delivery_date).toLocaleDateString()}</p>
+            </div>
+            <div class="col-md-6">
+                <h6>Order Details</h6>
+                <p><strong>Requested Quantity:</strong> ${order.requested_quantity} kg</p>
+                <p><strong>Filled Quantity:</strong> ${order.filled_quantity} kg</p>
+                <p><strong>Target Price:</strong> $${order.target_price}/kg</p>
+                <p><strong>Total Value:</strong> $${(order.requested_quantity * order.target_price).toFixed(2)}</p>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-12">
+                <h6>Order Timeline</h6>
+                <div class="order-timeline">
+                    <div class="timeline-item">
+                        <strong>Order Created</strong>
+                        <div class="text-muted small">${new Date(order.created_at).toLocaleString()}</div>
+                    </div>
+                    ${order.status !== 'PENDING' ? `
+                    <div class="timeline-item">
+                        <strong>Processing Started</strong>
+                        <div class="text-muted small">${new Date(order.updated_at).toLocaleString()}</div>
+                    </div>
+                    ` : ''}
+                    ${order.filled_quantity > 0 ? `
+                    <div class="timeline-item">
+                        <strong>Partial Fulfillment</strong>
+                        <div class="text-muted small">${order.filled_quantity} kg processed</div>
+                    </div>
+                    ` : ''}
+                </div>
+            </div>
+        </div>
+        
+        ${order.special_requirements ? `
+        <div class="row mt-4">
+            <div class="col-12">
+                <h6>Special Requirements</h6>
+                <p>${order.special_requirements}</p>
+            </div>
+        </div>
+        ` : ''}
+    `;
+    
+    document.getElementById('orderDetails').innerHTML = detailsHtml;
+}
+
+function processOrder(orderId) {
+    // Load available inventory for the order
+    fetch(`/merchant/api/orders/${orderId}/available-inventory/`)
+        .then(response => response.json())
+        .then(data => {
+            const inventorySelect = document.querySelector('[name="source_inventory"]');
+            inventorySelect.innerHTML = '<option value="">Select Source</option>';
+            
+            data.inventory.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.id;
+                option.textContent = `${item.grade} - ${item.quantity}kg available at ${item.location}`;
+                inventorySelect.appendChild(option);
+            });
+            
+            document.getElementById('processForm').dataset.orderId = orderId;
+            new bootstrap.Modal(document.getElementById('processModal')).show();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            TIMBUtils.showNotification('Error loading inventory data', 'danger');
+        });
+}
+
+function submitProcess() {
+    const form = document.getElementById('processForm');
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData);
+    const orderId = form.dataset.orderId;
+    
+    fetch(`/merchant/api/orders/${orderId}/process/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': TIMBUtils.getCsrfToken(),
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            TIMBUtils.showNotification('Order processed successfully', 'success');
+            bootstrap.Modal.getInstance(document.getElementById('processModal')).hide();
+            location.reload();
+        } else {
+            TIMBUtils.showNotification('Error processing order: ' + data.error, 'danger');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        TIMBUtils.showNotification('Error processing order', 'danger');
+    });
+}
+
+function communicateWithClient(orderId) {
+    // Open communication interface
+    TIMBUtils.showNotification('Client communication feature coming soon', 'info');
+}
+
+function bulkProcess() {
+    // Bulk processing interface
+    TIMBUtils.showNotification('Bulk processing feature coming soon', 'info');
+}
+
+function generateOrderReport() {
+    TIMBUtils.showLoader();
+    
+    fetch('/merchant/api/orders/report/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': TIMBUtils.getCsrfToken(),
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.blob())
+    .then(blob => {
+        TIMBUtils.hideLoader();
+        
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `orders-report-${new Date().toISOString().split('T')[0]}.pdf`;
+        link.click();
+        window.URL.revokeObjectURL(url);
+        
+        TIMBUtils.showNotification('Orders report generated', 'success');
+    })
+    .catch(error => {
+        TIMBUtils.hideLoader();
+        console.error('Error:', error);
+        TIMBUtils.showNotification('Error generating report', 'danger');
+    });
+}
+
+function exportOrders() {
+    window.open('/merchant/api/orders/export/', '_blank');
+}
+
+// Initialize progress circles
+document.addEventListener('DOMContentLoaded', function() {
+    const progressCircles = document.querySelectorAll('.progress-circle');
+    progressCircles.forEach(circle => {
+        const progress = parseInt(circle.nextElementSibling.textContent);
+        const offset = 157 - (progress / 100) * 157;
+        circle.style.strokeDashoffset = offset;
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,495 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Merchant Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .merchant-card {
+        background: linear-gradient(135deg, var(--merchant-primary), var(--merchant-secondary));
+        color: white;
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .inventory-item {
+        border-left: 4px solid var(--merchant-secondary);
+        padding: 1rem;
+        margin-bottom: 0.5rem;
+        background: var(--merchant-light);
+        border-radius: var(--radius-md);
+    }
+    
+    .recommendation-card {
+        border: 2px solid var(--merchant-accent);
+        border-radius: var(--radius-lg);
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .risk-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 0.5rem;
+    }
+    
+    .risk-low { background: var(--success); }
+    .risk-medium { background: var(--warning); }
+    .risk-high { background: var(--danger); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="h3 mb-0">{{ merchant.company_name }}</h1>
+        <p class="text-muted">Merchant Trading Dashboard</p>
+    </div>
+</div>
+
+<!-- Key Metrics -->
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-6">
+        <div class="merchant-card">
+            <div class="d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <div class="metric-value">${{ stats.total_inventory_value|floatformat:2 }}</div>
+                    <div>Inventory Value</div>
+                </div>
+                <div class="metric-icon">
+                    <i class="bi bi-box-seam fs-1"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+        <div class="merchant-card">
+            <div class="d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <div class="metric-value">{{ stats.active_orders }}</div>
+                    <div>Active Orders</div>
+                </div>
+                <div class="metric-icon">
+                    <i class="bi bi-clipboard-check fs-1"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+        <div class="merchant-card">
+            <div class="d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <div class="metric-value">{{ stats.todays_purchases }}</div>
+                    <div>Today's Purchases</div>
+                </div>
+                <div class="metric-icon">
+                    <i class="bi bi-cart-plus fs-1"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+        <div class="merchant-card">
+            <div class="d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <div class="metric-value">{{ stats.monthly_volume|floatformat:0 }}kg</div>
+                    <div>Monthly Volume</div>
+                </div>
+                <div class="metric-icon">
+                    <i class="bi bi-graph-up fs-1"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts and Analytics -->
+<div class="row mb-4">
+    <div class="col-lg-8">
+        <div class="custom-card">
+            <div class="card-header-custom">
+                <h5 class="mb-0">Inventory Value Trends</h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="inventoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="custom-card">
+            <div class="card-header-custom">
+                <h5 class="mb-0">Order Fulfillment</h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="orderChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="custom-card">
+            <div class="card-header-custom">
+                <h5 class="mb-0">Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <a href="{% url 'merchant_create_order' %}" class="btn btn-primary-custom w-100 mb-2">
+                            <i class="bi bi-plus-circle me-2"></i>Create Order
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{% url 'merchant_inventory' %}" class="btn btn-outline-primary w-100 mb-2">
+                            <i class="bi bi-box-seam me-2"></i>View Inventory
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-outline-success w-100 mb-2" onclick="generateInventoryQR()">
+                            <i class="bi bi-qr-code me-2"></i>Generate QR Report
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{% url 'merchant_custom_grades' %}" class="btn btn-outline-info w-100 mb-2">
+                            <i class="bi bi-gear me-2"></i>Manage Grades
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity and Recommendations -->
+<div class="row">
+    <div class="col-lg-4">
+        <div class="custom-card">
+            <div class="card-header-custom">
+                <h5 class="mb-0">Current Inventory</h5>
+            </div>
+            <div class="card-body">
+                <div style="max-height: 300px; overflow-y: auto;">
+                    {% for item in inventory %}
+                    <div class="inventory-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ item.grade.grade_name }}</strong>
+                                <div class="small text-muted">{{ item.location }}</div>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-bold">{{ item.quantity|floatformat:0 }}kg</div>
+                                <div class="small text-muted">${{ item.average_cost|floatformat:2 }}/kg</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center text-muted">
+                        <i class="bi bi-box fs-1"></i>
+                        <p>No inventory items</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="custom-card">
+            <div class="card-header-custom">
+                <h5 class="mb-0">AI Recommendations</h5>
+            </div>
+            <div class="card-body">
+                <div style="max-height: 300px; overflow-y: auto;">
+                    {% for rec in recommendations %}
+                    <div class="recommendation-card">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong>{{ rec.grade.grade_name }}</strong>
+                                <p class="mb-1 small">{{ rec.reasoning }}</p>
+                                <div class="small text-muted">
+                                    Qty: {{ rec.recommended_quantity|floatformat:0 }}kg
+                                    @ ${{ rec.recommended_price|floatformat:2 }}/kg
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="small text-success">{{ rec.confidence_score|floatformat:1 }}% confidence</div>
+                                <button class="btn btn-sm btn-outline-primary mt-1" onclick="actOnRecommendation({{ rec.id }})">
+                                    Act
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center text-muted">
+                        <i class="bi bi-lightbulb fs-1"></i>
+                        <p>No recommendations available</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="custom-card">
+            <div class="card-header-custom">
+                <h5 class="mb-0">Risk Assessment</h5>
+            </div>
+            <div class="card-body">
+                <div style="max-height: 300px; overflow-y: auto;">
+                    {% for risk in risks %}
+                    <div class="d-flex align-items-center mb-3 p-2 rounded" style="background: var(--merchant-light);">
+                        <span class="risk-indicator risk-{{ risk.risk_level|lower }}"></span>
+                        <div class="flex-grow-1">
+                            <div class="fw-bold">{{ risk.get_risk_type_display }}</div>
+                            <div class="small text-muted">{{ risk.description|truncatechars:60 }}</div>
+                            <div class="small">Score: {{ risk.risk_score|floatformat:1 }}%</div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center text-muted">
+                        <i class="bi bi-shield-check fs-1"></i>
+                        <p>No active risks</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Active Orders -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="custom-card">
+            <div class="card-header-custom">
+                <h5 class="mb-0">Active Orders</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-custom">
+                        <thead>
+                            <tr>
+                                <th>Order #</th>
+                                <th>Client</th>
+                                <th>Grade</th>
+                                <th>Quantity</th>
+                                <th>Progress</th>
+                                <th>Delivery Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in active_orders %}
+                            <tr>
+                                <td>{{ order.order_number }}</td>
+                                <td>{{ order.client_name }}</td>
+                                <td>{{ order.custom_grade.custom_grade_name|default:"Standard" }}</td>
+                                <td>{{ order.requested_quantity|floatformat:0 }}kg</td>
+                                <td>
+                                    {% widthratio order.filled_quantity order.requested_quantity 100 as progress %}
+                                    <div class="progress" style="height: 6px;">
+                                        <div class="progress-bar" style="width: {{ progress }}%"></div>
+                                    </div>
+                                    <small>{{ progress }}% completed</small>
+                                </td>
+                                <td>{{ order.delivery_date|date:"M d, Y" }}</td>
+                                <td>
+                                    <span class="badge bg-{% if order.status == 'COMPLETED' %}success{% elif order.status == 'PROCESSING' %}primary{% else %}warning{% endif %}">
+                                        {{ order.get_status_display }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center text-muted">No active orders</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- QR Code Modal -->
+<div class="modal fade" id="qrModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Secure Inventory Report</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div id="qrCodeContainer">
+                    <!-- QR code will be inserted here -->
+                </div>
+                <p class="mt-3">Scan this QR code to access encrypted inventory data</p>
+                <div id="qrExpiry" class="small text-muted"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize charts
+    initializeCharts();
+});
+
+function initializeCharts() {
+    // Inventory value chart
+    const inventoryCtx = document.getElementById('inventoryChart').getContext('2d');
+    fetch('{% url "api_inventory_value" %}?days=30')
+        .then(response => response.json())
+        .then(data => {
+            new Chart(inventoryCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.map(item => item.grade__grade_name),
+                    datasets: [{
+                        data: data.map(item => item.value),
+                        backgroundColor: [
+                            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+                            '#9966FF', '#FF9F40', '#FF6384', '#C9CBCF'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        });
+    
+    // Order fulfillment chart
+    const orderCtx = document.getElementById('orderChart').getContext('2d');
+    fetch('{% url "api_order_fulfillment" %}')
+        .then(response => response.json())
+        .then(data => {
+            new Chart(orderCtx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(item => item.status),
+                    datasets: [{
+                        label: 'Orders',
+                        data: data.map(item => item.count),
+                        backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--merchant-secondary')
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+        });
+}
+
+function generateInventoryQR() {
+    fetch('{% url "api_inventory_qr" %}', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.qr_code) {
+            document.getElementById('qrCodeContainer').innerHTML = `
+                <img src="data:image/png;base64,${data.qr_code}" alt="QR Code" class="img-fluid">
+            `;
+            
+            const expiryDate = new Date(data.expires_at);
+            document.getElementById('qrExpiry').textContent = 
+                `Expires: ${expiryDate.toLocaleString()}`;
+            
+            new bootstrap.Modal(document.getElementById('qrModal')).show();
+        } else {
+            alert('Error generating QR code');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error generating QR code');
+    });
+}
+
+function actOnRecommendation(recommendationId) {
+    if (confirm('Do you want to act on this recommendation?')) {
+        fetch(`/merchant/api/act-on-recommendation/${recommendationId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Recommendation noted. You will be redirected to the trading floor.');
+                // Redirect to trading interface or marketplace
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error processing recommendation');
+        });
+    }
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}

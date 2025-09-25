@@ -1,0 +1,456 @@
+/* TIMB Theme - Official Tobacco Industry and Marketing Board Colors */
+
+:root {
+    /* TIMB Primary Colors */
+    --timb-primary: #2E7D32;
+    --timb-secondary: #4CAF50;
+    --timb-accent: #FFC107;
+    --timb-dark: #1B5E20;
+    --timb-light: #E8F5E8;
+    --timb-text: #263238;
+    --timb-gray: #ECEFF1;
+    
+    /* TIMB Gradients */
+    --timb-gradient-primary: linear-gradient(135deg, #2E7D32 0%, #4CAF50 100%);
+    --timb-gradient-secondary: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+    --timb-gradient-accent: linear-gradient(135deg, #FFC107 0%, #FFD54F 100%);
+    
+    /* TIMB Shadows */
+    --timb-shadow-sm: 0 2px 4px rgba(46, 125, 50, 0.1);
+    --timb-shadow-md: 0 4px 8px rgba(46, 125, 50, 0.15);
+    --timb-shadow-lg: 0 8px 16px rgba(46, 125, 50, 0.2);
+    
+    /* Status Colors for TIMB */
+    --timb-success: #2E7D32;
+    --timb-warning: #FF8F00;
+    --timb-danger: #C62828;
+    --timb-info: #1976D2;
+}
+
+/* TIMB Body Styling */
+body.timb-theme {
+    background: linear-gradient(135deg, var(--timb-light) 0%, #f8f9fa 100%);
+    color: var(--timb-text);
+}
+
+/* TIMB Header */
+.timb-theme .main-header {
+    background: var(--timb-gradient-primary);
+    border-bottom: 3px solid var(--timb-accent);
+}
+
+.timb-theme .logo {
+    color: white;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.timb-theme .logo::before {
+    content: "🌿";
+    margin-right: 0.5rem;
+    font-size: 2rem;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+/* TIMB Navigation */
+.timb-theme .nav-controls .theme-toggle {
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.timb-theme .nav-controls .theme-toggle:hover {
+    background: var(--timb-accent);
+    color: var(--timb-dark);
+    border-color: var(--timb-accent);
+    transform: translateY(-2px);
+}
+
+.timb-theme .nav-controls .theme-toggle.active {
+    background: var(--timb-accent);
+    color: var(--timb-dark);
+    border-color: var(--timb-accent);
+}
+
+/* TIMB Cards */
+.timb-theme .custom-card {
+    background: white;
+    border: 1px solid rgba(46, 125, 50, 0.1);
+    box-shadow: var(--timb-shadow-sm);
+    transition: all 0.3s ease;
+}
+
+.timb-theme .custom-card:hover {
+    box-shadow: var(--timb-shadow-md);
+    transform: translateY(-2px);
+    border-color: rgba(46, 125, 50, 0.2);
+}
+
+.timb-theme .card-header-custom {
+    background: var(--timb-gradient-primary);
+    color: white;
+    border-bottom: 3px solid var(--timb-accent);
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+/* TIMB Statistics Cards */
+.timb-theme .stat-card {
+    background: white;
+    border-left: 5px solid var(--timb-secondary);
+    box-shadow: var(--timb-shadow-sm);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.timb-theme .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(46, 125, 50, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+    transform: translate(30px, -30px);
+}
+
+.timb-theme .stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--timb-shadow-lg);
+    border-left-color: var(--timb-accent);
+}
+
+.timb-theme .stat-icon {
+    background: var(--timb-gradient-primary);
+    color: white;
+    box-shadow: var(--timb-shadow-sm);
+}
+
+.timb-theme .stat-value {
+    color: var(--timb-primary);
+    font-weight: 700;
+}
+
+.timb-theme .stat-change.positive {
+    color: var(--timb-success);
+}
+
+.timb-theme .stat-change.negative {
+    color: var(--timb-danger);
+}
+
+/* TIMB Buttons */
+.timb-theme .btn-primary-custom {
+    background: var(--timb-gradient-primary);
+    border: none;
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: var(--timb-shadow-sm);
+    transition: all 0.3s ease;
+}
+
+.timb-theme .btn-primary-custom:hover {
+    background: var(--timb-gradient-secondary);
+    transform: translateY(-2px);
+    box-shadow: var(--timb-shadow-md);
+}
+
+.timb-theme .btn-outline-primary {
+    border-color: var(--timb-primary);
+    color: var(--timb-primary);
+}
+
+.timb-theme .btn-outline-primary:hover {
+    background: var(--timb-primary);
+    border-color: var(--timb-primary);
+    color: white;
+}
+
+/* TIMB Forms */
+.timb-theme .form-control:focus {
+    border-color: var(--timb-primary);
+    box-shadow: 0 0 0 0.2rem rgba(46, 125, 50, 0.25);
+}
+
+.timb-theme .form-select:focus {
+    border-color: var(--timb-primary);
+    box-shadow: 0 0 0 0.2rem rgba(46, 125, 50, 0.25);
+}
+
+/* TIMB Tables */
+.timb-theme .table-custom thead th {
+    background: var(--timb-gradient-primary);
+    color: white;
+    border: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.timb-theme .table-custom tbody tr:hover {
+    background: var(--timb-light);
+}
+
+/* TIMB Alerts */
+.timb-theme .alert-success-custom {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    border-left: 4px solid var(--timb-success);
+    color: #155724;
+}
+
+.timb-theme .alert-warning-custom {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    border-left: 4px solid var(--timb-warning);
+    color: #856404;
+}
+
+.timb-theme .alert-danger-custom {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    border-left: 4px solid var(--timb-danger);
+    color: #721c24;
+}
+
+.timb-theme .alert-info-custom {
+    background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+    border-left: 4px solid var(--timb-info);
+    color: #0c5460;
+}
+
+/* TIMB Progress Bars */
+.timb-theme .progress-bar {
+    background: var(--timb-gradient-primary);
+}
+
+.timb-theme .progress {
+    background: rgba(46, 125, 50, 0.1);
+}
+
+/* TIMB Badges */
+.timb-theme .badge.bg-primary {
+    background: var(--timb-primary) !important;
+}
+
+.timb-theme .badge.bg-secondary {
+    background: var(--timb-secondary) !important;
+}
+
+.timb-theme .badge.bg-success {
+    background: var(--timb-success) !important;
+}
+
+.timb-theme .badge.bg-warning {
+    background: var(--timb-warning) !important;
+    color: white !important;
+}
+
+.timb-theme .badge.bg-danger {
+    background: var(--timb-danger) !important;
+}
+
+/* TIMB Modals */
+.timb-theme .modal-header {
+    background: var(--timb-gradient-primary);
+    color: white;
+    border-bottom: 3px solid var(--timb-accent);
+}
+
+.timb-theme .modal-content {
+    border: none;
+    box-shadow: var(--timb-shadow-lg);
+}
+
+/* TIMB Loading Spinner */
+.timb-theme .loading-spinner {
+    border-top-color: var(--timb-primary);
+}
+
+/* TIMB Real-time Feed */
+.timb-theme .feed-item {
+    border-left: 3px solid var(--timb-secondary);
+    background: var(--timb-light);
+    position: relative;
+}
+
+.timb-theme .feed-item::before {
+    content: '';
+    position: absolute;
+    left: -3px;
+    top: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--timb-gradient-primary);
+}
+
+.timb-theme .feed-item:hover {
+    background: rgba(46, 125, 50, 0.1);
+    transform: translateX(5px);
+}
+
+/* TIMB Dashboard Metrics */
+.timb-theme .metric-card {
+    background: var(--timb-gradient-primary);
+    color: white;
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+}
+
+.timb-theme .metric-card::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    border-radius: 50%;
+}
+
+.timb-theme .metric-value {
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* TIMB Navigation Pills */
+.timb-theme .nav-pills .nav-link.active {
+    background: var(--timb-gradient-primary);
+    color: white;
+}
+
+.timb-theme .nav-pills .nav-link {
+    color: var(--timb-primary);
+}
+
+.timb-theme .nav-pills .nav-link:hover {
+    background: var(--timb-light);
+}
+
+/* TIMB Dropdown */
+.timb-theme .dropdown-menu {
+    border: 1px solid rgba(46, 125, 50, 0.2);
+    box-shadow: var(--timb-shadow-md);
+}
+
+.timb-theme .dropdown-item:hover {
+    background: var(--timb-light);
+    color: var(--timb-primary);
+}
+
+/* TIMB Charts */
+.timb-theme .chart-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: var(--timb-shadow-sm);
+    position: relative;
+}
+
+.timb-theme .chart-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--timb-gradient-primary);
+    border-radius: 12px 12px 0 0;
+}
+
+/* TIMB Grade Categories */
+.timb-theme .badge.bg-strip { background: #2E7D32 !important; }
+.timb-theme .badge.bg-leaf { background: #388E3C !important; }
+.timb-theme .badge.bg-lug { background: #43A047 !important; }
+.timb-theme .badge.bg-tip { background: #4CAF50 !important; }
+.timb-theme .badge.bg-smoking { background: #66BB6A !important; }
+.timb-theme .badge.bg-cutter { background: #81C784 !important; }
+.timb-theme .badge.bg-scrap { background: #A5D6A7 !important; }
+.timb-theme .badge.bg-primary { background: #C8E6C9 !important; color: #1B5E20 !important; }
+
+/* TIMB Typography */
+.timb-theme h1, .timb-theme h2, .timb-theme h3, 
+.timb-theme h4, .timb-theme h5, .timb-theme h6 {
+    color: var(--timb-primary);
+}
+
+.timb-theme .display-1, .timb-theme .display-2, 
+.timb-theme .display-3, .timb-theme .display-4 {
+    color: var(--timb-primary);
+    font-weight: 700;
+}
+
+/* TIMB Special Effects */
+.timb-theme .glow {
+    box-shadow: 0 0 20px rgba(46, 125, 50, 0.3);
+}
+
+.timb-theme .pulse {
+    animation: timbPulse 2s infinite;
+}
+
+@keyframes timbPulse {
+    0% { box-shadow: 0 0 0 0 rgba(46, 125, 50, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(46, 125, 50, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(46, 125, 50, 0); }
+}
+
+/* TIMB Responsive Adjustments */
+@media (max-width: 768px) {
+    .timb-theme .stat-card {
+        text-align: center;
+    }
+    
+    .timb-theme .metric-card {
+        margin-bottom: 1rem;
+    }
+    
+    .timb-theme .chart-container {
+        padding: 0.5rem;
+    }
+}
+
+/* TIMB Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    .timb-theme {
+        --timb-text: #ffffff;
+        --timb-gray: #2d3748;
+        --timb-light: rgba(46, 125, 50, 0.1);
+    }
+    
+    .timb-theme body {
+        background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+        color: #e2e8f0;
+    }
+    
+    .timb-theme .custom-card {
+        background: #2d3748;
+        color: #e2e8f0;
+        border-color: rgba(46, 125, 50, 0.2);
+    }
+    
+    .timb-theme .stat-card {
+        background: #2d3748;
+        color: #e2e8f0;
+    }
+}
+
+/* TIMB Print Styles */
+@media print {
+    .timb-theme .btn, .timb-theme .navbar, 
+    .timb-theme .modal, .timb-theme .alert {
+        display: none !important;
+    }
+    
+    .timb-theme .custom-card {
+        border: 2px solid var(--timb-primary);
+        break-inside: avoid;
+    }
+    
+    .timb-theme .card-header-custom {
+        background: var(--timb-primary) !important;
+        color: white !important;
+    }
+}

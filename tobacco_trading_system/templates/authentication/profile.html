@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Profile - TIMB Trading System{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="h3 mb-0">User Profile</h1>
+        <p class="text-muted">Manage your account settings and preferences</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-4">
+        <div class="custom-card">
+            <div class="card-header-custom">
+                <h5 class="mb-0">Profile Information</h5>
+            </div>
+            <div class="card-body text-center">
+                <div class="profile-avatar mb-3">
+                    <i class="bi bi-person-circle display-1"></i>
+                </div>
+                <h5>{{ user.get_full_name|default:user.username }}</h5>
+                <p class="text-muted">{{ user.email }}</p>
+                <span class="badge bg-{% if user.is_timb_staff %}success{% elif user.is_merchant %}primary{% else %}secondary{% endif %}">
+                    {% if user.is_timb_staff %}TIMB Staff{% elif user.is_merchant %}Merchant{% else %}User{% endif %}
+                </span>
+            </div>
+        </div>
+        
+        <div class="custom-card mt-3">
+            <div class="card-header-custom">
+                <h5 class="mb-0">Account Statistics</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6">
+                        <div class="h4">{{ user.date_joined|timesince }}</div>
+                        <div class="small text-muted">Member Since</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="h4">{{ user.last_login|timesince|default:"Never" }}</div>
+                        <div class="small text-muted">Last Login</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-8">
+        <div class="custom-card">
+            <div class="card-header-custom">
+                <h5 class="mb-0">Edit Profile</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Company Name</label>
+                            {{ form.company_name }}
+                            {% if form.company_name.errors %}
+                                <div class="text-danger small">{{ form.company_name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">License Number</label>
+                            {{ form.license_number }}
+                            {% if form.license_number.errors %}
+                                <div class="text-danger small">{{ form.license_number.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Address</label>
+                        {{ form.address }}
+                        {% if form.address.errors %}
+                            <div class="text-danger small">{{ form.address.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Theme Preference</label>
+                        {{ form.theme_preference }}
+                        {% if form.theme_preference.errors %}
+                            <div class="text-danger small">{{ form.theme_preference.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button type="submit" class="btn btn-primary-custom">
+                            <i class="bi bi-check"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="custom-card mt-3">
+            <div class="card-header-custom">
+                <h5 class="mb-0">Security Settings</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Password</h6>
+                        <p class="text-muted">Last changed: {{ user.last_login|date:"M d, Y" }}</p>
+                        <button class="btn btn-outline-warning btn-sm">Change Password</button>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Two-Factor Authentication</h6>
+                        <p class="text-muted">Add an extra layer of security</p>
+                        <button class="btn btn-outline-success btn-sm">Enable 2FA</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

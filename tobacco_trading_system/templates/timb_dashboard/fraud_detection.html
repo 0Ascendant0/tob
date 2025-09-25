@@ -1,0 +1,461 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Fraud Detection - TIMB Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .alert-card {
+        border-left: 5px solid;
+        transition: all 0.3s ease;
+    }
+    .alert-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    .alert-card.critical { border-left-color: #dc3545; }
+    .alert-card.high { border-left-color: #fd7e14; }
+    .alert-card.medium { border-left-color: #ffc107; }
+    .alert-card.low { border-left-color: #20c997; }
+    
+    .fraud-score {
+        font-weight: bold;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.375rem;
+        font-size: 0.875rem;
+    }
+    .fraud-score.high { background: #dc3545; color: white; }
+    .fraud-score.medium { background: #ffc107; color: #212529; }
+    .fraud-score.low { background: #198754; color: white; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="h3 mb-0">Fraud Detection & Prevention</h1>
+        <p class="text-muted">AI-powered fraud detection and alert management</p>
+    </div>
+</div>
+
+<!-- Alert Statistics -->
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-icon bg-danger">
+                <i class="bi bi-exclamation-triangle"></i>
+            </div>
+            <div class="stat-value text-danger">{{ alert_stats.total_alerts }}</div>
+            <div class="stat-label">Total Alerts</div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-icon bg-warning">
+                <i class="bi bi-eye"></i>
+            </div>
+            <div class="stat-value text-warning">{{ alert_stats.open_alerts }}</div>
+            <div class="stat-label">Open Alerts</div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-icon bg-danger">
+                <i class="bi bi-shield-exclamation"></i>
+            </div>
+            <div class="stat-value text-danger">{{ alert_stats.critical_alerts }}</div>
+            <div class="stat-label">Critical Alerts</div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bi bi-graph-up"></i>
+            </div>
+            <div class="stat-value">94.2%</div>
+            <div class="stat-label">AI Accuracy</div>
+        </div>
+    </div>
+</div>
+
+<!-- Fraud Patterns Analysis -->
+<div class="row mb-4">
+    <div class="col-lg-8">
+        <div class="custom-card">
+            <div class="card-header-custom">
+                <h5 class="mb-0">Fraud Patterns Analysis</h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="fraudPatternsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="custom-card">
+            <div class="card-header-custom">
+                <h5 class="mb-0">Detection Methods</h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="detectionMethodsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Active Alerts -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="custom-card">
+            <div class="card-header-custom">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Active Fraud Alerts</h5>
+                    <button class="btn btn-outline-light btn-sm" onclick="refreshAlerts()">
+                        <i class="bi bi-arrow-clockwise"></i> Refresh
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for alert in alerts %}
+                    <div class="col-lg-6 mb-3">
+                        <div class="alert-card {{ alert.severity|lower }} p-3 bg-white rounded shadow-sm">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h6 class="fw-bold">{{ alert.get_alert_type_display }}</h6>
+                                    <span class="badge bg-{{ alert.severity|lower }}">{{ alert.severity }}</span>
+                                </div>
+                                <div class="text-end">
+                                    <small class="text-muted">{{ alert.created_at|timesince }} ago</small>
+                                </div>
+                            </div>
+                            
+                            <p class="mb-2">{{ alert.description }}</p>
+                            
+                            {% if alert.transaction %}
+                            <div class="mb-2">
+                                <small class="text-muted">
+                                    <strong>Transaction:</strong> {{ alert.transaction.transaction_id }}<br>
+                                    <strong>Amount:</strong> ${{ alert.transaction.total_amount|floatformat:2 }}<br>
+                                    {% if alert.transaction.fraud_score %}
+                                    <strong>Fraud Score:</strong> 
+                                    <span class="fraud-score {% if alert.transaction.fraud_score > 0.7 %}high{% elif alert.transaction.fraud_score > 0.4 %}medium{% else %}low{% endif %}">
+                                        {{ alert.transaction.fraud_score|floatformat:1 }}%
+                                    </span>
+                                    {% endif %}
+                                </small>
+                            </div>
+                            {% endif %}
+                            
+                            {% if alert.merchant %}
+                            <div class="mb-2">
+                                <small class="text-muted">
+                                    <strong>Merchant:</strong> {{ alert.merchant.company_name }}<br>
+                                    <strong>Risk Score:</strong> {{ alert.merchant.risk_score|floatformat:1 }}%
+                                </small>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="d-flex justify-content-end gap-2 mt-3">
+                                <button class="btn btn-outline-primary btn-sm" onclick="viewAlertDetails({{ alert.id }})">
+                                    <i class="bi bi-eye"></i> View
+                                </button>
+                                <button class="btn btn-outline-warning btn-sm" onclick="investigateAlert({{ alert.id }})">
+                                    <i class="bi bi-search"></i> Investigate
+                                </button>
+                                {% if alert.status == 'OPEN' %}
+                                <button class="btn btn-outline-success btn-sm" onclick="resolveAlert({{ alert.id }})">
+                                    <i class="bi bi-check"></i> Resolve
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-12">
+                        <div class="text-center text-muted py-5">
+                            <i class="bi bi-shield-check display-1"></i>
+                            <h5>No active fraud alerts</h5>
+                            <p>Your system is secure and operating normally.</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AI Model Performance -->
+<div class="row">
+    <div class="col-12">
+        <div class="custom-card">
+            <div class="card-header-custom">
+                <h5 class="mb-0">AI Model Performance</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 text-center">
+                        <div class="display-6 fw-bold text-success">94.2%</div>
+                        <div class="text-muted">Overall Accuracy</div>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="display-6 fw-bold text-info">2.1%</div>
+                        <div class="text-muted">False Positive Rate</div>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="display-6 fw-bold text-warning">1.2%</div>
+                        <div class="text-muted">False Negative Rate</div>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="display-6 fw-bold text-primary">342</div>
+                        <div class="text-muted">Frauds Detected Today</div>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <button class="btn btn-outline-primary" onclick="retrainModel()">
+                        <i class="bi bi-arrow-repeat"></i> Retrain Model
+                    </button>
+                    <button class="btn btn-outline-secondary" onclick="downloadReport()">
+                        <i class="bi bi-download"></i> Download Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Alert Detail Modal -->
+<div class="modal fade" id="alertModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Alert Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="alertDetails">
+                    <!-- Alert details will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-warning" id="investigateAlertBtn">Start Investigation</button>
+                <button type="button" class="btn btn-success" id="resolveAlertBtn">Mark Resolved</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    initializeFraudCharts();
+});
+
+function initializeFraudCharts() {
+    // Fraud patterns chart
+    const patternsCtx = document.getElementById('fraudPatternsChart').getContext('2d');
+    const patternsData = {{ fraud_patterns|safe }};
+    
+    new Chart(patternsCtx, {
+        type: 'doughnut',
+        data: {
+            labels: patternsData.map(item => item.alert_type),
+            datasets: [{
+                data: patternsData.map(item => item.count),
+                backgroundColor: ['#dc3545', '#fd7e14', '#ffc107', '#20c997', '#6f42c1']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+    
+    // Detection methods chart
+    const methodsCtx = document.getElementById('detectionMethodsChart').getContext('2d');
+    
+    new Chart(methodsCtx, {
+        type: 'bar',
+        data: {
+            labels: ['AI Detection', 'Manual Review', 'System Rules', 'User Reports'],
+            datasets: [{
+                label: 'Detections',
+                data: [85, 8, 5, 2],
+                backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--timb-secondary')
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function viewAlertDetails(alertId) {
+    fetch(`/timb/api/fraud-alert/${alertId}/`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('alertDetails').innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Alert Information</h6>
+                        <p><strong>Type:</strong> ${data.alert_type}</p>
+                        <p><strong>Severity:</strong> <span class="badge bg-${data.severity.toLowerCase()}">${data.severity}</span></p>
+                        <p><strong>Status:</strong> ${data.status}</p>
+                        <p><strong>Created:</strong> ${new Date(data.created_at).toLocaleString()}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Description</h6>
+                        <p>${data.description}</p>
+                        ${data.transaction ? `
+                            <h6>Related Transaction</h6>
+                            <p><strong>ID:</strong> ${data.transaction.transaction_id}</p>
+                            <p><strong>Amount:</strong> $${data.transaction.total_amount}</p>
+                        ` : ''}
+                    </div>
+                </div>
+                ${data.evidence ? `
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <h6>Evidence</h6>
+                            <pre class="bg-light p-3 rounded"><code>${JSON.stringify(data.evidence, null, 2)}</code></pre>
+                        </div>
+                    </div>
+                ` : ''}
+            `;
+            
+            // Set up modal buttons
+            document.getElementById('investigateAlertBtn').onclick = () => investigateAlert(alertId);
+            document.getElementById('resolveAlertBtn').onclick = () => resolveAlert(alertId);
+            
+            new bootstrap.Modal(document.getElementById('alertModal')).show();
+        })
+        .catch(error => {
+            console.error('Error loading alert details:', error);
+            TIMBUtils.showNotification('Error loading alert details', 'danger');
+        });
+}
+
+function investigateAlert(alertId) {
+    TIMBUtils.showConfirmDialog(
+        'Start investigation for this alert?',
+        () => {
+            fetch(`/timb/api/fraud-alert/${alertId}/investigate/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': TIMBUtils.getCsrfToken(),
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    TIMBUtils.showNotification('Investigation started successfully', 'success');
+                    location.reload();
+                } else {
+                    TIMBUtils.showNotification('Error starting investigation: ' + data.error, 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                TIMBUtils.showNotification('Error starting investigation', 'danger');
+            });
+        }
+    );
+}
+
+function resolveAlert(alertId) {
+    TIMBUtils.showConfirmDialog(
+        'Mark this alert as resolved?',
+        () => {
+            fetch(`/timb/api/fraud-alert/${alertId}/resolve/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': TIMBUtils.getCsrfToken(),
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    TIMBUtils.showNotification('Alert resolved successfully', 'success');
+                    location.reload();
+                } else {
+                    TIMBUtils.showNotification('Error resolving alert: ' + data.error, 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                TIMBUtils.showNotification('Error resolving alert', 'danger');
+            });
+        }
+    );
+}
+
+function refreshAlerts() {
+    location.reload();
+}
+
+function retrainModel() {
+    TIMBUtils.showConfirmDialog(
+        'Retrain the fraud detection model? This may take several minutes.',
+        () => {
+            TIMBUtils.showLoader();
+            
+            fetch('/ai/train/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': TIMBUtils.getCsrfToken(),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ model: 'fraud' })
+            })
+            .then(response => response.json())
+            .then(data => {
+                TIMBUtils.hideLoader();
+                if (data.success) {
+                    TIMBUtils.showNotification('Model retrained successfully', 'success');
+                } else {
+                    TIMBUtils.showNotification('Error retraining model: ' + data.error, 'danger');
+                }
+            })
+            .catch(error => {
+                TIMBUtils.hideLoader();
+                console.error('Error:', error);
+                TIMBUtils.showNotification('Error retraining model', 'danger');
+            });
+        }
+    );
+}
+
+function downloadReport() {
+    window.open('/timb/api/fraud-report/', '_blank');
+}
+</script>
+{% endblock %}

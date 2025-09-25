@@ -1,0 +1,289 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Merchants - TIMB Dashboard{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="h3 mb-0">Merchant Management</h1>
+        <p class="text-muted">Monitor and manage tobacco merchants</p>
+    </div>
+</div>
+
+<!-- Merchant Statistics -->
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bi bi-building"></i>
+            </div>
+            <div class="stat-value">{{ merchants.count }}</div>
+            <div class="stat-label">Total Merchants</div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bi bi-check-circle"></i>
+            </div>
+            <div class="stat-value">{{ merchants|length }}</div>
+            <div class="stat-label">Active Merchants</div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bi bi-exclamation-triangle"></i>
+            </div>
+            <div class="stat-value">0</div>
+            <div class="stat-label">High Risk</div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bi bi-clock"></i>
+            </div>
+            <div class="stat-value">0</div>
+            <div class="stat-label">Pending Approval</div>
+        </div>
+    </div>
+</div>
+
+<!-- Merchants Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="custom-card">
+            <div class="card-header-custom">
+                <h5 class="mb-0">Merchant Directory</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-custom">
+                        <thead>
+                            <tr>
+                                <th>Company Name</th>
+                                <th>License Number</th>
+                                <th>Contact Person</th>
+                                <th>Status</th>
+                                <th>Risk Score</th>
+                                <th>Total Purchases</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for merchant in merchants %}
+                            <tr>
+                                <td>
+                                    <strong>{{ merchant.company_name }}</strong>
+                                    <br>
+                                    <small class="text-muted">{{ merchant.user.email }}</small>
+                                </td>
+                                <td>{{ merchant.license_number }}</td>
+                                <td>{{ merchant.user.get_full_name|default:merchant.user.username }}</td>
+                                <td>
+                                    <span class="badge bg-{% if merchant.status == 'ACTIVE' %}success{% elif merchant.status == 'SUSPENDED' %}danger{% else %}warning{% endif %}">
+                                        {{ merchant.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="progress me-2" style="width: 60px; height: 6px;">
+                                            <div class="progress-bar 
+                                                {% if merchant.risk_score < 30 %}bg-success
+                                                {% elif merchant.risk_score < 70 %}bg-warning
+                                                {% else %}bg-danger{% endif %}"
+                                                style="width: {{ merchant.risk_score }}%"></div>
+                                        </div>
+                                        <small>{{ merchant.risk_score|floatformat:1 }}%</small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <strong>${{ merchant_stats|default_if_none:merchant.id.total_purchases|default:0|floatformat:2 }}</strong>
+                                    <br>
+                                    <small class="text-muted">{{ merchant_stats|default_if_none:merchant.id.total_quantity|default:0|floatformat:0 }}kg</small>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-primary" onclick="viewMerchant({{ merchant.id }})">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-outline-warning" onclick="assessRisk({{ merchant.id }})">
+                                            <i class="bi bi-shield-exclamation"></i>
+                                        </button>
+                                        {% if merchant.status == 'ACTIVE' %}
+                                        <button class="btn btn-outline-danger" onclick="suspendMerchant({{ merchant.id }})">
+                                            <i class="bi bi-pause-circle"></i>
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center text-muted">No merchants found</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Merchant Detail Modal -->
+<div class="modal fade" id="merchantModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Merchant Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="merchantDetails">
+                    <!-- Merchant details will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function viewMerchant(merchantId) {
+    // Load merchant details
+    fetch(`/api/merchant/${merchantId}/`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('merchantDetails').innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Company Information</h6>
+                        <p><strong>Company:</strong> ${data.company_name}</p>
+                        <p><strong>License:</strong> ${data.license_number}</p>
+                        <p><strong>Registration:</strong> ${data.registration_date}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Contact Information</h6>
+                        <p><strong>Contact Person:</strong> ${data.contact_person}</p>
+                        <p><strong>Email:</strong> ${data.email}</p>
+                        <p><strong>Phone:</strong> ${data.phone}</p>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h6>Trading Statistics</h6>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <div class="h4 text-primary">${data.total_purchases}</div>
+                                    <small>Total Purchases</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <div class="h4 text-success">${data.total_quantity}kg</div>
+                                    <small>Total Quantity</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <div class="h4 text-warning">${data.risk_score}%</div>
+                                    <small>Risk Score</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <div class="h4 text-info">${data.transaction_count}</div>
+                                    <small>Transactions</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Show modal
+            new bootstrap.Modal(document.getElementById('merchantModal')).show();
+        })
+        .catch(error => {
+            console.error('Error loading merchant details:', error);
+            alert('Error loading merchant details');
+        });
+}
+
+function assessRisk(merchantId) {
+    if (confirm('Perform risk assessment for this merchant?')) {
+        fetch(`/api/merchant/${merchantId}/assess-risk/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Risk assessment completed');
+                location.reload();
+            } else {
+                alert('Error performing risk assessment: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error performing risk assessment');
+        });
+    }
+}
+
+function suspendMerchant(merchantId) {
+    if (confirm('Are you sure you want to suspend this merchant?')) {
+        fetch(`/api/merchant/${merchantId}/suspend/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Merchant suspended successfully');
+                location.reload();
+            } else {
+                alert('Error suspending merchant: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error suspending merchant');
+        });
+    }
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}

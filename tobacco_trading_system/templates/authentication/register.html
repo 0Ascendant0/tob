@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - TIMB Trading System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --timb-primary: #2E7D32;
+            --timb-secondary: #4CAF50;
+            --merchant-primary: #1976D2;
+            --merchant-secondary: #2196F3;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--timb-primary) 0%, var(--timb-secondary) 100%);
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+        
+        .register-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .register-header {
+            background: linear-gradient(135deg, var(--timb-primary) 0%, var(--timb-secondary) 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .register-body {
+            padding: 2rem;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 12px;
+            border: 2px solid #e9ecef;
+            padding: 12px 16px;
+            font-size: 16px;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--timb-primary);
+            box-shadow: 0 0 0 0.2rem rgba(46, 125, 50, 0.25);
+        }
+        
+        .user-type-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .user-type-card {
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .user-type-card:hover {
+            border-color: var(--timb-primary);
+            background: #f8f9fa;
+        }
+        
+        .user-type-card.selected {
+            border-color: var(--timb-primary);
+            background: var(--timb-primary);
+            color: white;
+        }
+        
+        .user-type-card.merchant.selected {
+            border-color: var(--merchant-primary);
+            background: var(--merchant-primary);
+        }
+        
+        .btn-register {
+            background: linear-gradient(135deg, var(--timb-primary) 0%, var(--timb-secondary) 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 12px 24px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="register-card">
+            <div class="register-header">
+                <div class="system-logo">
+                    <i class="bi bi-building fs-1"></i>
+                </div>
+                <h2 class="mb-0">Create Account</h2>
+                <p class="mb-0">Join the TIMB Trading System</p>
+            </div>
+            
+            <div class="register-body">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                
+                <form method="post" id="registerForm">
+                    {% csrf_token %}
+                    
+                    <!-- User Type Selection -->
+                    <div class="user-type-selector">
+                        <div class="user-type-card" data-type="timb">
+                            <i class="bi bi-shield-check fs-2 mb-2 d-block"></i>
+                            <h5>TIMB Staff</h5>
+                            <p class="small text-muted">Regulatory and monitoring access</p>
+                        </div>
+                        <div class="user-type-card merchant" data-type="merchant">
+                            <i class="bi bi-briefcase fs-2 mb-2 d-block"></i>
+                            <h5>Merchant</h5>
+                            <p class="small text-muted">Trading and inventory management</p>
+                        </div>
+                    </div>
+                    
+                    {{ form.user_type.as_hidden }}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">First Name</label>
+                            {{ form.first_name }}
+                            {% if form.first_name.errors %}
+                                <div class="text-danger small">{{ form.first_name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Last Name</label>
+                            {{ form.last_name }}
+                            {% if form.last_name.errors %}
+                                <div class="text-danger small">{{ form.last_name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        {{ form.username }}
+                        {% if form.username.errors %}
+                            <div class="text-danger small">{{ form.username.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Email Address</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                            <div class="text-danger small">{{ form.email.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Phone Number</label>
+                        {{ form.phone }}
+                        {% if form.phone.errors %}
+                            <div class="text-danger small">{{ form.phone.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3" id="companyField" style="display: none;">
+                        <label class="form-label">Company Name</label>
+                        {{ form.company_name }}
+                        {% if form.company_name.errors %}
+                            <div class="text-danger small">{{ form.company_name.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Password</label>
+                            {{ form.password1 }}
+                            {% if form.password1.errors %}
+                                <div class="text-danger small">{{ form.password1.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Confirm Password</label>
+                            {{ form.password2 }}
+                            {% if form.password2.errors %}
+                                <div class="text-danger small">{{ form.password2.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid mb-3">
+                        <button type="submit" class="btn btn-primary btn-register">
+                            <i class="bi bi-person-plus me-2"></i>Create Account
+                        </button>
+                    </div>
+                    
+                    <div class="text-center">
+                        <p class="text-muted">Already have an account?</p>
+                        <a href="{% url 'login' %}" class="btn btn-outline-primary">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Login
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // User type selection
+        document.querySelectorAll('.user-type-card').forEach(card => {
+            card.addEventListener('click', function() {
+                // Remove selected class from all cards
+                document.querySelectorAll('.user-type-card').forEach(c => c.classList.remove('selected'));
+                
+                // Add selected class to clicked card
+                this.classList.add('selected');
+                
+                // Update hidden field
+                const userType = this.dataset.type;
+                document.getElementById('id_user_type').value = userType;
+                
+                // Show/hide company field for merchants
+                const companyField = document.getElementById('companyField');
+                if (userType === 'merchant') {
+                    companyField.style.display = 'block';
+                    companyField.querySelector('input').required = true;
+                } else {
+                    companyField.style.display = 'none';
+                    companyField.querySelector('input').required = false;
+                }
+            });
+        });
+        
+        // Default selection
+        document.querySelector('.user-type-card[data-type="timb"]').click();
+    </script>
+</body>
+</html>

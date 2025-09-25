@@ -1,0 +1,772 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}AI Models - Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .model-card {
+        border: 2px solid #e9ecef;
+        border-radius: var(--radius-lg);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    .model-card:hover {
+        border-color: var(--timb-secondary);
+        transform: translateY(-2px);
+    }
+    .model-status {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+    }
+    .status-active { background: #198754; }
+    .status-training { background: #ffc107; animation: pulse 2s infinite; }
+    .status-inactive { background: #dc3545; }
+    
+    .accuracy-meter {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: conic-gradient(var(--timb-secondary) 0deg, #e9ecef 0deg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+    .accuracy-meter::before {
+        content: '';
+        position: absolute;
+        width: 80px;
+        height: 80px;
+        background: white;
+        border-radius: 50%;
+    }
+    .accuracy-value {
+        position: relative;
+        z-index: 1;
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+    
+    .prediction-item {
+        padding: 1rem;
+        border-left: 4px solid var(--timb-secondary);
+        margin-bottom: 1rem;
+        background: var(--timb-light);
+        border-radius: var(--radius-md);
+    }
+    
+    .model-training-progress {
+        height: 8px;
+        background: #e9ecef;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    .training-progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, var(--timb-primary), var(--timb-secondary));
+        border-radius: 4px;
+        transition: width 0.5s ease;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="h3 mb-0">AI Models Dashboard</h1>
+        <p class="text-muted">Monitor and manage artificial intelligence models</p>
+    </div>
+</div>
+
+<!-- Model Overview -->
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bi bi-cpu"></i>
+            </div>
+            <div class="stat-value">3</div>
+            <div class="stat-label">Active Models</div>
+            <div class="stat-change positive">All operational</div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bi bi-graph-up"></i>
+            </div>
+            <div class="stat-value">94.2%</div>
+            <div class="stat-label">Average Accuracy</div>
+            <div class="stat-change positive">+2.1% this month</div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bi bi-lightning"></i>
+            </div>
+            <div class="stat-value">1,247</div>
+            <div class="stat-label">Predictions Today</div>
+            <div class="stat-change positive">+15% from yesterday</div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bi bi-clock"></i>
+            </div>
+            <div class="stat-value">45ms</div>
+            <div class="stat-label">Avg Response Time</div>
+            <div class="stat-change negative">+5ms from last week</div>
+        </div>
+    </div>
+</div>
+
+<!-- AI Models Grid -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="custom-card">
+            <div class="card-header-custom">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">AI Models</h5>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-light btn-sm" onclick="trainAllModels()">
+                            <i class="bi bi-arrow-repeat"></i> Retrain All
+                        </button>
+                        <button class="btn btn-outline-light btn-sm" onclick="downloadModelReport()">
+                            <i class="bi bi-download"></i> Export Report
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- Fraud Detection Model -->
+                    <div class="col-lg-4 col-md-6 mb-3">
+                        <div class="model-card p-3">
+                            <div class="model-status status-active" title="Active"></div>
+                            
+                            <div class="text-center mb-3">
+                                <div class="accuracy-meter mx-auto mb-2" style="background: conic-gradient(var(--timb-secondary) 0deg 340deg, #e9ecef 340deg);">
+                                    <div class="accuracy-value">95.1%</div>
+                                </div>
+                                <h6 class="fw-bold">Fraud Detection</h6>
+                                <small class="text-muted">Random Forest Classifier</small>
+                            </div>
+                            
+                            <div class="row text-center mb-3">
+                                <div class="col-4">
+                                    <div class="fw-bold text-success">2.1%</div>
+                                    <small class="text-muted">False Positive</small>
+                                </div>
+                                <div class="col-4">
+                                    <div class="fw-bold text-warning">1.2%</div>
+                                    <small class="text-muted">False Negative</small>
+                                </div>
+                                <div class="col-4">
+                                    <div class="fw-bold text-primary">847</div>
+                                    <small class="text-muted">Predictions</small>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <small>Last Training</small>
+                                    <small>2 days ago</small>
+                                </div>
+                                <div class="d-flex justify-content-between mb-1">
+                                    <small>Training Data</small>
+                                    <small>10,000 samples</small>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <small>Version</small>
+                                    <small>v2.1.3</small>
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-outline-primary btn-sm" onclick="viewModelDetails('fraud')">
+                                    <i class="bi bi-eye"></i> View Details
+                                </button>
+                                <button class="btn btn-outline-warning btn-sm" onclick="retrainModel('fraud')">
+                                    <i class="bi bi-arrow-repeat"></i> Retrain
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Yield Prediction Model -->
+                    <div class="col-lg-4 col-md-6 mb-3">
+                        <div class="model-card p-3">
+                            <div class="model-status status-active" title="Active"></div>
+                            
+                            <div class="text-center mb-3">
+                                <div class="accuracy-meter mx-auto mb-2" style="background: conic-gradient(var(--timb-secondary) 0deg 320deg, #e9ecef 320deg);">
+                                    <div class="accuracy-value">92.8%</div>
+                                </div>
+                                <h6 class="fw-bold">Yield Prediction</h6>
+                                <small class="text-muted">Gradient Boosting Regressor</small>
+                            </div>
+                            
+                            <div class="row text-center mb-3">
+                                <div class="col-4">
+                                    <div class="fw-bold text-success">6.2%</div>
+                                    <small class="text-muted">MAE</small>
+                                </div>
+                                <div class="col-4">
+                                    <div class="fw-bold text-info">0.94</div>
+                                    <small class="text-muted">R² Score</small>
+                                </div>
+                                <div class="col-4">
+                                    <div class="fw-bold text-primary">156</div>
+                                    <small class="text-muted">Predictions</small>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <small>Last Training</small>
+                                    <small>1 week ago</small>
+                                </div>
+                                <div class="d-flex justify-content-between mb-1">
+                                    <small>Training Data</small>
+                                    <small>40 years</small>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <small>Version</small>
+                                    <small>v1.4.2</small>
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-outline-primary btn-sm" onclick="viewModelDetails('yield')">
+                                    <i class="bi bi-eye"></i> View Details
+                                </button>
+                                <button class="btn btn-outline-warning btn-sm" onclick="retrainModel('yield')">
+                                    <i class="bi bi-arrow-repeat"></i> Retrain
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Side Buying Detection Model -->
+                    <div class="col-lg-4 col-md-6 mb-3">
+                        <div class="model-card p-3">
+                            <div class="model-status status-training" title="Training"></div>
+                            
+                            <div class="text-center mb-3">
+                                <div class="accuracy-meter mx-auto mb-2" style="background: conic-gradient(var(--timb-secondary) 0deg 306deg, #e9ecef 306deg);">
+                                    <div class="accuracy-value">89.2%</div>
+                                </div>
+                                <h6 class="fw-bold">Side Buying Detection</h6>
+                                <small class="text-muted">Random Forest Classifier</small>
+                            </div>
+                            
+                            <div class="row text-center mb-3">
+                                <div class="col-4">
+                                    <div class="fw-bold text-success">3.5%</div>
+                                    <small class="text-muted">False Positive</small>
+                                </div>
+                                <div class="col-4">
+                                    <div class="fw-bold text-warning">2.8%</div>
+                                    <small class="text-muted">False Negative</small>
+                                </div>
+                                <div class="col-4">
+                                    <div class="fw-bold text-primary">234</div>
+                                    <small class="text-muted">Predictions</small>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <small>Training Progress</small>
+                                    <small>73%</small>
+                                </div>
+                                <div class="model-training-progress">
+                                    <div class="training-progress-bar" style="width: 73%"></div>
+                                </div>
+                                <div class="d-flex justify-content-between mt-1">
+                                    <small>ETA: 15 minutes</small>
+                                    <small>v1.2.1</small>
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-outline-primary btn-sm" onclick="viewModelDetails('side_buying')">
+                                    <i class="bi bi-eye"></i> View Details
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm" disabled>
+                                    <i class="bi bi-hourglass"></i> Training...
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Predictions -->
+<div class="row mb-4">
+    <div class="col-lg-8">
+        <div class="custom-card">
+            <div class="card-header-custom">
+                <h5 class="mb-0">Recent Predictions</h5>
+            </div>
+            <div class="card-body">
+                <div style="max-height: 400px; overflow-y: auto;">
+                    {% for prediction in recent_predictions %}
+                    <div class="prediction-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="fw-bold mb-1">{{ prediction.get_prediction_type_display }}</h6>
+                                <small class="text-muted">Model: {{ prediction.model_used }}</small>
+                                <div class="mt-1">
+                                    <span class="badge bg-success">{{ prediction.confidence_score|floatformat:1 }}% confidence</span>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <small class="text-muted">{{ prediction.created_at|timesince }} ago</small>
+                                {% if prediction.created_by %}
+                                <div class="small text-muted">by {{ prediction.created_by.username }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        {% if prediction.prediction_type == 'FRAUD' %}
+                        <div class="mt-2">
+                            <strong>Result:</strong> 
+                            {% if prediction.prediction_result.fraud_probability > 0.7 %}
+                                <span class="text-danger">High Fraud Risk ({{ prediction.prediction_result.fraud_probability|floatformat:1 }}%)</span>
+                            {% elif prediction.prediction_result.fraud_probability > 0.4 %}
+                                <span class="text-warning">Medium Risk ({{ prediction.prediction_result.fraud_probability|floatformat:1 }}%)</span>
+                            {% else %}
+                                <span class="text-success">Low Risk ({{ prediction.prediction_result.fraud_probability|floatformat:1 }}%)</span>
+                            {% endif %}
+                        </div>
+                        {% elif prediction.prediction_type == 'YIELD' %}
+                        <div class="mt-2">
+                            <strong>Predicted Yield:</strong> {{ prediction.prediction_result.predicted_yield|floatformat:0 }} kg
+                            <br>
+                            <strong>Range:</strong> {{ prediction.prediction_result.lower_bound|floatformat:0 }} - {{ prediction.prediction_result.upper_bound|floatformat:0 }} kg
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% empty %}
+                    <div class="text-center text-muted py-4">
+                        <i class="bi bi-graph-up display-4"></i>
+                        <p>No recent predictions</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="custom-card">
+            <div class="card-header-custom">
+                <h5 class="mb-0">Model Performance</h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="performanceChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Training Data & Metrics -->
+<div class="row">
+    <div class="col-lg-6">
+        <div class="custom-card">
+            <div class="card-header-custom">
+                <h5 class="mb-0">Training Data Status</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-6 text-center">
+                        <div class="h3 text-primary">40,000</div>
+                        <div class="text-muted">Fraud Samples</div>
+                    </div>
+                    <div class="col-6 text-center">
+                        <div class="h3 text-success">40 Years</div>
+                        <div class="text-muted">Yield Data</div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-6 text-center">
+                        <div class="h3 text-warning">5,000</div>
+                        <div class="text-muted">Side Buying</div>
+                    </div>
+                    <div class="col-6 text-center">
+                        <div class="h3 text-info">10,000</div>
+                        <div class="text-muted">Risk Profiles</div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <button class="btn btn-outline-primary w-100" onclick="manageTrainingData()">
+                        <i class="bi bi-database"></i> Manage Training Data
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6">
+        <div class="custom-card">
+            <div class="card-header-custom">
+                <h5 class="mb-0">Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary-custom" onclick="testPrediction()">
+                        <i class="bi bi-play-circle"></i> Test Prediction
+                    </button>
+                    <button class="btn btn-outline-success" onclick="validateModels()">
+                        <i class="bi bi-check-circle"></i> Validate All Models
+                    </button>
+                    <button class="btn btn-outline-warning" onclick="generateSyntheticData()">
+                        <i class="bi bi-plus-square"></i> Generate Synthetic Data
+                    </button>
+                    <button class="btn btn-outline-info" onclick="exportModels()">
+                        <i class="bi bi-download"></i> Export Models
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Model Detail Modal -->
+<div class="modal fade" id="modelModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Model Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="modelDetails">
+                    <!-- Model details will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-warning" id="retrainModelBtn">Retrain Model</button>
+                <button type="button" class="btn btn-success" id="validateModelBtn">Validate Model</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    initializePerformanceChart();
+    updateTrainingProgress();
+});
+
+function initializePerformanceChart() {
+    const ctx = document.getElementById('performanceChart').getContext('2d');
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+            datasets: [{
+                label: 'Fraud Detection',
+                data: [93.2, 94.1, 94.8, 95.1],
+                borderColor: 'rgb(255, 99, 132)',
+                tension: 0.4
+            }, {
+                label: 'Yield Prediction',
+                data: [91.5, 92.1, 92.5, 92.8],
+                borderColor: 'rgb(54, 162, 235)',
+                tension: 0.4
+            }, {
+                label: 'Side Buying',
+                data: [87.2, 88.1, 88.9, 89.2],
+                borderColor: 'rgb(255, 205, 86)',
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    min: 85,
+                    max: 100,
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function updateTrainingProgress() {
+    // Simulate training progress updates
+    const progressElement = document.querySelector('.training-progress-bar');
+    let currentProgress = 73;
+    
+    const interval = setInterval(() => {
+        currentProgress += Math.random() * 5;
+        if (currentProgress >= 100) {
+            currentProgress = 100;
+            clearInterval(interval);
+            
+            // Update UI when training completes
+            setTimeout(() => {
+                location.reload();
+            }, 2000);
+        }
+        
+        progressElement.style.width = currentProgress + '%';
+        progressElement.parentElement.nextElementSibling.querySelector('small').textContent = 
+            currentProgress >= 100 ? 'Training Complete!' : `ETA: ${Math.ceil((100 - currentProgress) / 3)} minutes`;
+    }, 10000);
+}
+
+function viewModelDetails(modelType) {
+    fetch(`/ai/api/model-details/${modelType}/`)
+        .then(response => response.json())
+        .then(data => {
+            displayModelDetails(data);
+            new bootstrap.Modal(document.getElementById('modelModal')).show();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            TIMBUtils.showNotification('Error loading model details', 'danger');
+        });
+}
+
+function displayModelDetails(model) {
+    const detailsHtml = `
+        <div class="row">
+            <div class="col-md-6">
+                <h6>Model Information</h6>
+                <p><strong>Name:</strong> ${model.name}</p>
+                <p><strong>Type:</strong> ${model.type}</p>
+                <p><strong>Version:</strong> ${model.version}</p>
+                <p><strong>Status:</strong> <span class="badge bg-success">${model.status}</span></p>
+                <p><strong>Last Trained:</strong> ${new Date(model.last_trained).toLocaleString()}</p>
+            </div>
+            <div class="col-md-6">
+                <h6>Performance Metrics</h6>
+                <p><strong>Accuracy:</strong> ${model.accuracy}%</p>
+                <p><strong>Precision:</strong> ${model.precision}%</p>
+                <p><strong>Recall:</strong> ${model.recall}%</p>
+                <p><strong>F1 Score:</strong> ${model.f1_score}</p>
+                <p><strong>Training Samples:</strong> ${model.training_samples.toLocaleString()}</p>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-12">
+                <h6>Feature Importance</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>Importance</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${model.feature_importance.map(feature => `
+                                <tr>
+                                    <td>${feature.name}</td>
+                                    <td>
+                                        <div class="progress" style="height: 6px;">
+                                            <div class="progress-bar" style="width: ${feature.importance * 100}%"></div>
+                                        </div>
+                                        ${(feature.importance * 100).toFixed(1)}%
+                                    </td>
+                                    <td>${feature.description}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-12">
+                <h6>Hyperparameters</h6>
+                <pre class="bg-light p-3 rounded"><code>${JSON.stringify(model.hyperparameters, null, 2)}</code></pre>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('modelDetails').innerHTML = detailsHtml;
+}
+
+function retrainModel(modelType) {
+    TIMBUtils.showConfirmDialog(
+        `Retrain the ${modelType} model? This may take several minutes.`,
+        () => {
+            TIMBUtils.showLoader();
+            
+            fetch('/ai/train/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': TIMBUtils.getCsrfToken(),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ model: modelType })
+            })
+            .then(response => response.json())
+            .then(data => {
+                TIMBUtils.hideLoader();
+                
+                if (data.success) {
+                    TIMBUtils.showNotification('Model retraining started successfully', 'success');
+                    setTimeout(() => location.reload(), 2000);
+                } else {
+                    TIMBUtils.showNotification('Error starting retraining: ' + data.error, 'danger');
+                }
+            })
+            .catch(error => {
+                TIMBUtils.hideLoader();
+                console.error('Error:', error);
+                TIMBUtils.showNotification('Error starting model retraining', 'danger');
+            });
+        }
+    );
+}
+
+function trainAllModels() {
+    TIMBUtils.showConfirmDialog(
+        'Retrain all AI models? This operation may take significant time.',
+        () => {
+            TIMBUtils.showLoader();
+            
+            fetch('/ai/train/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': TIMBUtils.getCsrfToken(),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ model: 'all' })
+            })
+            .then(response => response.json())
+            .then(data => {
+                TIMBUtils.hideLoader();
+                
+                if (data.success) {
+                    TIMBUtils.showNotification('All models retraining started', 'success');
+                    setTimeout(() => location.reload(), 3000);
+                } else {
+                    TIMBUtils.showNotification('Error starting training: ' + data.error, 'danger');
+                }
+            })
+            .catch(error => {
+                TIMBUtils.hideLoader();
+                console.error('Error:', error);
+                TIMBUtils.showNotification('Error starting model training', 'danger');
+            });
+        }
+    );
+}
+
+function testPrediction() {
+    // Open test prediction interface
+    TIMBUtils.showNotification('Test prediction interface coming soon', 'info');
+}
+
+function validateModels() {
+    TIMBUtils.showLoader();
+    
+    fetch('/ai/validate/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': TIMBUtils.getCsrfToken(),
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        TIMBUtils.hideLoader();
+        
+        if (data.success) {
+            TIMBUtils.showNotification('Model validation completed successfully', 'success');
+        } else {
+            TIMBUtils.showNotification('Error during validation: ' + data.error, 'danger');
+        }
+    })
+    .catch(error => {
+        TIMBUtils.hideLoader();
+        console.error('Error:', error);
+        TIMBUtils.showNotification('Error validating models', 'danger');
+    });
+}
+
+function generateSyntheticData() {
+    TIMBUtils.showConfirmDialog(
+        'Generate new synthetic training data? This will create additional samples for model training.',
+        () => {
+            TIMBUtils.showLoader();
+            
+            fetch('/ai/generate-data/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': TIMBUtils.getCsrfToken(),
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                TIMBUtils.hideLoader();
+                
+                if (data.success) {
+                    TIMBUtils.showNotification('Synthetic data generated successfully', 'success');
+                } else {
+                    TIMBUtils.showNotification('Error generating data: ' + data.error, 'danger');
+                }
+            })
+            .catch(error => {
+                TIMBUtils.hideLoader();
+                console.error('Error:', error);
+                TIMBUtils.showNotification('Error generating synthetic data', 'danger');
+            });
+        }
+    );
+}
+
+function manageTrainingData() {
+    // Open training data management interface
+    window.open('/ai/training-data/', '_blank');
+}
+
+function exportModels() {
+    window.open('/ai/export/', '_blank');
+}
+
+function downloadModelReport() {
+    window.open('/ai/model-report/', '_blank');
+}
+</script>
+{% endblock %}

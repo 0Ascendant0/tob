@@ -1,0 +1,508 @@
+/* Merchant Theme - Professional Business Colors */
+
+:root {
+    /* Merchant Primary Colors */
+    --merchant-primary: #1976D2;
+    --merchant-secondary: #2196F3;
+    --merchant-accent: #FF9800;
+    --merchant-dark: #0D47A1;
+    --merchant-light: #E3F2FD;
+    --merchant-text: #263238;
+    --merchant-gray: #ECEFF1;
+    
+    /* Merchant Gradients */
+    --merchant-gradient-primary: linear-gradient(135deg, #1976D2 0%, #2196F3 100%);
+    --merchant-gradient-secondary: linear-gradient(135deg, #2196F3 0%, #42A5F5 100%);
+    --merchant-gradient-accent: linear-gradient(135deg, #FF9800 0%, #FFB74D 100%);
+    
+    /* Merchant Shadows */
+    --merchant-shadow-sm: 0 2px 4px rgba(25, 118, 210, 0.1);
+    --merchant-shadow-md: 0 4px 8px rgba(25, 118, 210, 0.15);
+    --merchant-shadow-lg: 0 8px 16px rgba(25, 118, 210, 0.2);
+    
+    /* Status Colors for Merchant */
+    --merchant-success: #2E7D32;
+    --merchant-warning: #F57C00;
+    --merchant-danger: #D32F2F;
+    --merchant-info: #1976D2;
+}
+
+/* Merchant Body Styling */
+body.merchant-theme {
+    background: linear-gradient(135deg, var(--merchant-light) 0%, #f8f9fa 100%);
+    color: var(--merchant-text);
+}
+
+/* Merchant Header */
+.merchant-theme .main-header {
+    background: var(--merchant-gradient-primary);
+    border-bottom: 3px solid var(--merchant-accent);
+}
+
+.merchant-theme .logo {
+    color: white;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.merchant-theme .logo::before {
+    content: "💼";
+    margin-right: 0.5rem;
+    font-size: 2rem;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+/* Merchant Navigation */
+.merchant-theme .nav-controls .theme-toggle {
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.merchant-theme .nav-controls .theme-toggle:hover {
+    background: var(--merchant-accent);
+    color: var(--merchant-dark);
+    border-color: var(--merchant-accent);
+    transform: translateY(-2px);
+}
+
+.merchant-theme .nav-controls .theme-toggle.active {
+    background: var(--merchant-accent);
+    color: var(--merchant-dark);
+    border-color: var(--merchant-accent);
+}
+
+/* Merchant Cards */
+.merchant-theme .custom-card {
+    background: white;
+    border: 1px solid rgba(25, 118, 210, 0.1);
+    box-shadow: var(--merchant-shadow-sm);
+    transition: all 0.3s ease;
+}
+
+.merchant-theme .custom-card:hover {
+    box-shadow: var(--merchant-shadow-md);
+    transform: translateY(-2px);
+    border-color: rgba(25, 118, 210, 0.2);
+}
+
+.merchant-theme .card-header-custom {
+    background: var(--merchant-gradient-primary);
+    color: white;
+    border-bottom: 3px solid var(--merchant-accent);
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+/* Merchant Statistics Cards */
+.merchant-theme .stat-card {
+    background: white;
+    border-left: 5px solid var(--merchant-secondary);
+    box-shadow: var(--merchant-shadow-sm);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.merchant-theme .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(25, 118, 210, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+    transform: translate(30px, -30px);
+}
+
+.merchant-theme .stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--merchant-shadow-lg);
+    border-left-color: var(--merchant-accent);
+}
+
+.merchant-theme .stat-icon {
+    background: var(--merchant-gradient-primary);
+    color: white;
+    box-shadow: var(--merchant-shadow-sm);
+}
+
+.merchant-theme .stat-value {
+    color: var(--merchant-primary);
+    font-weight: 700;
+}
+
+.merchant-theme .stat-change.positive {
+    color: var(--merchant-success);
+}
+
+.merchant-theme .stat-change.negative {
+    color: var(--merchant-danger);
+}
+
+/* Merchant Buttons */
+.merchant-theme .btn-primary-custom {
+    background: var(--merchant-gradient-primary);
+    border: none;
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: var(--merchant-shadow-sm);
+    transition: all 0.3s ease;
+}
+
+.merchant-theme .btn-primary-custom:hover {
+    background: var(--merchant-gradient-secondary);
+    transform: translateY(-2px);
+    box-shadow: var(--merchant-shadow-md);
+}
+
+.merchant-theme .btn-outline-primary {
+    border-color: var(--merchant-primary);
+    color: var(--merchant-primary);
+}
+
+.merchant-theme .btn-outline-primary:hover {
+    background: var(--merchant-primary);
+    border-color: var(--merchant-primary);
+    color: white;
+}
+
+/* Merchant Specific Cards */
+.merchant-theme .merchant-card {
+    background: var(--merchant-gradient-primary);
+    color: white;
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.merchant-theme .merchant-card::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    border-radius: 50%;
+}
+
+.merchant-theme .merchant-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--merchant-shadow-lg);
+}
+
+.merchant-theme .merchant-card .metric-value {
+    color: white;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Merchant Forms */
+.merchant-theme .form-control:focus {
+    border-color: var(--merchant-primary);
+    box-shadow: 0 0 0 0.2rem rgba(25, 118, 210, 0.25);
+}
+
+.merchant-theme .form-select:focus {
+    border-color: var(--merchant-primary);
+    box-shadow: 0 0 0 0.2rem rgba(25, 118, 210, 0.25);
+}
+
+/* Merchant Tables */
+.merchant-theme .table-custom thead th {
+    background: var(--merchant-gradient-primary);
+    color: white;
+    border: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.merchant-theme .table-custom tbody tr:hover {
+    background: var(--merchant-light);
+}
+
+/* Merchant Alerts */
+.merchant-theme .alert-success-custom {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    border-left: 4px solid var(--merchant-success);
+    color: #155724;
+}
+
+.merchant-theme .alert-warning-custom {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    border-left: 4px solid var(--merchant-warning);
+    color: #856404;
+}
+
+.merchant-theme .alert-danger-custom {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    border-left: 4px solid var(--merchant-danger);
+    color: #721c24;
+}
+
+.merchant-theme .alert-info-custom {
+    background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+    border-left: 4px solid var(--merchant-info);
+    color: #0c5460;
+}
+
+/* Merchant Progress Bars */
+.merchant-theme .progress-bar {
+    background: var(--merchant-gradient-primary);
+}
+
+.merchant-theme .progress {
+    background: rgba(25, 118, 210, 0.1);
+}
+
+/* Merchant Badges */
+.merchant-theme .badge.bg-primary {
+    background: var(--merchant-primary) !important;
+}
+
+.merchant-theme .badge.bg-secondary {
+    background: var(--merchant-secondary) !important;
+}
+
+.merchant-theme .badge.bg-success {
+    background: var(--merchant-success) !important;
+}
+
+.merchant-theme .badge.bg-warning {
+    background: var(--merchant-warning) !important;
+    color: white !important;
+}
+
+.merchant-theme .badge.bg-danger {
+    background: var(--merchant-danger) !important;
+}
+
+/* Merchant Modals */
+.merchant-theme .modal-header {
+    background: var(--merchant-gradient-primary);
+    color: white;
+    border-bottom: 3px solid var(--merchant-accent);
+}
+
+.merchant-theme .modal-content {
+    border: none;
+    box-shadow: var(--merchant-shadow-lg);
+}
+
+/* Merchant Loading Spinner */
+.merchant-theme .loading-spinner {
+    border-top-color: var(--merchant-primary);
+}
+
+/* Merchant Real-time Feed */
+.merchant-theme .feed-item {
+    border-left: 3px solid var(--merchant-secondary);
+    background: var(--merchant-light);
+    position: relative;
+}
+
+.merchant-theme .feed-item::before {
+    content: '';
+    position: absolute;
+    left: -3px;
+    top: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--merchant-gradient-primary);
+}
+
+.merchant-theme .feed-item:hover {
+    background: rgba(25, 118, 210, 0.1);
+    transform: translateX(5px);
+}
+
+/* Merchant Inventory Specific */
+.merchant-theme .inventory-item {
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.merchant-theme .inventory-item:hover {
+    border-color: var(--merchant-secondary);
+    box-shadow: var(--merchant-shadow-md);
+}
+
+.merchant-theme .inventory-item.low-stock {
+    border-color: var(--merchant-warning);
+    background: #fff8e1;
+}
+
+.merchant-theme .inventory-item.out-of-stock {
+    border-color: var(--merchant-danger);
+    background: #fef2f2;
+}
+
+/* Merchant Order Specific */
+.merchant-theme .order-card {
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.merchant-theme .order-card:hover {
+    border-color: var(--merchant-secondary);
+    box-shadow: var(--merchant-shadow-md);
+}
+
+.merchant-theme .client-avatar {
+    background: var(--merchant-light);
+    color: var(--merchant-primary);
+    font-weight: bold;
+}
+
+.merchant-theme .progress-ring circle {
+    stroke: var(--merchant-secondary);
+}
+
+/* Merchant Navigation Pills */
+.merchant-theme .nav-pills .nav-link.active {
+    background: var(--merchant-gradient-primary);
+    color: white;
+}
+
+.merchant-theme .nav-pills .nav-link {
+    color: var(--merchant-primary);
+}
+
+.merchant-theme .nav-pills .nav-link:hover {
+    background: var(--merchant-light);
+}
+
+/* Merchant Dropdown */
+.merchant-theme .dropdown-menu {
+    border: 1px solid rgba(25, 118, 210, 0.2);
+    box-shadow: var(--merchant-shadow-md);
+}
+
+.merchant-theme .dropdown-item:hover {
+    background: var(--merchant-light);
+    color: var(--merchant-primary);
+}
+
+/* Merchant Charts */
+.merchant-theme .chart-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: var(--merchant-shadow-sm);
+    position: relative;
+}
+
+.merchant-theme .chart-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--merchant-gradient-primary);
+    border-radius: 12px 12px 0 0;
+}
+
+/* Merchant Grade Categories */
+.merchant-theme .badge.bg-strip { background: #1976D2 !important; }
+.merchant-theme .badge.bg-leaf { background: #1E88E5 !important; }
+.merchant-theme .badge.bg-lug { background: #2196F3 !important; }
+.merchant-theme .badge.bg-tip { background: #42A5F5 !important; }
+.merchant-theme .badge.bg-smoking { background: #64B5F6 !important; }
+.merchant-theme .badge.bg-cutter { background: #90CAF9 !important; }
+.merchant-theme .badge.bg-scrap { background: #BBDEFB !important; }
+.merchant-theme .badge.bg-primary { background: #E3F2FD !important; color: #0D47A1 !important; }
+
+/* Merchant Typography */
+.merchant-theme h1, .merchant-theme h2, .merchant-theme h3, 
+.merchant-theme h4, .merchant-theme h5, .merchant-theme h6 {
+    color: var(--merchant-primary);
+}
+
+.merchant-theme .display-1, .merchant-theme .display-2, 
+.merchant-theme .display-3, .merchant-theme .display-4 {
+    color: var(--merchant-primary);
+    font-weight: 700;
+}
+
+/* Merchant Special Effects */
+.merchant-theme .glow {
+    box-shadow: 0 0 20px rgba(25, 118, 210, 0.3);
+}
+
+.merchant-theme .pulse {
+    animation: merchantPulse 2s infinite;
+}
+
+@keyframes merchantPulse {
+    0% { box-shadow: 0 0 0 0 rgba(25, 118, 210, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(25, 118, 210, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(25, 118, 210, 0); }
+}
+
+/* Merchant Responsive Adjustments */
+@media (max-width: 768px) {
+    .merchant-theme .stat-card {
+        text-align: center;
+    }
+    
+    .merchant-theme .merchant-card {
+        margin-bottom: 1rem;
+    }
+    
+    .merchant-theme .chart-container {
+        padding: 0.5rem;
+    }
+    
+    .merchant-theme .order-card {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Merchant Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    .merchant-theme {
+        --merchant-text: #ffffff;
+        --merchant-gray: #2d3748;
+        --merchant-light: rgba(25, 118, 210, 0.1);
+    }
+    
+    .merchant-theme body {
+        background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+        color: #e2e8f0;
+    }
+    
+    .merchant-theme .custom-card {
+        background: #2d3748;
+        color: #e2e8f0;
+        border-color: rgba(25, 118, 210, 0.2);
+    }
+    
+    .merchant-theme .stat-card {
+        background: #2d3748;
+        color: #e2e8f0;
+    }
+}
+
+/* Merchant Print Styles */
+@media print {
+    .merchant-theme .btn, .merchant-theme .navbar, 
+    .merchant-theme .modal, .merchant-theme .alert {
+        display: none !important;
+    }
+    
+    .merchant-theme .custom-card {
+        border: 2px solid var(--merchant-primary);
+        break-inside: avoid;
+    }
+    
+    .merchant-theme .card-header-custom {
+        background: var(--merchant-primary) !important;
+        color: white !important;
+    }
+}

@@ -1,0 +1,336 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Transactions - TIMB Dashboard{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="h3 mb-0">Transaction Monitoring</h1>
+        <p class="text-muted">Monitor and analyze tobacco trading transactions</p>
+    </div>
+</div>
+
+<!-- Filter Controls -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="custom-card">
+            <div class="card-header-custom">
+                <h5 class="mb-0">Filters</h5>
+            </div>
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label">Transaction Type</label>
+                        <select name="type" class="form-select">
+                            <option value="">All Types</option>
+                            {% for value, label in transaction_types %}
+                                <option value="{{ value }}" {% if request.GET.type == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Date From</label>
+                        <input type="date" name="date_from" class="form-control" value="{{ request.GET.date_from }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Date To</label>
+                        <input type="date" name="date_to" class="form-control" value="{{ request.GET.date_to }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">&nbsp;</label>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary-custom">Apply Filters</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Flagged Transactions Alert -->
+{% if flagged_transactions %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="alert alert-danger-custom">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            <strong>{{ flagged_transactions.count }} flagged transactions</strong> require immediate attention.
+            <a href="#flagged-section" class="alert-link">View flagged transactions</a>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Transaction Statistics -->
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bi bi-arrow-left-right"></i>
+            </div>
+            <div class="stat-value">{{ transactions.count }}</div>
+            <div class="stat-label">Total Transactions</div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bi bi-exclamation-triangle"></i>
+            </div>
+            <div class="stat-value text-danger">{{ flagged_transactions.count }}</div>
+            <div class="stat-label">Flagged Transactions</div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bi bi-cash-stack"></i>
+            </div>
+            <div class="stat-value">${{ transactions|length|default:0 }}</div>
+            <div class="stat-label">Total Value</div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bi bi-box-seam"></i>
+            </div>
+            <div class="stat-value">0kg</div>
+            <div class="stat-label">Total Volume</div>
+        </div>
+    </div>
+</div>
+
+<!-- Transactions Table -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="custom-card">
+            <div class="card-header-custom">
+                <h5 class="mb-0">Recent Transactions</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-custom">
+                        <thead>
+                            <tr>
+                                <th>Transaction ID</th>
+                                <th>Type</th>
+                                <th>Buyer</th>
+                                <th>Seller</th>
+                                <th>Grade</th>
+                                <th>Quantity</th>
+                                <th>Price/kg</th>
+                                <th>Total</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transaction in transactions %}
+                            <tr class="{% if transaction.is_flagged %}table-danger{% endif %}">
+                                <td>
+                                    <code>{{ transaction.transaction_id }}</code>
+                                    {% if transaction.is_flagged %}
+                                        <i class="bi bi-flag-fill text-danger ms-1" title="Flagged for review"></i>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary">{{ transaction.get_transaction_type_display }}</span>
+                                </td>
+                                <td>{{ transaction.buyer.username }}</td>
+                                <td>{{ transaction.seller.username }}</td>
+                                <td>{{ transaction.grade.grade_name }}</td>
+                                <td>{{ transaction.quantity|floatformat:0 }}kg</td>
+                                <td>${{ transaction.price_per_kg|floatformat:2 }}</td>
+                                <td><strong>${{ transaction.total_amount|floatformat:2 }}</strong></td>
+                                <td>{{ transaction.timestamp|date:"M d, H:i" }}</td>
+                                <td>
+                                    {% if transaction.fraud_score > 0.7 %}
+                                        <span class="badge bg-danger">High Risk</span>
+                                    {% elif transaction.fraud_score > 0.4 %}
+                                        <span class="badge bg-warning">Medium Risk</span>
+                                    {% else %}
+                                        <span class="badge bg-success">Normal</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-primary" onclick="viewTransaction('{{ transaction.transaction_id }}')">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        {% if transaction.is_flagged %}
+                                            <button class="btn btn-outline-warning" onclick="investigateTransaction('{{ transaction.transaction_id }}')">
+                                                <i class="bi bi-search"></i>
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="11" class="text-center text-muted">No transactions found</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Flagged Transactions Section -->
+{% if flagged_transactions %}
+<div class="row" id="flagged-section">
+    <div class="col-12">
+        <div class="custom-card">
+            <div class="card-header-custom bg-danger">
+                <h5 class="mb-0 text-white">Flagged Transactions</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-custom">
+                        <thead>
+                            <tr>
+                                <th>Transaction ID</th>
+                                <th>Fraud Score</th>
+                                <th>Reason</th>
+                                <th>Buyer</th>
+                                <th>Amount</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transaction in flagged_transactions %}
+                            <tr>
+                                <td><code>{{ transaction.transaction_id }}</code></td>
+                                <td>
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar bg-danger" style="width: {{ transaction.fraud_score|floatformat:0 }}%">
+                                            {{ transaction.fraud_score|floatformat:1 }}%
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>AI Pattern Detection</td>
+                                <td>{{ transaction.buyer.username }}</td>
+                                <td>${{ transaction.total_amount|floatformat:2 }}</td>
+                                <td>{{ transaction.timestamp|date:"M d, H:i" }}</td>
+                                <td>
+                                    <button class="btn btn-warning btn-sm" onclick="investigateTransaction('{{ transaction.transaction_id }}')">
+                                        Investigate
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Transaction Detail Modal -->
+<div class="modal fade" id="transactionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Transaction Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="transactionDetails">
+                    <!-- Transaction details will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-warning" id="flagTransactionBtn">Flag Transaction</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function viewTransaction(transactionId) {
+    fetch(`/timb/api/transaction/${transactionId}/`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('transactionDetails').innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Transaction Information</h6>
+                        <p><strong>ID:</strong> ${data.transaction_id}</p>
+                        <p><strong>Type:</strong> ${data.transaction_type}</p>
+                        <p><strong>Date:</strong> ${new Date(data.timestamp).toLocaleString()}</p>
+                        <p><strong>Floor:</strong> ${data.floor || 'N/A'}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Trading Details</h6>
+                        <p><strong>Buyer:</strong> ${data.buyer}</p>
+                        <p><strong>Seller:</strong> ${data.seller}</p>
+                        <p><strong>Grade:</strong> ${data.grade}</p>
+                        <p><strong>Quantity:</strong> ${data.quantity}kg</p>
+                        <p><strong>Price:</strong> $${data.price_per_kg}/kg</p>
+                        <p><strong>Total:</strong> $${data.total_amount}</p>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h6>Risk Assessment</h6>
+                        <div class="progress mb-2">
+                            <div class="progress-bar ${data.fraud_score > 0.7 ? 'bg-danger' : data.fraud_score > 0.4 ? 'bg-warning' : 'bg-success'}" 
+                                 style="width: ${data.fraud_score * 100}%">
+                                ${(data.fraud_score * 100).toFixed(1)}%
+                            </div>
+                        </div>
+                        <p class="small text-muted">Fraud probability based on AI analysis</p>
+                    </div>
+                </div>
+            `;
+            
+            new bootstrap.Modal(document.getElementById('transactionModal')).show();
+        })
+        .catch(error => {
+            console.error('Error loading transaction details:', error);
+            TIMBUtils.showNotification('Error loading transaction details', 'danger');
+        });
+}
+
+function investigateTransaction(transactionId) {
+    TIMBUtils.showConfirmDialog(
+        'Start investigation for this transaction?',
+        () => {
+            fetch(`/timb/api/transaction/${transactionId}/investigate/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': TIMBUtils.getCsrfToken(),
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    TIMBUtils.showNotification('Investigation started successfully', 'success');
+                    location.reload();
+                } else {
+                    TIMBUtils.showNotification('Error starting investigation: ' + data.error, 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                TIMBUtils.showNotification('Error starting investigation', 'danger');
+            });
+        }
+    );
+}
+</script>
+{% endblock %}
