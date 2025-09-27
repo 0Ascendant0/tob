@@ -1,246 +1,282 @@
 from celery import shared_task
 from django.utils import timezone
 from datetime import timedelta
-from .models import Transaction, FraudAlert, ContractFarmer, Merchant
-from ai_models.ai_engine import fraud_model, side_buying_model
-from realtime_data.models import MarketAlert
-from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync
-import pandas as pd
+from decimal import Decimal
+import logging
+
+from .models import (
+    Transaction, TobaccoGrade, DailyPrice, DashboardMetric, 
+    SystemAlert, TobaccoFloor
+)
+
+logger = logging.getLogger(__name__)
+
 
 @shared_task
-def monitor_fraud_patterns():
-    """Continuously monitor for fraud patterns"""
-    # Get recent transactions
-    recent_transactions = Transaction.objects.filter(
-        timestamp__gte=timezone.now() - timedelta(hours=1)
-    )
+def calculate_daily_prices():
+    """Calculate daily prices for all grades"""
+    today = timezone.now().date()
+    yesterday = today - timedelta(days=1)
     
-    fraud_alerts_created = 0
-    
-    for transaction in recent_transactions:
-        if transaction.is_flagged:
-            continue  # Already flagged
+    try:
+        grades = TobaccoGrade.objects.filter(is_active=True, is_tradeable=True)
+        updated_count = 0
         
-        # Prepare transaction data for AI model
-        transaction_data = {
-            'grade': transaction.grade.grade_code,
-            'purchase_price_per_kg': float(transaction.price_per_kg),
-            'sale_price_per_kg': float(transaction.price_per_kg * 1.2),  # Estimated
-            'quantity_kg': float(transaction.quantity),
-            'time_difference_days': 1,  # Default
-            'merchant_experience_years': 5,  # Default
-            'market_volatility': 0.15,  # Default
-            'season': 'peak',
-            'floor_location': transaction.floor.location if transaction.floor else 'unknown'
-        }
-        
-        # Get fraud prediction
-        if fraud_model.is_trained:
-            prediction = fraud_model.predict(pd.DataFrame([transaction_data]))
+        for grade in grades:
+            # Get yesterday's transactions
+            transactions = Transaction.objects.filter(
+                grade=grade,
+                timestamp__date=yesterday,
+                status='COMPLETED'
+            ).order_by('timestamp')
             
-            if prediction['fraud_probability'] > 0.7:  # High fraud probability
-                # Create fraud alert
-                alert = FraudAlert.objects.create(
-                    alert_type='UNUSUAL_PATTERN',
-                    transaction=transaction,
-                    merchant=transaction.buyer.merchant if hasattr(transaction.buyer, 'merchant') else None,
-                    severity='HIGH' if prediction['fraud_probability'] > 0.9 else 'MEDIUM',
-                    description=f"AI detected potential fraud pattern. Probability: {prediction['fraud_probability']:.2%}"
+            if transactions.exists():
+                prices = [t.price_per_kg for t in transactions]
+                volumes = [t.quantity for t in transactions]
+                
+                opening_price = prices[0]
+                closing_price = prices[-1]
+                high_price = max(prices)
+                low_price = min(prices)
+                avg_price = sum(prices) / len(prices)
+                total_volume = sum(volumes)
+                
+                # Create daily price record
+                daily_price, created = DailyPrice.objects.get_or_create(
+                    grade=grade,
+                    date=yesterday,
+                    defaults={
+                        'opening_price': opening_price,
+                        'closing_price': closing_price,
+                        'high_price': high_price,
+                        'low_price': low_price,
+                        'average_price': avg_price,
+                        'volume_traded': total_volume,
+                        'number_of_transactions': transactions.count(),
+                    }
                 )
                 
-                # Set evidence
-                alert.set_evidence({
-                    'ai_prediction': prediction,
-                    'transaction_data': transaction_data,
-                    'detection_timestamp': timezone.now().isoformat()
-                })
-                alert.save()
-                
-                # Flag the transaction
-                transaction.is_flagged = True
-                transaction.fraud_score = prediction['fraud_probability']
-                transaction.save()
-                
-                fraud_alerts_created += 1
-                
-                # Broadcast alert
-                broadcast_fraud_alert(alert)
-    
-    return f"Fraud monitoring completed. {fraud_alerts_created} new alerts created."
+                if created:
+                    updated_count += 1
+                    logger.info(f"Created daily price for {grade.grade_code}: ${closing_price}")
+        
+        logger.info(f"Daily price calculation completed: {updated_count} grades updated")
+        return updated_count
+        
+    except Exception as e:
+        logger.error(f"Error calculating daily prices: {str(e)}")
+        raise
+
 
 @shared_task
-def monitor_side_buying():
-    """Monitor contract farmers for side buying"""
-    # Get farmers with recent delivery activity
-    farmers = ContractFarmer.objects.filter(
-        contract_end_date__gte=timezone.now().date()
-    )
-    
-    alerts_created = 0
-    
-    for farmer in farmers:
-        # Check delivery ratio
-        delivery_ratio = farmer.delivered_quantity / farmer.contracted_quantity if farmer.contracted_quantity > 0 else 0
+def detect_price_anomalies():
+    """Detect unusual price movements"""
+    try:
+        today = timezone.now().date()
+        alert_count = 0
         
-        if delivery_ratio < 0.8:  # Less than 80% delivery
-            # Prepare farmer data for AI model
-            farmer_data = {
-                'contracted_quantity_kg': float(farmer.contracted_quantity),
-                'delivered_to_contractor_kg': float(farmer.delivered_quantity),
-                'delivered_to_others_kg': 0,  # This would need to be tracked
-                'delivery_ratio': delivery_ratio,
-                'distance_to_contractor_km': 20,  # Default
-                'distance_to_alternative_km': 15,  # Default
-                'alternative_price_premium': 0.1,  # Default
-                'farmer_debt_level_usd': 500,  # Default
-                'contractor_support_score': 70,  # Default
-                'harvest_season': 'mid'
-            }
+        # Get today's prices
+        todays_prices = DailyPrice.objects.filter(date=today)
+        
+        for price_record in todays_prices:
+            # Get previous price
+            previous_price = DailyPrice.objects.filter(
+                grade=price_record.grade,
+                date__lt=today
+            ).order_by('-date').first()
             
-            # Get side buying prediction
-            if side_buying_model.is_trained:
-                prediction = side_buying_model.predict(pd.DataFrame([farmer_data]))
+            if previous_price:
+                # Calculate percentage change
+                change_pct = (
+                    (price_record.closing_price - previous_price.closing_price) 
+                    / previous_price.closing_price
+                ) * 100
                 
-                if prediction['side_buying_probability'] > 0.6:
-                    # Create fraud alert
-                    alert = FraudAlert.objects.create(
-                        alert_type='SIDE_BUYING',
-                        farmer=farmer,
-                        merchant=farmer.contracted_merchant,
-                        severity=prediction['risk_level'],
-                        description=f"Potential side buying detected. Risk: {prediction['risk_level']}, Probability: {prediction['side_buying_probability']:.2%}"
+                # Check for significant changes
+                if abs(change_pct) > 15:  # More than 15% change
+                    severity = 'HIGH' if abs(change_pct) > 25 else 'MEDIUM'
+                    
+                    SystemAlert.objects.create(
+                        title=f'Price anomaly detected: {price_record.grade.grade_code}',
+                        message=f'Price changed by {change_pct:.1f}% from ${previous_price.closing_price} to ${price_record.closing_price}',
+                        alert_type='PRICE',
+                        severity=severity,
+                        grade=price_record.grade,
+                        metadata={
+                            'previous_price': float(previous_price.closing_price),
+                            'current_price': float(price_record.closing_price),
+                            'change_percentage': float(change_pct),
+                            'date': today.isoformat()
+                        }
                     )
                     
-                    # Set evidence
-                    alert.set_evidence({
-                        'ai_prediction': prediction,
-                        'farmer_data': farmer_data,
-                        'delivery_shortfall': float(farmer.contracted_quantity - farmer.delivered_quantity)
-                    })
-                    alert.save()
-                    
-                    alerts_created += 1
-    
-    return f"Side buying monitoring completed. {alerts_created} new alerts created."
+                    alert_count += 1
+        
+        logger.info(f"Price anomaly detection completed: {alert_count} alerts created")
+        return alert_count
+        
+    except Exception as e:
+        logger.error(f"Error detecting price anomalies: {str(e)}")
+        raise
+
 
 @shared_task
-def update_merchant_risk_scores():
-    """Update risk scores for all merchants"""
-    merchants = Merchant.objects.all()
-    
-    for merchant in merchants:
-        # Calculate risk score based on various factors
-        recent_transactions = Transaction.objects.filter(
-            buyer=merchant.user,
-            timestamp__gte=timezone.now() - timedelta(days=30)
+def cleanup_old_metrics():
+    """Clean up old dashboard metrics"""
+    try:
+        cutoff_date = timezone.now() - timedelta(days=30)
+        
+        # Delete old metrics
+        deleted_count = DashboardMetric.objects.filter(
+            timestamp__lt=cutoff_date
+        ).delete()[0]
+        
+        logger.info(f"Cleaned up {deleted_count} old metrics")
+        return deleted_count
+        
+    except Exception as e:
+        logger.error(f"Error cleaning up metrics: {str(e)}")
+        raise
+
+
+@shared_task
+def generate_daily_report():
+    """Generate daily trading report"""
+    try:
+        today = timezone.now().date()
+        yesterday = today - timedelta(days=1)
+        
+        # Get yesterday's statistics
+        transactions = Transaction.objects.filter(timestamp__date=yesterday)
+        
+        total_transactions = transactions.count()
+        total_volume = sum([t.quantity for t in transactions])
+        total_value = sum([t.total_amount for t in transactions])
+        avg_price = total_value / total_volume if total_volume > 0 else 0
+        
+        # Get floor statistics
+        floor_stats = {}
+        for floor in TobaccoFloor.objects.filter(is_active=True):
+            floor_transactions = transactions.filter(floor=floor)
+            floor_stats[floor.name] = {
+                'transactions': floor_transactions.count(),
+                'volume': sum([t.quantity for t in floor_transactions]),
+                'value': sum([t.total_amount for t in floor_transactions]),
+            }
+        
+        # Get top grades
+        grade_stats = {}
+        for transaction in transactions:
+            grade_code = transaction.grade.grade_code
+            if grade_code not in grade_stats:
+                grade_stats[grade_code] = {
+                    'volume': 0,
+                    'value': 0,
+                    'transactions': 0
+                }
+            grade_stats[grade_code]['volume'] += transaction.quantity
+            grade_stats[grade_code]['value'] += transaction.total_amount
+            grade_stats[grade_code]['transactions'] += 1
+        
+        # Sort by volume
+        top_grades = sorted(
+            grade_stats.items(),
+            key=lambda x: x[1]['volume'],
+            reverse=True
+        )[:10]
+        
+        report_data = {
+            'date': yesterday.isoformat(),
+            'summary': {
+                'total_transactions': total_transactions,
+                'total_volume': float(total_volume),
+                'total_value': float(total_value),
+                'average_price': float(avg_price),
+            },
+            'floor_statistics': floor_stats,
+            'top_grades': dict(top_grades),
+            'generated_at': timezone.now().isoformat()
+        }
+        
+        # Store as dashboard metric
+        DashboardMetric.objects.create(
+            metric_type='DAILY_REPORT',
+            value=total_transactions,
+            metadata=report_data
         )
         
-        # Transaction volume risk
-        total_volume = sum(t.quantity for t in recent_transactions)
-        volume_risk = min(1.0, total_volume / 10000)  # Normalize to 0-1
+        logger.info(f"Generated daily report for {yesterday}")
+        return report_data
         
-        # Price volatility risk
-        if recent_transactions:
-            prices = [float(t.price_per_kg) for t in recent_transactions]
-            price_std = pd.Series(prices).std()
-            volatility_risk = min(1.0, price_std / 2.0)  # Normalize
-        else:
-            volatility_risk = 0
+    except Exception as e:
+        logger.error(f"Error generating daily report: {str(e)}")
+        raise
+
+
+@shared_task
+def monitor_system_health():
+    """Monitor system health and performance"""
+    try:
+        from django.db import connection
         
-        # Fraud alerts risk
-        fraud_alerts = FraudAlert.objects.filter(
-            merchant=merchant,
-            created_at__gte=timezone.now() - timedelta(days=30)
+        # Check database connection
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+            db_healthy = True
+        
+        # Check recent transaction volume
+        recent_transactions = Transaction.objects.filter(
+            timestamp__gte=timezone.now() - timedelta(hours=1)
         ).count()
-        fraud_risk = min(1.0, fraud_alerts / 5)  # Normalize
         
-        # Calculate overall risk score (0-100)
-        risk_score = (volume_risk * 0.3 + volatility_risk * 0.4 + fraud_risk * 0.3) * 100
+        # Check for stuck transactions
+        stuck_transactions = Transaction.objects.filter(
+            status='PENDING',
+            timestamp__lt=timezone.now() - timedelta(hours=24)
+        ).count()
         
-        # Update merchant risk score
-        merchant.risk_score = risk_score
-        merchant.save()
-    
-    return f"Updated risk scores for {merchants.count()} merchants."
-
-@shared_task
-def generate_daily_reports():
-    """Generate daily trading reports"""
-    from timb_dashboard.views import generate_daily_report
-    
-    # Generate report data
-    report_data = generate_daily_report()
-    
-    # Store report (could be saved to database, sent via email, etc.)
-    # For now, we'll just log it
-    print(f"Daily report generated: {report_data}")
-    
-    return "Daily report generated successfully."
-
-@shared_task
-def cleanup_expired_qr_tokens():
-    """Clean up expired QR tokens"""
-    from authentication.models import QRToken, EncryptedData
-    
-    # Get expired tokens
-    expired_tokens = QRToken.objects.filter(
-        expires_at__lt=timezone.now()
-    )
-    
-    # Get associated data references
-    data_refs = list(expired_tokens.values_list('data_ref', flat=True))
-    
-    # Delete expired tokens
-    deleted_tokens = expired_tokens.count()
-    expired_tokens.delete()
-    
-    # Delete associated encrypted data
-    deleted_data = EncryptedData.objects.filter(
-        data_ref__in=data_refs
-    ).delete()[0]
-    
-    return f"Cleaned up {deleted_tokens} expired tokens and {deleted_data} encrypted data records."
-
-def broadcast_fraud_alert(alert):
-    """Broadcast fraud alert via WebSocket"""
-    channel_layer = get_channel_layer()
-    async_to_sync(channel_layer.group_send)(
-        "realtime_data",
-        {
-            "type": "fraud_alert",
-            "data": {
-                "alert_id": alert.id,
-                "alert_type": alert.alert_type,
-                "severity": alert.severity,
-                "description": alert.description,
-                "timestamp": alert.created_at.isoformat()
-            }
+        # Create health metrics
+        health_data = {
+            'database_healthy': db_healthy,
+            'recent_transactions': recent_transactions,
+            'stuck_transactions': stuck_transactions,
+            'timestamp': timezone.now().isoformat()
         }
-    )
-
-# Schedule periodic tasks
-from celery.schedules import crontab
-
-app.conf.beat_schedule = {
-    'monitor-fraud-patterns': {
-        'task': 'timb_dashboard.tasks.monitor_fraud_patterns',
-        'schedule': crontab(minute='*/10'),  # Every 10 minutes
-    },
-    'monitor-side-buying': {
-        'task': 'timb_dashboard.tasks.monitor_side_buying',
-        'schedule': crontab(hour=6, minute=0),  # Daily at 6 AM
-    },
-    'update-risk-scores': {
-        'task': 'timb_dashboard.tasks.update_merchant_risk_scores',
-        'schedule': crontab(hour=2, minute=0),  # Daily at 2 AM
-    },
-    'generate-daily-reports': {
-        'task': 'timb_dashboard.tasks.generate_daily_reports',
-        'schedule': crontab(hour=23, minute=0),  # Daily at 11 PM
-    },
-    'cleanup-expired-tokens': {
-        'task': 'timb_dashboard.tasks.cleanup_expired_qr_tokens',
-        'schedule': crontab(hour=1, minute=0),  # Daily at 1 AM
-    },
-}
+        
+        # Create alerts for issues
+        if stuck_transactions > 0:
+            SystemAlert.objects.create(
+                title=f'{stuck_transactions} stuck transactions detected',
+                message=f'Found {stuck_transactions} transactions pending for more than 24 hours',
+                alert_type='SYSTEM',
+                severity='HIGH',
+                metadata=health_data
+            )
+        
+        if recent_transactions == 0:
+            # No transactions in the last hour during business hours
+            current_hour = timezone.now().hour
+            if 8 <= current_hour <= 17:  # Business hours
+                SystemAlert.objects.create(
+                    title='No recent transaction activity',
+                    message='No transactions recorded in the last hour during business hours',
+                    alert_type='BUSINESS',
+                    severity='MEDIUM',
+                    metadata=health_data
+                )
+        
+        logger.info("System health monitoring completed")
+        return health_data
+        
+    except Exception as e:
+        logger.error(f"Error monitoring system health: {str(e)}")
+        
+        # Create critical alert for monitoring failure
+        SystemAlert.objects.create(
+            title='System monitoring failed',
+            message=f'Health monitoring task failed: {str(e)}',
+            alert_type='SYSTEM',
+            severity='CRITICAL',
+            metadata={'error': str(e), 'timestamp': timezone.now().isoformat()}
+        )
+        raise

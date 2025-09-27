@@ -1,469 +1,529 @@
 {% extends 'base.html' %}
-{% load static %}
 
-{% block title %}AI Models - Dashboard{% endblock %}
+{% block title %}AI Models Dashboard - TIMB{% endblock %}
 
 {% block extra_css %}
 <style>
     .model-card {
-        border: 2px solid #e9ecef;
-        border-radius: var(--radius-lg);
         transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
     }
-    .model-card:hover {
-        border-color: var(--timb-secondary);
-        transform: translateY(-2px);
-    }
-    .model-status {
-        position: absolute;
-        top: 1rem;
-        right: 1rem;
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-    }
-    .status-active { background: #198754; }
-    .status-training { background: #ffc107; animation: pulse 2s infinite; }
-    .status-inactive { background: #dc3545; }
     
-    .accuracy-meter {
-        width: 100px;
-        height: 100px;
-        border-radius: 50%;
-        background: conic-gradient(var(--timb-secondary) 0deg, #e9ecef 0deg);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
+    .model-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     }
-    .accuracy-meter::before {
-        content: '';
-        position: absolute;
-        width: 80px;
-        height: 80px;
-        background: white;
-        border-radius: 50%;
-    }
-    .accuracy-value {
+    
+    .accuracy-ring {
         position: relative;
-        z-index: 1;
-        font-weight: bold;
-        font-size: 1.2rem;
+        display: inline-block;
+    }
+    
+    .accuracy-ring svg {
+        transform: rotate(-90deg);
     }
     
     .prediction-item {
-        padding: 1rem;
-        border-left: 4px solid var(--timb-secondary);
-        margin-bottom: 1rem;
-        background: var(--timb-light);
-        border-radius: var(--radius-md);
+        animation: slideIn 0.5s ease-out;
     }
     
-    .model-training-progress {
-        height: 8px;
-        background: #e9ecef;
-        border-radius: 4px;
-        overflow: hidden;
-    }
-    .training-progress-bar {
-        height: 100%;
-        background: linear-gradient(90deg, var(--timb-primary), var(--timb-secondary));
-        border-radius: 4px;
-        transition: width 0.5s ease;
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="row mb-4">
-    <div class="col-12">
-        <h1 class="h3 mb-0">AI Models Dashboard</h1>
-        <p class="text-muted">Monitor and manage artificial intelligence models</p>
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="mb-8">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">AI Models Dashboard</h1>
+                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                    Monitor and manage AI models for tobacco trading • <span id="model-status-indicator" class="text-green-600">All Systems Operational</span>
+                </p>
+            </div>
+            <div class="flex space-x-3">
+                <button onclick="refreshModels()" class="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition duration-200">
+                    <i class="fas fa-sync-alt mr-2"></i>Refresh Models
+                </button>
+                <button onclick="showTrainingModal()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-200">
+                    <i class="fas fa-cog mr-2"></i>Train Models
+                </button>
+            </div>
+        </div>
     </div>
-</div>
 
-<!-- Model Overview -->
-<div class="row mb-4">
-    <div class="col-lg-3 col-md-6">
-        <div class="stat-card">
-            <div class="stat-icon">
-                <i class="bi bi-cpu"></i>
-            </div>
-            <div class="stat-value">3</div>
-            <div class="stat-label">Active Models</div>
-            <div class="stat-change positive">All operational</div>
-        </div>
-    </div>
-    <div class="col-lg-3 col-md-6">
-        <div class="stat-card">
-            <div class="stat-icon">
-                <i class="bi bi-graph-up"></i>
-            </div>
-            <div class="stat-value">94.2%</div>
-            <div class="stat-label">Average Accuracy</div>
-            <div class="stat-change positive">+2.1% this month</div>
-        </div>
-    </div>
-    <div class="col-lg-3 col-md-6">
-        <div class="stat-card">
-            <div class="stat-icon">
-                <i class="bi bi-lightning"></i>
-            </div>
-            <div class="stat-value">1,247</div>
-            <div class="stat-label">Predictions Today</div>
-            <div class="stat-change positive">+15% from yesterday</div>
-        </div>
-    </div>
-    <div class="col-lg-3 col-md-6">
-        <div class="stat-card">
-            <div class="stat-icon">
-                <i class="bi bi-clock"></i>
-            </div>
-            <div class="stat-value">45ms</div>
-            <div class="stat-label">Avg Response Time</div>
-            <div class="stat-change negative">+5ms from last week</div>
-        </div>
-    </div>
-</div>
-
-<!-- AI Models Grid -->
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="custom-card">
-            <div class="card-header-custom">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">AI Models</h5>
-                    <div class="d-flex gap-2">
-                        <button class="btn btn-outline-light btn-sm" onclick="trainAllModels()">
-                            <i class="bi bi-arrow-repeat"></i> Retrain All
-                        </button>
-                        <button class="btn btn-outline-light btn-sm" onclick="downloadModelReport()">
-                            <i class="bi bi-download"></i> Export Report
-                        </button>
+    <!-- Model Statistics -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-blue-100 rounded-md flex items-center justify-center">
+                            <i class="fas fa-robot text-blue-600"></i>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Active Models</dt>
+                            <dd class="text-lg font-medium text-gray-900 dark:text-white">{{ models_stats.active_models }}</dd>
+                        </dl>
                     </div>
                 </div>
             </div>
-            <div class="card-body">
-                <div class="row">
-                    <!-- Fraud Detection Model -->
-                    <div class="col-lg-4 col-md-6 mb-3">
-                        <div class="model-card p-3">
-                            <div class="model-status status-active" title="Active"></div>
-                            
-                            <div class="text-center mb-3">
-                                <div class="accuracy-meter mx-auto mb-2" style="background: conic-gradient(var(--timb-secondary) 0deg 340deg, #e9ecef 340deg);">
-                                    <div class="accuracy-value">95.1%</div>
-                                </div>
-                                <h6 class="fw-bold">Fraud Detection</h6>
-                                <small class="text-muted">Random Forest Classifier</small>
-                            </div>
-                            
-                            <div class="row text-center mb-3">
-                                <div class="col-4">
-                                    <div class="fw-bold text-success">2.1%</div>
-                                    <small class="text-muted">False Positive</small>
-                                </div>
-                                <div class="col-4">
-                                    <div class="fw-bold text-warning">1.2%</div>
-                                    <small class="text-muted">False Negative</small>
-                                </div>
-                                <div class="col-4">
-                                    <div class="fw-bold text-primary">847</div>
-                                    <small class="text-muted">Predictions</small>
-                                </div>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between mb-1">
-                                    <small>Last Training</small>
-                                    <small>2 days ago</small>
-                                </div>
-                                <div class="d-flex justify-content-between mb-1">
-                                    <small>Training Data</small>
-                                    <small>10,000 samples</small>
-                                </div>
-                                <div class="d-flex justify-content-between">
-                                    <small>Version</small>
-                                    <small>v2.1.3</small>
-                                </div>
-                            </div>
-                            
-                            <div class="d-grid gap-2">
-                                <button class="btn btn-outline-primary btn-sm" onclick="viewModelDetails('fraud')">
-                                    <i class="bi bi-eye"></i> View Details
-                                </button>
-                                <button class="btn btn-outline-warning btn-sm" onclick="retrainModel('fraud')">
-                                    <i class="bi bi-arrow-repeat"></i> Retrain
-                                </button>
-                            </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-green-100 rounded-md flex items-center justify-center">
+                            <i class="fas fa-brain text-green-600"></i>
                         </div>
                     </div>
-                    
-                    <!-- Yield Prediction Model -->
-                    <div class="col-lg-4 col-md-6 mb-3">
-                        <div class="model-card p-3">
-                            <div class="model-status status-active" title="Active"></div>
-                            
-                            <div class="text-center mb-3">
-                                <div class="accuracy-meter mx-auto mb-2" style="background: conic-gradient(var(--timb-secondary) 0deg 320deg, #e9ecef 320deg);">
-                                    <div class="accuracy-value">92.8%</div>
-                                </div>
-                                <h6 class="fw-bold">Yield Prediction</h6>
-                                <small class="text-muted">Gradient Boosting Regressor</small>
-                            </div>
-                            
-                            <div class="row text-center mb-3">
-                                <div class="col-4">
-                                    <div class="fw-bold text-success">6.2%</div>
-                                    <small class="text-muted">MAE</small>
-                                </div>
-                                <div class="col-4">
-                                    <div class="fw-bold text-info">0.94</div>
-                                    <small class="text-muted">R² Score</small>
-                                </div>
-                                <div class="col-4">
-                                    <div class="fw-bold text-primary">156</div>
-                                    <small class="text-muted">Predictions</small>
-                                </div>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between mb-1">
-                                    <small>Last Training</small>
-                                    <small>1 week ago</small>
-                                </div>
-                                <div class="d-flex justify-content-between mb-1">
-                                    <small>Training Data</small>
-                                    <small>40 years</small>
-                                </div>
-                                <div class="d-flex justify-content-between">
-                                    <small>Version</small>
-                                    <small>v1.4.2</small>
-                                </div>
-                            </div>
-                            
-                            <div class="d-grid gap-2">
-                                <button class="btn btn-outline-primary btn-sm" onclick="viewModelDetails('yield')">
-                                    <i class="bi bi-eye"></i> View Details
-                                </button>
-                                <button class="btn btn-outline-warning btn-sm" onclick="retrainModel('yield')">
-                                    <i class="bi bi-arrow-repeat"></i> Retrain
-                                </button>
-                            </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Training Models</dt>
+                            <dd class="text-lg font-medium text-gray-900 dark:text-white">{{ models_stats.training_models }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-purple-100 rounded-md flex items-center justify-center">
+                            <i class="fas fa-chart-line text-purple-600"></i>
                         </div>
                     </div>
-                    
-                    <!-- Side Buying Detection Model -->
-                    <div class="col-lg-4 col-md-6 mb-3">
-                        <div class="model-card p-3">
-                            <div class="model-status status-training" title="Training"></div>
-                            
-                            <div class="text-center mb-3">
-                                <div class="accuracy-meter mx-auto mb-2" style="background: conic-gradient(var(--timb-secondary) 0deg 306deg, #e9ecef 306deg);">
-                                    <div class="accuracy-value">89.2%</div>
-                                </div>
-                                <h6 class="fw-bold">Side Buying Detection</h6>
-                                <small class="text-muted">Random Forest Classifier</small>
-                            </div>
-                            
-                            <div class="row text-center mb-3">
-                                <div class="col-4">
-                                    <div class="fw-bold text-success">3.5%</div>
-                                    <small class="text-muted">False Positive</small>
-                                </div>
-                                <div class="col-4">
-                                    <div class="fw-bold text-warning">2.8%</div>
-                                    <small class="text-muted">False Negative</small>
-                                </div>
-                                <div class="col-4">
-                                    <div class="fw-bold text-primary">234</div>
-                                    <small class="text-muted">Predictions</small>
-                                </div>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between mb-1">
-                                    <small>Training Progress</small>
-                                    <small>73%</small>
-                                </div>
-                                <div class="model-training-progress">
-                                    <div class="training-progress-bar" style="width: 73%"></div>
-                                </div>
-                                <div class="d-flex justify-content-between mt-1">
-                                    <small>ETA: 15 minutes</small>
-                                    <small>v1.2.1</small>
-                                </div>
-                            </div>
-                            
-                            <div class="d-grid gap-2">
-                                <button class="btn btn-outline-primary btn-sm" onclick="viewModelDetails('side_buying')">
-                                    <i class="bi bi-eye"></i> View Details
-                                </button>
-                                <button class="btn btn-outline-secondary btn-sm" disabled>
-                                    <i class="bi bi-hourglass"></i> Training...
-                                </button>
-                            </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Predictions Today</dt>
+                            <dd class="text-lg font-medium text-gray-900 dark:text-white">{{ models_stats.predictions_today }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-yellow-100 rounded-md flex items-center justify-center">
+                            <i class="fas fa-database text-yellow-600"></i>
                         </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Total Models</dt>
+                            <dd class="text-lg font-medium text-gray-900 dark:text-white">{{ models_stats.total_models }}</dd>
+                        </dl>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Recent Predictions -->
-<div class="row mb-4">
-    <div class="col-lg-8">
-        <div class="custom-card">
-            <div class="card-header-custom">
-                <h5 class="mb-0">Recent Predictions</h5>
-            </div>
-            <div class="card-body">
-                <div style="max-height: 400px; overflow-y: auto;">
-                    {% for prediction in recent_predictions %}
-                    <div class="prediction-item">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h6 class="fw-bold mb-1">{{ prediction.get_prediction_type_display }}</h6>
-                                <small class="text-muted">Model: {{ prediction.model_used }}</small>
-                                <div class="mt-1">
-                                    <span class="badge bg-success">{{ prediction.confidence_score|floatformat:1 }}% confidence</span>
-                                </div>
+    <!-- AI Models Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- Fraud Detection Model -->
+        <div class="model-card bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
+            <div class="px-6 py-4 bg-gradient-to-r from-red-600 to-red-700">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                            <i class="fas fa-shield-alt text-white text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-bold text-white">Fraud Detection</h3>
+                            <p class="text-red-100 text-sm">Real-time transaction analysis</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="accuracy-ring">
+                            <svg width="60" height="60">
+                                <circle cx="30" cy="30" r="25" stroke="#ffffff40" stroke-width="4" fill="none"/>
+                                <circle cx="30" cy="30" r="25" stroke="#ffffff" stroke-width="4" fill="none"
+                                        stroke-dasharray="157" stroke-dashoffset="15.7" stroke-linecap="round"/>
+                            </svg>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <span class="text-white text-sm font-bold">95.2%</span>
                             </div>
-                            <div class="text-end">
-                                <small class="text-muted">{{ prediction.created_at|timesince }} ago</small>
-                                {% if prediction.created_by %}
-                                <div class="small text-muted">by {{ prediction.created_by.username }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">Status</div>
+                        <div class="text-sm font-medium text-green-600">Active</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">Detections Today</div>
+                        <div class="text-sm font-medium text-gray-900 dark:text-white" id="fraud-detections">3</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">Last Updated</div>
+                        <div class="text-sm font-medium text-gray-900 dark:text-white">2 hours ago</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">Model Version</div>
+                        <div class="text-sm font-medium text-gray-900 dark:text-white">v2.1.3</div>
+                    </div>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="runFraudDetection()" class="flex-1 bg-red-600 text-white px-3 py-2 rounded text-sm hover:bg-red-700">
+                        <i class="fas fa-play mr-2"></i>Run Analysis
+                    </button>
+                    <button onclick="viewFraudReports()" class="flex-1 border border-gray-300 text-gray-700 dark:text-gray-300 px-3 py-2 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <i class="fas fa-chart-bar mr-2"></i>View Reports
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Price Prediction Model -->
+        <div class="model-card bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
+            <div class="px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-700">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                            <i class="fas fa-chart-line text-white text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-bold text-white">Price Prediction</h3>
+                            <p class="text-blue-100 text-sm">Market price forecasting</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="accuracy-ring">
+                            <svg width="60" height="60">
+                                <circle cx="30" cy="30" r="25" stroke="#ffffff40" stroke-width="4" fill="none"/>
+                                <circle cx="30" cy="30" r="25" stroke="#ffffff" stroke-width="4" fill="none"
+                                        stroke-dasharray="157" stroke-dashoffset="19.6" stroke-linecap="round"/>
+                            </svg>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <span class="text-white text-sm font-bold">87.5%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">Status</div>
+                        <div class="text-sm font-medium text-green-600">Active</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">Predictions Today</div>
+                        <div class="text-sm font-medium text-gray-900 dark:text-white" id="price-predictions">24</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">Last Updated</div>
+                        <div class="text-sm font-medium text-gray-900 dark:text-white">30 minutes ago</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">Model Version</div>
+                        <div class="text-sm font-medium text-gray-900 dark:text-white">v1.8.2</div>
+                    </div>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="generatePriceForecast()" class="flex-1 bg-blue-600 text-white px-3 py-2 rounded text-sm hover:bg-blue-700">
+                        <i class="fas fa-crystal-ball mr-2"></i>Generate Forecast
+                    </button>
+                    <button onclick="viewPriceTrends()" class="flex-1 border border-gray-300 text-gray-700 dark:text-gray-300 px-3 py-2 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <i class="fas fa-trending-up mr-2"></i>View Trends
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Yield Prediction Model -->
+        <div class="model-card bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
+            <div class="px-6 py-4 bg-gradient-to-r from-green-600 to-green-700">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                            <i class="fas fa-seedling text-white text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-bold text-white">Yield Prediction</h3>
+                            <p class="text-green-100 text-sm">Crop yield forecasting</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="accuracy-ring">
+                            <svg width="60" height="60">
+                                <circle cx="30" cy="30" r="25" stroke="#ffffff40" stroke-width="4" fill="none"/>
+                                <circle cx="30" cy="30" r="25" stroke="#ffffff" stroke-width="4" fill="none"
+                                        stroke-dasharray="157" stroke-dashoffset="33.1" stroke-linecap="round"/>
+                            </svg>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <span class="text-white text-sm font-bold">78.9%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">Status</div>
+                        <div class="text-sm font-medium text-green-600">Active</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">Forecasts Active</div>
+                        <div class="text-sm font-medium text-gray-900 dark:text-white" id="yield-forecasts">5</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">Last Updated</div>
+                        <div class="text-sm font-medium text-gray-900 dark:text-white">1 day ago</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">Model Version</div>
+                        <div class="text-sm font-medium text-gray-900 dark:text-white">v1.5.1</div>
+                    </div>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="generateYieldForecast()" class="flex-1 bg-green-600 text-white px-3 py-2 rounded text-sm hover:bg-green-700">
+                        <i class="fas fa-leaf mr-2"></i>Create Forecast
+                    </button>
+                    <button onclick="viewYieldAnalysis()" class="flex-1 border border-gray-300 text-gray-700 dark:text-gray-300 px-3 py-2 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <i class="fas fa-analytics mr-2"></i>View Analysis
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Side Buying Detection Model -->
+        <div class="model-card bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
+            <div class="px-6 py-4 bg-gradient-to-r from-purple-600 to-purple-700">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                            <i class="fas fa-search text-white text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-bold text-white">Side Buying Detection</h3>
+                            <p class="text-purple-100 text-sm">Contract violation detection</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="accuracy-ring">
+                            <svg width="60" height="60">
+                                <circle cx="30" cy="30" r="25" stroke="#ffffff40" stroke-width="4" fill="none"/>
+                                <circle cx="30" cy="30" r="25" stroke="#ffffff" stroke-width="4" fill="none"
+                                        stroke-dasharray="157" stroke-dashoffset="12.4" stroke-linecap="round"/>
+                            </svg>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <span class="text-white text-sm font-bold">92.1%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">Status</div>
+                        <div class="text-sm font-medium text-green-600">Active</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">Detections Today</div>
+                        <div class="text-sm font-medium text-gray-900 dark:text-white" id="side-buying-detections">3</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">Last Updated</div>
+                        <div class="text-sm font-medium text-gray-900 dark:text-white">15 minutes ago</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">Model Version</div>
+                        <div class="text-sm font-medium text-gray-900 dark:text-white">v1.3.0</div>
+                    </div>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="runSideBuyingAnalysis()" class="flex-1 bg-purple-600 text-white px-3 py-2 rounded text-sm hover:bg-purple-700">
+                        <i class="fas fa-eye mr-2"></i>Monitor Contracts
+                    </button>
+                    <button onclick="viewSideBuyingReports()" class="flex-1 border border-gray-300 text-gray-700 dark:text-gray-300 px-3 py-2 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <i class="fas fa-file-alt mr-2"></i>View Reports
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Predictions -->
+    <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg mb-8">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex justify-between items-center">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                    <i class="fas fa-history mr-2 text-primary-600"></i>Recent Predictions
+                </h3>
+                <div class="flex items-center space-x-2">
+                    <div class="w-3 h-3 bg-green-500 rounded-full live-indicator"></div>
+                    <span class="text-sm text-gray-500">Real-time</span>
+                </div>
+            </div>
+        </div>
+        <div class="overflow-hidden">
+            <div id="predictions-list" class="divide-y divide-gray-200 dark:divide-gray-700 max-h-96 overflow-y-auto">
+                {% for prediction in recent_predictions %}
+                <div class="prediction-item p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-200">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <div class="flex-shrink-0">
+                                {% if prediction.prediction_type == 'FRAUD' %}
+                                    <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-shield-alt text-red-600"></i>
+                                    </div>
+                                {% elif prediction.prediction_type == 'PRICE' %}
+                                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-chart-line text-blue-600"></i>
+                                    </div>
+                                {% elif prediction.prediction_type == 'YIELD' %}
+                                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-seedling text-green-600"></i>
+                                    </div>
+                                {% else %}
+                                    <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-search text-purple-600"></i>
+                                    </div>
                                 {% endif %}
                             </div>
+                            <div>
+                                <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                    {{ prediction.get_prediction_type_display }}
+                                </div>
+                                <div class="text-sm text-gray-500">
+                                    Model: {{ prediction.model_used.name }} v{{ prediction.model_used.version }}
+                                </div>
+                                <div class="text-xs text-gray-400">
+                                    {{ prediction.created_at|timesince }} ago
+                                </div>
+                            </div>
                         </div>
-                        
-                        {% if prediction.prediction_type == 'FRAUD' %}
-                        <div class="mt-2">
-                            <strong>Result:</strong> 
-                            {% if prediction.prediction_result.fraud_probability > 0.7 %}
-                                <span class="text-danger">High Fraud Risk ({{ prediction.prediction_result.fraud_probability|floatformat:1 }}%)</span>
-                            {% elif prediction.prediction_result.fraud_probability > 0.4 %}
-                                <span class="text-warning">Medium Risk ({{ prediction.prediction_result.fraud_probability|floatformat:1 }}%)</span>
-                            {% else %}
-                                <span class="text-success">Low Risk ({{ prediction.prediction_result.fraud_probability|floatformat:1 }}%)</span>
-                            {% endif %}
+                        <div class="text-right">
+                            <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                {{ prediction.confidence_score|floatformat:1 }}% confidence
+                            </div>
+                            <div class="text-xs text-gray-500">
+                                {% if prediction.user %}by {{ prediction.user.username }}{% endif %}
+                            </div>
                         </div>
-                        {% elif prediction.prediction_type == 'YIELD' %}
-                        <div class="mt-2">
-                            <strong>Predicted Yield:</strong> {{ prediction.prediction_result.predicted_yield|floatformat:0 }} kg
-                            <br>
-                            <strong>Range:</strong> {{ prediction.prediction_result.lower_bound|floatformat:0 }} - {{ prediction.prediction_result.upper_bound|floatformat:0 }} kg
-                        </div>
-                        {% endif %}
                     </div>
-                    {% empty %}
-                    <div class="text-center text-muted py-4">
-                        <i class="bi bi-graph-up display-4"></i>
-                        <p>No recent predictions</p>
+                </div>
+                {% empty %}
+                <div class="p-8 text-center text-gray-500">
+                    <i class="fas fa-brain text-4xl mb-4 text-gray-300"></i>
+                    <p>No recent predictions</p>
+                    <p class="text-sm">AI models will appear here as they make predictions</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Model Performance Chart -->
+    <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                <i class="fas fa-chart-bar mr-2 text-primary-600"></i>Model Performance Overview
+            </h3>
+        </div>
+        <div class="p-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Performance Chart -->
+                <div>
+                    <canvas id="performanceChart" width="400" height="200"></canvas>
+                </div>
+                
+                <!-- Performance Summary -->
+                <div class="space-y-4">
+                    {% for data in performance_data %}
+                    <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <div>
+                            <div class="text-sm font-medium text-gray-900 dark:text-white">{{ data.model.name }}</div>
+                            <div class="text-xs text-gray-500">{{ data.predictions_count }} predictions</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-lg font-bold text-gray-900 dark:text-white">{{ data.accuracy|floatformat:1 }}%</div>
+                            <div class="text-xs {% if data.accuracy > 80 %}text-green-600{% elif data.accuracy > 60 %}text-yellow-600{% else %}text-red-600{% endif %}">
+                                {% if data.accuracy > 80 %}Excellent{% elif data.accuracy > 60 %}Good{% else %}Needs Improvement{% endif %}
+                            </div>
+                        </div>
                     </div>
                     {% endfor %}
                 </div>
             </div>
         </div>
     </div>
-    
-    <div class="col-lg-4">
-        <div class="custom-card">
-            <div class="card-header-custom">
-                <h5 class="mb-0">Model Performance</h5>
-            </div>
-            <div class="card-body">
-                <div class="chart-container">
-                    <canvas id="performanceChart"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 
-<!-- Training Data & Metrics -->
-<div class="row">
-    <div class="col-lg-6">
-        <div class="custom-card">
-            <div class="card-header-custom">
-                <h5 class="mb-0">Training Data Status</h5>
+<!-- Training Modal -->
+<div id="training-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">Retrain AI Model</h3>
             </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-6 text-center">
-                        <div class="h3 text-primary">40,000</div>
-                        <div class="text-muted">Fraud Samples</div>
+            
+            <div class="p-6">
+                <div class="space-y-4">
+                    <div>
+                        <label for="model_select" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Select Model</label>
+                        <select id="model_select" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            <option value="fraud_detection">Fraud Detection</option>
+                            <option value="price_prediction">Price Prediction</option>
+                            <option value="yield_prediction">Yield Prediction</option>
+                            <option value="side_buying_detection">Side Buying Detection</option>
+                        </select>
                     </div>
-                    <div class="col-6 text-center">
-                        <div class="h3 text-success">40 Years</div>
-                        <div class="text-muted">Yield Data</div>
+                    
+                    <div>
+                        <label for="epochs" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Training Epochs</label>
+                        <input type="number" id="epochs" value="100" min="10" max="1000" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
                     </div>
-                </div>
-                <div class="row mt-3">
-                    <div class="col-6 text-center">
-                        <div class="h3 text-warning">5,000</div>
-                        <div class="text-muted">Side Buying</div>
-                    </div>
-                    <div class="col-6 text-center">
-                        <div class="h3 text-info">10,000</div>
-                        <div class="text-muted">Risk Profiles</div>
+                    
+                    <div class="bg-yellow-50 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-700 rounded-md p-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-exclamation-triangle text-yellow-400"></i>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                                    Training Notice
+                                </h3>
+                                <div class="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
+                                    <p>Model training may take 2-4 hours depending on the data size and model complexity.</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="mt-4">
-                    <button class="btn btn-outline-primary w-100" onclick="manageTrainingData()">
-                        <i class="bi bi-database"></i> Manage Training Data
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button onclick="closeTrainingModal()" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+                        Cancel
+                    </button>
+                    <button onclick="startTraining()" class="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700">
+                        Start Training
                     </button>
                 </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-lg-6">
-        <div class="custom-card">
-            <div class="card-header-custom">
-                <h5 class="mb-0">Quick Actions</h5>
-            </div>
-            <div class="card-body">
-                <div class="d-grid gap-2">
-                    <button class="btn btn-primary-custom" onclick="testPrediction()">
-                        <i class="bi bi-play-circle"></i> Test Prediction
-                    </button>
-                    <button class="btn btn-outline-success" onclick="validateModels()">
-                        <i class="bi bi-check-circle"></i> Validate All Models
-                    </button>
-                    <button class="btn btn-outline-warning" onclick="generateSyntheticData()">
-                        <i class="bi bi-plus-square"></i> Generate Synthetic Data
-                    </button>
-                    <button class="btn btn-outline-info" onclick="exportModels()">
-                        <i class="bi bi-download"></i> Export Models
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Model Detail Modal -->
-<div class="modal fade" id="modelModal" tabindex="-1">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Model Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div id="modelDetails">
-                    <!-- Model details will be loaded here -->
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-warning" id="retrainModelBtn">Retrain Model</button>
-                <button type="button" class="btn btn-success" id="validateModelBtn">Validate Model</button>
             </div>
         </div>
     </div>
@@ -472,33 +532,40 @@
 
 {% block extra_js %}
 <script>
+let performanceChart;
+
+// Initialize dashboard
 document.addEventListener('DOMContentLoaded', function() {
     initializePerformanceChart();
-    updateTrainingProgress();
+    startRealTimeUpdates();
 });
 
+// Initialize performance chart
 function initializePerformanceChart() {
     const ctx = document.getElementById('performanceChart').getContext('2d');
     
-    new Chart(ctx, {
-        type: 'line',
+    const performanceData = {{ performance_data|safe }};
+    
+    performanceChart = new Chart(ctx, {
+        type: 'bar',
         data: {
-            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+            labels: performanceData.map(item => item.model.name),
             datasets: [{
-                label: 'Fraud Detection',
-                data: [93.2, 94.1, 94.8, 95.1],
-                borderColor: 'rgb(255, 99, 132)',
-                tension: 0.4
-            }, {
-                label: 'Yield Prediction',
-                data: [91.5, 92.1, 92.5, 92.8],
-                borderColor: 'rgb(54, 162, 235)',
-                tension: 0.4
-            }, {
-                label: 'Side Buying',
-                data: [87.2, 88.1, 88.9, 89.2],
-                borderColor: 'rgb(255, 205, 86)',
-                tension: 0.4
+                label: 'Accuracy (%)',
+                data: performanceData.map(item => item.accuracy),
+                backgroundColor: [
+                    'rgba(239, 68, 68, 0.8)',
+                    'rgba(59, 130, 246, 0.8)',
+                    'rgba(16, 185, 129, 0.8)',
+                    'rgba(139, 92, 246, 0.8)'
+                ],
+                borderColor: [
+                    'rgb(239, 68, 68)',
+                    'rgb(59, 130, 246)',
+                    'rgb(16, 185, 129)',
+                    'rgb(139, 92, 246)'
+                ],
+                borderWidth: 1
             }]
         },
         options: {
@@ -506,13 +573,12 @@ function initializePerformanceChart() {
             maintainAspectRatio: false,
             plugins: {
                 legend: {
-                    position: 'bottom'
+                    display: false
                 }
             },
             scales: {
                 y: {
-                    beginAtZero: false,
-                    min: 85,
+                    beginAtZero: true,
                     max: 100,
                     ticks: {
                         callback: function(value) {
@@ -525,248 +591,238 @@ function initializePerformanceChart() {
     });
 }
 
-function updateTrainingProgress() {
-    // Simulate training progress updates
-    const progressElement = document.querySelector('.training-progress-bar');
-    let currentProgress = 73;
-    
-    const interval = setInterval(() => {
-        currentProgress += Math.random() * 5;
-        if (currentProgress >= 100) {
-            currentProgress = 100;
-            clearInterval(interval);
+// Real-time updates
+function startRealTimeUpdates() {
+    setInterval(async () => {
+        try {
+            const response = await fetch('/ai/status/');
+            const data = await response.json();
             
-            // Update UI when training completes
-            setTimeout(() => {
-                location.reload();
-            }, 2000);
+            if (data.success) {
+                updateModelStats(data);
+            }
+        } catch (error) {
+            console.error('Error fetching model status:', error);
         }
-        
-        progressElement.style.width = currentProgress + '%';
-        progressElement.parentElement.nextElementSibling.querySelector('small').textContent = 
-            currentProgress >= 100 ? 'Training Complete!' : `ETA: ${Math.ceil((100 - currentProgress) / 3)} minutes`;
-    }, 10000);
+    }, 30000); // Update every 30 seconds
 }
 
-function viewModelDetails(modelType) {
-    fetch(`/ai/api/model-details/${modelType}/`)
-        .then(response => response.json())
-        .then(data => {
-            displayModelDetails(data);
-            new bootstrap.Modal(document.getElementById('modelModal')).show();
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            TIMBUtils.showNotification('Error loading model details', 'danger');
+// Update model statistics
+function updateModelStats(data) {
+    // Update health indicator
+    const allModelsActive = data.models.every(model => model.status === 'active');
+    const indicator = document.getElementById('model-status-indicator');
+    
+    if (allModelsActive) {
+        indicator.textContent = 'All Systems Operational';
+        indicator.className = 'text-green-600';
+    } else {
+        indicator.textContent = 'Some Models Offline';
+        indicator.className = 'text-yellow-600';
+    }
+    
+    // Update individual model stats
+    data.models.forEach(model => {
+        if (model.type === 'fraud_detection') {
+            document.getElementById('fraud-detections').textContent = model.predictions_today;
+        } else if (model.type === 'price_prediction') {
+            document.getElementById('price-predictions').textContent = model.predictions_today;
+        } else if (model.type === 'yield_prediction') {
+            document.getElementById('yield-forecasts').textContent = model.predictions_today;
+        } else if (model.type === 'side_buying_detection') {
+            document.getElementById('side-buying-detections').textContent = model.predictions_today;
+        }
+    });
+}
+
+// Model action functions
+async function refreshModels() {
+    window.timbRealTime.showNotification('Refreshing model status...', 'info');
+    
+    try {
+        const response = await fetch('/ai/status/');
+        const data = await response.json();
+        
+        if (data.success) {
+            updateModelStats(data);
+            window.timbRealTime.showNotification('Models refreshed successfully', 'success');
+        } else {
+            window.timbRealTime.showNotification('Failed to refresh models', 'error');
+        }
+    } catch (error) {
+        window.timbRealTime.showNotification('Error refreshing models', 'error');
+    }
+}
+
+async function runFraudDetection() {
+    window.timbRealTime.showNotification('Running fraud detection analysis...', 'info');
+    // Implementation would depend on specific requirements
+}
+
+async function generatePriceForecast() {
+    window.timbRealTime.showNotification('Generating price forecast...', 'info');
+    // Implementation would depend on specific requirements
+}
+
+async function generateYieldForecast() {
+    window.timbRealTime.showNotification('Creating yield forecast...', 'info');
+    // Implementation would depend on specific requirements
+}
+
+async function runSideBuyingAnalysis() {
+    window.timbRealTime.showNotification('Monitoring contracts for side buying...', 'info');
+    // Implementation would depend on specific requirements
+}
+
+// Training modal functions
+function showTrainingModal() {
+    document.getElementById('training-modal').classList.remove('hidden');
+}
+
+function closeTrainingModal() {
+    document.getElementById('training-modal').classList.add('hidden');
+}
+
+async function startTraining() {
+    const modelType = document.getElementById('model_select').value;
+    const epochs = document.getElementById('epochs').value;
+    
+    try {
+        const response = await fetch('/ai/retrain/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                model_name: modelType,
+                epochs: parseInt(epochs)
+            })
         });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            closeTrainingModal();
+            window.timbRealTime.showNotification(
+                `Training started for ${modelType}. Job ID: ${result.job_id}`, 
+                'success'
+            );
+        } else {
+            window.timbRealTime.showNotification(result.error || 'Failed to start training', 'error');
+        }
+    } catch (error) {
+        window.timbRealTime.showNotification('Error starting training', 'error');
+    }
 }
 
-function displayModelDetails(model) {
-    const detailsHtml = `
-        <div class="row">
-            <div class="col-md-6">
-                <h6>Model Information</h6>
-                <p><strong>Name:</strong> ${model.name}</p>
-                <p><strong>Type:</strong> ${model.type}</p>
-                <p><strong>Version:</strong> ${model.version}</p>
-                <p><strong>Status:</strong> <span class="badge bg-success">${model.status}</span></p>
-                <p><strong>Last Trained:</strong> ${new Date(model.last_trained).toLocaleString()}</p>
-            </div>
-            <div class="col-md-6">
-                <h6>Performance Metrics</h6>
-                <p><strong>Accuracy:</strong> ${model.accuracy}%</p>
-                <p><strong>Precision:</strong> ${model.precision}%</p>
-                <p><strong>Recall:</strong> ${model.recall}%</p>
-                <p><strong>F1 Score:</strong> ${model.f1_score}</p>
-                <p><strong>Training Samples:</strong> ${model.training_samples.toLocaleString()}</p>
-            </div>
-        </div>
+// View functions
+function viewFraudReports() {
+    window.location.href = '/ai/fraud-reports/';
+}
+
+function viewPriceTrends() {
+    window.location.href = '/ai/price-trends/';
+}
+
+function viewYieldAnalysis() {
+    window.location.href = '/ai/yield-analysis/';
+}
+
+function viewSideBuyingReports() {
+    window.location.href = '/ai/side-buying-reports/';
+}
+
+// WebSocket connection for real-time updates
+if (window.WebSocket) {
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = `${protocol}//${window.location.host}/ws/ai/predictions/`;
+    
+    const ws = new WebSocket(wsUrl);
+    
+    ws.onmessage = function(event) {
+        const data = JSON.parse(event.data);
         
-        <div class="row mt-4">
-            <div class="col-12">
-                <h6>Feature Importance</h6>
-                <div class="table-responsive">
-                    <table class="table table-sm">
-                        <thead>
-                            <tr>
-                                <th>Feature</th>
-                                <th>Importance</th>
-                                <th>Description</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${model.feature_importance.map(feature => `
-                                <tr>
-                                    <td>${feature.name}</td>
-                                    <td>
-                                        <div class="progress" style="height: 6px;">
-                                            <div class="progress-bar" style="width: ${feature.importance * 100}%"></div>
-                                        </div>
-                                        ${(feature.importance * 100).toFixed(1)}%
-                                    </td>
-                                    <td>${feature.description}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
+        if (data.type === 'new_prediction') {
+            addNewPrediction(data.data);
+        } else if (data.type === 'model_update') {
+            updateModelStatus(data.data);
+        }
+    };
+}
+
+function addNewPrediction(prediction) {
+    const predictionsList = document.getElementById('predictions-list');
+    
+    // Create new prediction element
+    const predictionElement = document.createElement('div');
+    predictionElement.className = 'prediction-item p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-200';
+    
+    let iconClass, iconColor;
+    switch (prediction.type) {
+        case 'FRAUD':
+            iconClass = 'fas fa-shield-alt';
+            iconColor = 'text-red-600';
+            break;
+        case 'PRICE':
+            iconClass = 'fas fa-chart-line';
+            iconColor = 'text-blue-600';
+            break;
+        case 'YIELD':
+            iconClass = 'fas fa-seedling';
+            iconColor = 'text-green-600';
+            break;
+        default:
+            iconClass = 'fas fa-search';
+            iconColor = 'text-purple-600';
+    }
+    
+    predictionElement.innerHTML = `
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <div class="flex-shrink-0">
+                    <div class="w-10 h-10 bg-${iconColor.split('-')[1]}-100 rounded-full flex items-center justify-center">
+                        <i class="${iconClass} ${iconColor}"></i>
+                    </div>
+                </div>
+                <div>
+                    <div class="text-sm font-medium text-gray-900 dark:text-white">
+                        ${prediction.type_display}
+                    </div>
+                    <div class="text-sm text-gray-500">
+                        Model: ${prediction.model_name}
+                    </div>
+                    <div class="text-xs text-gray-400">
+                        Just now
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="row mt-4">
-            <div class="col-12">
-                <h6>Hyperparameters</h6>
-                <pre class="bg-light p-3 rounded"><code>${JSON.stringify(model.hyperparameters, null, 2)}</code></pre>
+            <div class="text-right">
+                <div class="text-sm font-medium text-gray-900 dark:text-white">
+                    ${prediction.confidence}% confidence
+                </div>
+                <div class="text-xs text-gray-500">
+                    by ${prediction.user}
+                </div>
             </div>
         </div>
     `;
     
-    document.getElementById('modelDetails').innerHTML = detailsHtml;
-}
-
-function retrainModel(modelType) {
-    TIMBUtils.showConfirmDialog(
-        `Retrain the ${modelType} model? This may take several minutes.`,
-        () => {
-            TIMBUtils.showLoader();
-            
-            fetch('/ai/train/', {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': TIMBUtils.getCsrfToken(),
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ model: modelType })
-            })
-            .then(response => response.json())
-            .then(data => {
-                TIMBUtils.hideLoader();
-                
-                if (data.success) {
-                    TIMBUtils.showNotification('Model retraining started successfully', 'success');
-                    setTimeout(() => location.reload(), 2000);
-                } else {
-                    TIMBUtils.showNotification('Error starting retraining: ' + data.error, 'danger');
-                }
-            })
-            .catch(error => {
-                TIMBUtils.hideLoader();
-                console.error('Error:', error);
-                TIMBUtils.showNotification('Error starting model retraining', 'danger');
-            });
-        }
-    );
-}
-
-function trainAllModels() {
-    TIMBUtils.showConfirmDialog(
-        'Retrain all AI models? This operation may take significant time.',
-        () => {
-            TIMBUtils.showLoader();
-            
-            fetch('/ai/train/', {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': TIMBUtils.getCsrfToken(),
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ model: 'all' })
-            })
-            .then(response => response.json())
-            .then(data => {
-                TIMBUtils.hideLoader();
-                
-                if (data.success) {
-                    TIMBUtils.showNotification('All models retraining started', 'success');
-                    setTimeout(() => location.reload(), 3000);
-                } else {
-                    TIMBUtils.showNotification('Error starting training: ' + data.error, 'danger');
-                }
-            })
-            .catch(error => {
-                TIMBUtils.hideLoader();
-                console.error('Error:', error);
-                TIMBUtils.showNotification('Error starting model training', 'danger');
-            });
-        }
-    );
-}
-
-function testPrediction() {
-    // Open test prediction interface
-    TIMBUtils.showNotification('Test prediction interface coming soon', 'info');
-}
-
-function validateModels() {
-    TIMBUtils.showLoader();
+    // Add to top of list
+    predictionsList.insertBefore(predictionElement, predictionsList.firstChild);
     
-    fetch('/ai/validate/', {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': TIMBUtils.getCsrfToken(),
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        TIMBUtils.hideLoader();
-        
-        if (data.success) {
-            TIMBUtils.showNotification('Model validation completed successfully', 'success');
-        } else {
-            TIMBUtils.showNotification('Error during validation: ' + data.error, 'danger');
-        }
-    })
-    .catch(error => {
-        TIMBUtils.hideLoader();
-        console.error('Error:', error);
-        TIMBUtils.showNotification('Error validating models', 'danger');
-    });
+    // Remove last item if list is too long
+    if (predictionsList.children.length > 10) {
+        predictionsList.removeChild(predictionsList.lastChild);
+    }
+    
+    // Show notification
+    window.timbRealTime.showNotification(`New ${prediction.type_display} prediction`, 'info');
 }
 
-function generateSyntheticData() {
-    TIMBUtils.showConfirmDialog(
-        'Generate new synthetic training data? This will create additional samples for model training.',
-        () => {
-            TIMBUtils.showLoader();
-            
-            fetch('/ai/generate-data/', {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': TIMBUtils.getCsrfToken(),
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                TIMBUtils.hideLoader();
-                
-                if (data.success) {
-                    TIMBUtils.showNotification('Synthetic data generated successfully', 'success');
-                } else {
-                    TIMBUtils.showNotification('Error generating data: ' + data.error, 'danger');
-                }
-            })
-            .catch(error => {
-                TIMBUtils.hideLoader();
-                console.error('Error:', error);
-                TIMBUtils.showNotification('Error generating synthetic data', 'danger');
-            });
-        }
-    );
-}
-
-function manageTrainingData() {
-    // Open training data management interface
-    window.open('/ai/training-data/', '_blank');
-}
-
-function exportModels() {
-    window.open('/ai/export/', '_blank');
-}
-
-function downloadModelReport() {
-    window.open('/ai/model-report/', '_blank');
+function updateModelStatus(modelData) {
+    // Update model status indicators
+    // Implementation would depend on the specific model data structure
 }
 </script>
 {% endblock %}

@@ -1,0 +1,383 @@
+{% extends 'base.html' %}
+
+{% block title %}Custom Grades - {{ merchant.company_name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="mb-8">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Custom Tobacco Grades</h1>
+                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                    Create and manage your custom tobacco grade blends
+                </p>
+            </div>
+            <div class="flex space-x-3">
+                <a href="{% url 'merchant_create_custom_grade' %}" class="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition duration-200">
+                    <i class="fas fa-plus mr-2"></i>Create New Grade
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Grades Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+        {% for grade in custom_grades %}
+        <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
+            <!-- Grade Header -->
+            <div class="px-6 py-4 bg-gradient-to-r from-blue-600 to-purple-600">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="text-lg font-bold text-white">{{ grade.custom_grade_name }}</h3>
+                        <p class="text-blue-100 text-sm">{{ grade.get_quality_standard_display }}</p>
+                    </div>
+                    <div class="flex space-x-2">
+                        {% if grade.is_active %}
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                Active
+                            </span>
+                        {% else %}
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                Inactive
+                            </span>
+                        {% endif %}
+                        {% if grade.is_public %}
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                Public
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Grade Details -->
+            <div class="px-6 py-4">
+                <div class="mb-4">
+                    <p class="text-sm text-gray-600 dark:text-gray-400">{{ grade.description|truncatewords:20 }}</p>
+                </div>
+                
+                <!-- Pricing Information -->
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">Target Price</div>
+                        <div class="text-lg font-semibold text-gray-900 dark:text-white">${{ grade.target_price|floatformat:2 }}/kg</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">Profit Margin</div>
+                        <div class="text-lg font-semibold {% if grade.profit_margin > 20 %}text-green-600{% elif grade.profit_margin > 10 %}text-yellow-600{% else %}text-red-600{% endif %}">
+                            {{ grade.profit_margin|floatformat:1 }}%
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Production Stats -->
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">Produced</div>
+                        <div class="text-sm font-medium text-gray-900 dark:text-white">{{ grade.total_produced|floatformat:0 }}kg</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">Sold</div>
+                        <div class="text-sm font-medium text-gray-900 dark:text-white">{{ grade.total_sold|floatformat:0 }}kg</div>
+                    </div>
+                </div>
+                
+                <!-- Grade Components -->
+                <div class="mb-4">
+                    <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-2">Components</h4>
+                    <div class="space-y-2">
+                        {% for component in grade.components.all %}
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600 dark:text-gray-400">{{ component.base_grade.grade_code }}</span>
+                            <span class="text-sm font-medium text-gray-900 dark:text-white">{{ component.percentage }}%</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- Quality Specifications -->
+                {% if grade.flavor_profile or grade.burn_rate or grade.moisture_content %}
+                <div class="mb-4">
+                    <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-2">Quality Specs</h4>
+                    <div class="text-xs text-gray-600 dark:text-gray-400 space-y-1">
+                        {% if grade.flavor_profile %}
+                            <div>Flavor: {{ grade.flavor_profile }}</div>
+                        {% endif %}
+                        {% if grade.burn_rate %}
+                            <div>Burn Rate: {{ grade.burn_rate }}</div>
+                        {% endif %}
+                        {% if grade.moisture_content %}
+                            <div>Moisture: {{ grade.moisture_content }}%</div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Grade Actions -->
+            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600">
+                <div class="flex justify-between items-center">
+                    <div class="flex space-x-2">
+                        <button onclick="editGrade({{ grade.id }})" class="text-indigo-600 hover:text-indigo-900 text-sm">
+                            <i class="fas fa-edit mr-1"></i>Edit
+                        </button>
+                        <button onclick="duplicateGrade({{ grade.id }})" class="text-green-600 hover:text-green-900 text-sm">
+                            <i class="fas fa-copy mr-1"></i>Duplicate
+                        </button>
+                        {% if grade.is_active %}
+                            <button onclick="toggleGradeStatus({{ grade.id }}, false)" class="text-yellow-600 hover:text-yellow-900 text-sm">
+                                <i class="fas fa-pause mr-1"></i>Deactivate
+                            </button>
+                        {% else %}
+                            <button onclick="toggleGradeStatus({{ grade.id }}, true)" class="text-green-600 hover:text-green-900 text-sm">
+                                <i class="fas fa-play mr-1"></i>Activate
+                            </button>
+                        {% endif %}
+                    </div>
+                    <button onclick="viewGradeDetails({{ grade.id }})" class="text-blue-600 hover:text-blue-900 text-sm">
+                        <i class="fas fa-eye mr-1"></i>Details
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-full">
+            <div class="text-center py-12">
+                <div class="mx-auto h-12 w-12 text-gray-400">
+                    <i class="fas fa-flask text-4xl"></i>
+                </div>
+                <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No custom grades</h3>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Get started by creating your first custom tobacco grade.</p>
+                <div class="mt-6">
+                    <a href="{% url 'merchant_create_custom_grade' %}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700">
+                        <i class="fas fa-plus mr-2"></i>Create Custom Grade
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Grade Details Modal -->
+<div id="grade-details-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-screen overflow-y-auto">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">Grade Details</h3>
+                    <button onclick="closeGradeDetailsModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div id="grade-details-content" class="p-6">
+                <!-- Content will be loaded dynamically -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Edit grade
+function editGrade(gradeId) {
+    window.location.href = `/merchant/grades/${gradeId}/edit/`;
+}
+
+// Duplicate grade
+async function duplicateGrade(gradeId) {
+    try {
+        const response = await fetch(`/merchant/grades/${gradeId}/duplicate/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json',
+            },
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            window.timbRealTime.showNotification('Grade duplicated successfully!', 'success');
+            setTimeout(() => window.location.reload(), 1000);
+        } else {
+            window.timbRealTime.showNotification(result.error || 'Failed to duplicate grade', 'error');
+        }
+    } catch (error) {
+        window.timbRealTime.showNotification('An error occurred', 'error');
+    }
+}
+
+// Toggle grade status
+async function toggleGradeStatus(gradeId, activate) {
+    try {
+        const response = await fetch(`/merchant/grades/${gradeId}/toggle-status/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ activate: activate })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            window.timbRealTime.showNotification(
+                `Grade ${activate ? 'activated' : 'deactivated'} successfully!`, 
+                'success'
+            );
+            setTimeout(() => window.location.reload(), 1000);
+        } else {
+            window.timbRealTime.showNotification(result.error || 'Failed to update grade status', 'error');
+        }
+    } catch (error) {
+        window.timbRealTime.showNotification('An error occurred', 'error');
+    }
+}
+
+// View grade details
+async function viewGradeDetails(gradeId) {
+    document.getElementById('grade-details-modal').classList.remove('hidden');
+    document.getElementById('grade-details-content').innerHTML = '<div class="text-center py-8"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div><p class="mt-2 text-gray-600">Loading...</p></div>';
+    
+    try {
+        const response = await fetch(`/merchant/grades/${gradeId}/details/`);
+        const result = await response.json();
+        
+        if (result.success) {
+            const grade = result.grade;
+            
+            document.getElementById('grade-details-content').innerHTML = `
+                <div class="space-y-6">
+                    <!-- Basic Information -->
+                    <div>
+                        <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-3">${grade.custom_grade_name}</h4>
+                        <p class="text-gray-600 dark:text-gray-400">${grade.description || 'No description provided'}</p>
+                    </div>
+                    
+                    <!-- Pricing & Financial -->
+                    <div>
+                        <h5 class="font-medium text-gray-900 dark:text-white mb-2">Pricing & Financial</h5>
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <span class="text-gray-500">Target Price:</span>
+                                <span class="font-medium ml-2">$${grade.target_price}/kg</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">Base Cost:</span>
+                                <span class="font-medium ml-2">$${grade.base_cost}/kg</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">Profit Margin:</span>
+                                <span class="font-medium ml-2">${grade.profit_margin}%</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">Min Order:</span>
+                                <span class="font-medium ml-2">${grade.minimum_order_quantity || 'N/A'}kg</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Components -->
+                    <div>
+                        <h5 class="font-medium text-gray-900 dark:text-white mb-2">Grade Components</h5>
+                        <div class="space-y-2">
+                            ${grade.components.map(component => `
+                                <div class="flex justify-between items-center py-2 px-3 bg-gray-50 dark:bg-gray-700 rounded">
+                                    <span class="text-sm">${component.base_grade_name}</span>
+                                    <span class="font-medium">${component.percentage}%</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <!-- Quality Specifications -->
+                    ${grade.flavor_profile || grade.burn_rate || grade.moisture_content ? `
+                        <div>
+                            <h5 class="font-medium text-gray-900 dark:text-white mb-2">Quality Specifications</h5>
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                ${grade.flavor_profile ? `
+                                    <div>
+                                        <span class="text-gray-500">Flavor Profile:</span>
+                                        <span class="font-medium ml-2">${grade.flavor_profile}</span>
+                                    </div>
+                                ` : ''}
+                                ${grade.burn_rate ? `
+                                    <div>
+                                        <span class="text-gray-500">Burn Rate:</span>
+                                        <span class="font-medium ml-2">${grade.burn_rate}</span>
+                                    </div>
+                                ` : ''}
+                                ${grade.moisture_content ? `
+                                    <div>
+                                        <span class="text-gray-500">Moisture Content:</span>
+                                        <span class="font-medium ml-2">${grade.moisture_content}%</span>
+                                    </div>
+                                ` : ''}
+                                ${grade.nicotine_level ? `
+                                    <div>
+                                        <span class="text-gray-500">Nicotine Level:</span>
+                                        <span class="font-medium ml-2">${grade.nicotine_level}</span>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    <!-- Production Statistics -->
+                    <div>
+                        <h5 class="font-medium text-gray-900 dark:text-white mb-2">Production Statistics</h5>
+                        <div class="grid grid-cols-3 gap-4 text-sm">
+                            <div>
+                                <span class="text-gray-500">Total Produced:</span>
+                                <span class="font-medium ml-2">${grade.total_produced}kg</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">Total Sold:</span>
+                                <span class="font-medium ml-2">${grade.total_sold}kg</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">Available:</span>
+                                <span class="font-medium ml-2">${grade.inventory_available}kg</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Marketing -->
+                    ${grade.marketing_description ? `
+                        <div>
+                            <h5 class="font-medium text-gray-900 dark:text-white mb-2">Marketing Description</h5>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">${grade.marketing_description}</p>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        } else {
+            document.getElementById('grade-details-content').innerHTML = `
+                <div class="text-center py-8 text-red-600">
+                    <i class="fas fa-exclamation-triangle text-3xl mb-2"></i>
+                    <p>Failed to load grade details</p>
+                </div>
+            `;
+        }
+    } catch (error) {
+        document.getElementById('grade-details-content').innerHTML = `
+            <div class="text-center py-8 text-red-600">
+                <i class="fas fa-exclamation-triangle text-3xl mb-2"></i>
+                <p>Error loading grade details</p>
+            </div>
+        `;
+    }
+}
+
+// Close grade details modal
+function closeGradeDetailsModal() {
+    document.getElementById('grade-details-modal').classList.add('hidden');
+}
+</script>
+{% endblock %}

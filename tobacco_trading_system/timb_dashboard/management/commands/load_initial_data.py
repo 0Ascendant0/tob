@@ -187,9 +187,7 @@ class Command(BaseCommand):
                 defaults={
                     'company_name': 'Demo Tobacco Company',
                     'license_number': 'LIC-DEMO-001',
-                    'registration_date': '2024-01-01',
-                    'status': 'ACTIVE',
-                    'risk_score': 25.5
+                    'is_active': True
                 }
             )
             

@@ -1,124 +1,251 @@
 {% extends 'base.html' %}
-{% load static %}
 
-{% block title %}Profile - TIMB Trading System{% endblock %}
+{% block title %}Profile - TIMB{% endblock %}
 
 {% block content %}
-<div class="row mb-4">
-    <div class="col-12">
-        <h1 class="h3 mb-0">User Profile</h1>
-        <p class="text-muted">Manage your account settings and preferences</p>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-lg-4">
-        <div class="custom-card">
-            <div class="card-header-custom">
-                <h5 class="mb-0">Profile Information</h5>
-            </div>
-            <div class="card-body text-center">
-                <div class="profile-avatar mb-3">
-                    <i class="bi bi-person-circle display-1"></i>
-                </div>
-                <h5>{{ user.get_full_name|default:user.username }}</h5>
-                <p class="text-muted">{{ user.email }}</p>
-                <span class="badge bg-{% if user.is_timb_staff %}success{% elif user.is_merchant %}primary{% else %}secondary{% endif %}">
-                    {% if user.is_timb_staff %}TIMB Staff{% elif user.is_merchant %}Merchant{% else %}User{% endif %}
-                </span>
-            </div>
-        </div>
-        
-        <div class="custom-card mt-3">
-            <div class="card-header-custom">
-                <h5 class="mb-0">Account Statistics</h5>
-            </div>
-            <div class="card-body">
-                <div class="row text-center">
-                    <div class="col-6">
-                        <div class="h4">{{ user.date_joined|timesince }}</div>
-                        <div class="small text-muted">Member Since</div>
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <div class="px-4 py-6 sm:px-0">
+        <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg">
+            <!-- Profile Header -->
+            <div class="px-4 py-5 sm:px-6 bg-gradient-to-r from-primary-600 to-primary-700">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        {% if profile.profile_picture %}
+                            <img class="h-20 w-20 rounded-full border-4 border-white" src="{{ profile.profile_picture.url }}" alt="">
+                        {% else %}
+                            <div class="h-20 w-20 rounded-full bg-primary-200 border-4 border-white flex items-center justify-center">
+                                <span class="text-2xl font-bold text-primary-800">{{ user.first_name.0|default:user.username.0|upper }}</span>
+                            </div>
+                        {% endif %}
                     </div>
-                    <div class="col-6">
-                        <div class="h4">{{ user.last_login|timesince|default:"Never" }}</div>
-                        <div class="small text-muted">Last Login</div>
+                    <div class="ml-6">
+                        <h1 class="text-2xl font-bold text-white">{{ user.get_full_name|default:user.username }}</h1>
+                        <p class="text-primary-100">{{ user.get_user_type }}</p>
+                        {% if profile.company_name %}
+                            <p class="text-primary-200">{{ profile.company_name }}</p>
+                        {% endif %}
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-    
-    <div class="col-lg-8">
-        <div class="custom-card">
-            <div class="card-header-custom">
-                <h5 class="mb-0">Edit Profile</h5>
+            
+            <!-- Navigation Tabs -->
+            <div class="border-b border-gray-200 dark:border-gray-700">
+                <nav class="-mb-px flex space-x-8 px-6" aria-label="Tabs">
+                    <button onclick="showTab('profile')" class="tab-btn border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                        <i class="fas fa-user mr-2"></i>Profile
+                    </button>
+                    <button onclick="showTab('security')" class="tab-btn border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                        <i class="fas fa-shield-alt mr-2"></i>Security
+                    </button>
+                    <button onclick="showTab('sessions')" class="tab-btn border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                        <i class="fas fa-desktop mr-2"></i>Sessions
+                    </button>
+                </nav>
             </div>
-            <div class="card-body">
-                <form method="post">
+            
+            <!-- Profile Tab -->
+            <div id="profile-tab" class="tab-content p-6">
+                <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
-                    
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Company Name</label>
-                            {{ form.company_name }}
-                            {% if form.company_name.errors %}
-                                <div class="text-danger small">{{ form.company_name.errors.0 }}</div>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Personal Information -->
+                        <div class="space-y-6">
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-white">Personal Information</h3>
+                            
+                            <div>
+                                <label for="profile_picture" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Profile Picture</label>
+                                <div class="mt-1 flex items-center space-x-5">
+                                    {% if profile.profile_picture %}
+                                        <img class="h-12 w-12 rounded-full" src="{{ profile.profile_picture.url }}" alt="">
+                                    {% else %}
+                                        <div class="h-12 w-12 rounded-full bg-gray-300 flex items-center justify-center">
+                                            <span class="text-sm font-medium text-gray-700">{{ user.first_name.0|default:user.username.0|upper }}</span>
+                                        </div>
+                                    {% endif %}
+                                    <input type="file" name="profile_picture" id="profile_picture" class="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100">
+                                </div>
+                            </div>
+                            
+                            {% if user.is_merchant %}
+                            <div>
+                                <label for="company_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Company Name</label>
+                                <input type="text" name="company_name" id="company_name" value="{{ profile.company_name }}"
+                                       class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            </div>
+                            
+                            <div>
+                                <label for="license_number" class="block text-sm font-medium text-gray-700 dark:text-gray-300">License Number</label>
+                                <input type="text" name="license_number" id="license_number" value="{{ profile.license_number }}"
+                                       class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            </div>
                             {% endif %}
+                            
+                            <div>
+                                <label for="bio" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Bio</label>
+                                <textarea name="bio" id="bio" rows="4"
+                                          class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white">{{ profile.bio }}</textarea>
+                            </div>
                         </div>
                         
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">License Number</label>
-                            {{ form.license_number }}
-                            {% if form.license_number.errors %}
-                                <div class="text-danger small">{{ form.license_number.errors.0 }}</div>
-                            {% endif %}
+                        <!-- Business Information -->
+                        <div class="space-y-6">
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-white">Contact & Business</h3>
+                            
+                            <div>
+                                <label for="business_address" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Business Address</label>
+                                <textarea name="business_address" id="business_address" rows="3"
+                                          class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white">{{ profile.business_address }}</textarea>
+                            </div>
+                            
+                            <div>
+                                <label for="website" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Website</label>
+                                <input type="url" name="website" id="website" value="{{ profile.website }}"
+                                       class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            </div>
+                            
+                            <div>
+                                <label for="theme_preference" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Theme Preference</label>
+                                <select name="theme_preference" id="theme_preference"
+                                        class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <option value="timb" {% if profile.theme_preference == 'timb' %}selected{% endif %}>TIMB Theme</option>
+                                    <option value="merchant" {% if profile.theme_preference == 'merchant' %}selected{% endif %}>Merchant Theme</option>
+                                    <option value="light" {% if profile.theme_preference == 'light' %}selected{% endif %}>Light Theme</option>
+                                    <option value="dark" {% if profile.theme_preference == 'dark' %}selected{% endif %}>Dark Theme</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Notification Preferences -->
+                            <div class="space-y-3">
+                                <h4 class="text-md font-medium text-gray-900 dark:text-white">Notifications</h4>
+                                <div class="flex items-center">
+                                    <input type="checkbox" name="email_notifications" id="email_notifications" {% if profile.email_notifications %}checked{% endif %}
+                                           class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                                    <label for="email_notifications" class="ml-2 block text-sm text-gray-900 dark:text-gray-300">
+                                        Email notifications
+                                    </label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" name="sms_notifications" id="sms_notifications" {% if profile.sms_notifications %}checked{% endif %}
+                                           class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                                    <label for="sms_notifications" class="ml-2 block text-sm text-gray-900 dark:text-gray-300">
+                                        SMS notifications
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <label class="form-label">Address</label>
-                        {{ form.address }}
-                        {% if form.address.errors %}
-                            <div class="text-danger small">{{ form.address.errors.0 }}</div>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Theme Preference</label>
-                        {{ form.theme_preference }}
-                        {% if form.theme_preference.errors %}
-                            <div class="text-danger small">{{ form.theme_preference.errors.0 }}</div>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <button type="submit" class="btn btn-primary-custom">
-                            <i class="bi bi-check"></i> Save Changes
+                    <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                        <button type="submit" class="bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                            <i class="fas fa-save mr-2"></i>Save Changes
                         </button>
                     </div>
                 </form>
             </div>
-        </div>
-        
-        <div class="custom-card mt-3">
-            <div class="card-header-custom">
-                <h5 class="mb-0">Security Settings</h5>
+            
+            <!-- Security Tab -->
+            <div id="security-tab" class="tab-content p-6 hidden">
+                <div class="max-w-lg">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-6">Change Password</h3>
+                    
+                    <form method="post" action="{% url 'change_password' %}">
+                        {% csrf_token %}
+                        <div class="space-y-4">
+                            <div>
+                                <label for="current_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Current Password</label>
+                                <input type="password" name="current_password" id="current_password" required
+                                       class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            </div>
+                            
+                            <div>
+                                <label for="new_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">New Password</label>
+                                <input type="password" name="new_password" id="new_password" required
+                                       class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            </div>
+                            
+                            <div>
+                                <label for="confirm_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Confirm New Password</label>
+                                <input type="password" name="confirm_password" id="confirm_password" required
+                                       class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            </div>
+                            
+                            <button type="submit" class="bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                <i class="fas fa-key mr-2"></i>Change Password
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <h6>Password</h6>
-                        <p class="text-muted">Last changed: {{ user.last_login|date:"M d, Y" }}</p>
-                        <button class="btn btn-outline-warning btn-sm">Change Password</button>
+            
+            <!-- Sessions Tab -->
+            <div id="sessions-tab" class="tab-content p-6 hidden">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-6">Active Sessions</h3>
+                
+                <div class="space-y-4">
+                    {% for session in active_sessions %}
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-{% if 'Mobile' in session.device_type %}mobile{% elif 'Tablet' in session.device_type %}tablet{% else %}desktop{% endif %} text-gray-400 text-xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                        {{ session.browser_info }} on {{ session.device_type|title }}
+                                    </div>
+                                    <div class="text-sm text-gray-500">
+                                        {{ session.ip_address }} • Last active: {{ session.last_activity|timesince }} ago
+                                    </div>
+                                    {% if session.session_key == request.session.session_key %}
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            Current session
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            {% if session.session_key != request.session.session_key %}
+                            <form method="post" action="{% url 'end_session' %}" class="inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="session_id" value="{{ session.id }}">
+                                <button type="submit" class="text-red-600 hover:text-red-900 text-sm">
+                                    <i class="fas fa-times mr-1"></i>End Session
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
                     </div>
-                    <div class="col-md-6">
-                        <h6>Two-Factor Authentication</h6>
-                        <p class="text-muted">Add an extra layer of security</p>
-                        <button class="btn btn-outline-success btn-sm">Enable 2FA</button>
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+function showTab(tabName) {
+    // Hide all tab contents
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.add('hidden');
+    });
+    
+    // Remove active state from all tab buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('border-primary-500', 'text-primary-600');
+        btn.classList.add('border-transparent', 'text-gray-500');
+    });
+    
+    // Show selected tab
+    document.getElementById(tabName + '-tab').classList.remove('hidden');
+    
+    // Activate selected tab button
+    event.target.classList.remove('border-transparent', 'text-gray-500');
+    event.target.classList.add('border-primary-500', 'text-primary-600');
+}
+
+// Initialize first tab as active
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelector('.tab-btn').click();
+});
+</script>
 {% endblock %}

@@ -1,0 +1,523 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Farmer Risk Assessment - {{ merchant.company_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .risk-level-card {
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .risk-level-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 5px;
+        height: 100%;
+    }
+    
+    .risk-low::before { background: #28a745; }
+    .risk-medium::before { background: #ffc107; }
+    .risk-high::before { background: #fd7e14; }
+    .risk-critical::before { background: #dc3545; }
+    
+    .risk-score-meter {
+        width: 100%;
+        height: 20px;
+        background: #e9ecef;
+        border-radius: 10px;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .risk-score-fill {
+        height: 100%;
+        transition: width 0.5s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 0.8rem;
+    }
+    
+    .risk-low .risk-score-fill { background: linear-gradient(90deg, #28a745, #20c997); }
+    .risk-medium .risk-score-fill { background: linear-gradient(90deg, #ffc107, #fd7e14); }
+    .risk-high .risk-score-fill { background: linear-gradient(90deg, #fd7e14, #dc3545); }
+    .risk-critical .risk-score-fill { background: linear-gradient(90deg, #dc3545, #721c24); }
+    
+    .farmer-form {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="h3 mb-0">Farmer Risk Assessment</h1>
+        <p class="text-muted">AI-powered risk analysis for farmer contract approvals</p>
+    </div>
+</div>
+
+<!-- Quick Statistics -->
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-6">
+        <div class="merchant-card">
+            <div class="d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <div class="metric-value">{{ assessments.count }}</div>
+                    <div>Total Assessments</div>
+                </div>
+                <div class="metric-icon">
+                    <i class="bi bi-person-check fs-1"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="merchant-card">
+            <div class="d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <div class="metric-value text-success">{{ assessments|length|default:0 }}</div>
+                    <div>Low Risk</div>
+                </div>
+                <div class="metric-icon">
+                    <i class="bi bi-shield-check fs-1 text-success"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="merchant-card">
+            <div class="d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <div class="metric-value text-warning">0</div>
+                    <div>Medium Risk</div>
+                </div>
+                <div class="metric-icon">
+                    <i class="bi bi-shield-exclamation fs-1 text-warning"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="merchant-card">
+            <div class="d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <div class="metric-value text-danger">0</div>
+                    <div>High Risk</div>
+                </div>
+                <div class="metric-icon">
+                    <i class="bi bi-shield-x fs-1 text-danger"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Action Buttons -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex gap-2 flex-wrap">
+            <button class="btn btn-primary-custom" onclick="showAssessmentForm()">
+                <i class="bi bi-plus-circle me-2"></i>New Assessment
+            </button>
+            <button class="btn btn-outline-success" onclick="exportAssessments()">
+                <i class="bi bi-download me-2"></i>Export Data
+            </button>
+            <button class="btn btn-outline-info" onclick="viewAnalytics()">
+                <i class="bi bi-graph-up me-2"></i>View Analytics
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Assessments List -->
+<div class="row">
+    <div class="col-12">
+        <div class="custom-card">
+            <div class="card-header-custom">
+                <h5 class="mb-0">Recent Assessments</h5>
+            </div>
+            <div class="card-body">
+                {% if assessments %}
+                    {% for assessment in assessments %}
+                    <div class="risk-level-card risk-{{ assessment.risk_level|lower }}">
+                        <div class="row align-items-center">
+                            <div class="col-md-3">
+                                <h6 class="fw-bold mb-1">{{ assessment.farmer_name }}</h6>
+                                <small class="text-muted">
+                                    {{ assessment.location }} • {{ assessment.total_hectares }} hectares
+                                </small>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="text-center">
+                                    <div class="h5 mb-0">${{ assessment.proposed_contract_value|floatformat:0 }}</div>
+                                    <small class="text-muted">Contract Value</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-1">Risk Score: {{ assessment.risk_score|floatformat:1 }}%</div>
+                                <div class="risk-score-meter">
+                                    <div class="risk-score-fill" style="width: {{ assessment.risk_score|floatformat:0 }}%">
+                                        {{ assessment.risk_score|floatformat:0 }}%
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <span class="badge bg-{{ assessment.risk_level|lower }} text-white">
+                                    {{ assessment.get_risk_level_display }}
+                                </span>
+                                <div class="small text-muted mt-1">
+                                    {{ assessment.assessment_date|date:"M d, Y" }}
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="d-flex gap-1">
+                                    <button class="btn btn-outline-primary btn-sm" onclick="viewAssessment({{ assessment.id }})">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    {% if not assessment.is_approved %}
+                                    <button class="btn btn-outline-success btn-sm" onclick="approveAssessment({{ assessment.id }})">
+                                        <i class="bi bi-check"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <div class="small">
+                                    <strong>AI Recommendation:</strong> {{ assessment.ai_recommendation|truncatewords:15 }}
+                                </div>
+                                {% if assessment.risk_factors %}
+                                <div class="small mt-1">
+                                    <strong>Risk Factors:</strong>
+                                    {% for factor in assessment.risk_factors %}
+                                        <span class="badge bg-light text-dark me-1">{{ factor }}</span>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center text-muted py-5">
+                        <i class="bi bi-person-check display-1"></i>
+                        <h5>No Risk Assessments</h5>
+                        <p>Start by assessing your first farmer for contract approval.</p>
+                        <button class="btn btn-primary-custom" onclick="showAssessmentForm()">
+                            <i class="bi bi-plus-circle me-2"></i>Create First Assessment
+                        </button>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Assessment Form Modal -->
+<div class="modal fade" id="assessmentModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Farmer Risk Assessment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="farmer-form">
+                    <form id="farmerAssessmentForm">
+                        {% csrf_token %}
+                        
+                        <!-- Farmer Information -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-primary mb-3">Farmer Information</h6>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Farmer Name *</label>
+                                <input type="text" class="form-control" name="farmer_name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Farmer ID</label>
+                                <input type="text" class="form-control" name="farmer_id" placeholder="Optional">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Location *</label>
+                                <input type="text" class="form-control" name="location" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" name="phone">
+                            </div>
+                        </div>
+                        
+                        <!-- Farm Details -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-primary mb-3">Farm Details</h6>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Total Hectares *</label>
+                                <input type="number" class="form-control" name="total_hectares" step="0.01" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Years of Experience *</label>
+                                <input type="number" class="form-control" name="years_experience" min="0" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Primary Tobacco Type *</label>
+                                <select class="form-select" name="primary_tobacco_type" required>
+                                    <option value="">Select Type</option>
+                                    <option value="Flue-cured">Flue-cured</option>
+                                    <option value="Burley">Burley</option>
+                                    <option value="Oriental">Oriental</option>
+                                    <option value="Dark">Dark</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Financial Information -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-primary mb-3">Financial Information</h6>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Annual Income (USD)</label>
+                                <input type="number" class="form-control" name="annual_income" step="0.01">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Current Debt Level (USD)</label>
+                                <input type="number" class="form-control" name="debt_level" step="0.01">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Credit Score (0-100)</label>
+                                <input type="number" class="form-control" name="credit_score" min="0" max="100">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Previous Defaults</label>
+                                <input type="number" class="form-control" name="previous_defaults" min="0" value="0">
+                            </div>
+                        </div>
+                        
+                        <!-- Proposed Contract -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-primary mb-3">Proposed Contract</h6>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Contract Value (USD) *</label>
+                                <input type="number" class="form-control" name="proposed_contract_value" step="0.01" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Quantity (kg) *</label>
+                                <input type="number" class="form-control" name="proposed_quantity" step="0.01" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Contract Duration (months) *</label>
+                                <input type="number" class="form-control" name="contract_duration_months" min="1" max="36" required>
+                            </div>
+                        </div>
+                        
+                        <!-- Sensitive Information -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-primary mb-3">Additional Information (Encrypted)</h6>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Bank Details</label>
+                                <textarea class="form-control" name="bank_details" rows="2" placeholder="Bank account information"></textarea>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Collateral Details</label>
+                                <textarea class="form-control" name="collateral_details" rows="2" placeholder="Available collateral"></textarea>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label class="form-label">Additional Notes</label>
+                                <textarea class="form-control" name="additional_notes" rows="3" placeholder="Any additional information or concerns"></textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary-custom" onclick="runAssessment()">
+                    <i class="bi bi-cpu me-2"></i>Run AI Assessment
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Assessment Result Modal -->
+<div class="modal fade" id="resultModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Assessment Results</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="assessmentResult">
+                    <!-- Results will be populated here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success" id="approveBtn" style="display: none;">
+                    <i class="bi bi-check-circle me-2"></i>Approve Contract
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function showAssessmentForm() {
+    document.getElementById('farmerAssessmentForm').reset();
+    new bootstrap.Modal(document.getElementById('assessmentModal')).show();
+}
+
+function runAssessment() {
+    const form = document.getElementById('farmerAssessmentForm');
+    const formData = new FormData(form);
+    
+    // Show loading state
+    TIMBUtils.showLoader();
+    
+    fetch('{% url "merchant_create_farmer_assessment" %}', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': TIMBUtils.getCsrfToken(),
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        TIMBUtils.hideLoader();
+        
+        if (data.success) {
+            // Hide assessment form modal
+            bootstrap.Modal.getInstance(document.getElementById('assessmentModal')).hide();
+            
+            // Show results
+            showAssessmentResult(data);
+            
+            TIMBUtils.showNotification('Assessment completed successfully', 'success');
+        } else {
+            TIMBUtils.showNotification('Error: ' + data.error, 'danger');
+        }
+    })
+    .catch(error => {
+        TIMBUtils.hideLoader();
+        console.error('Error:', error);
+        TIMBUtils.showNotification('Error running assessment', 'danger');
+    });
+}
+
+function showAssessmentResult(data) {
+    const riskLevel = data.risk_level.toLowerCase();
+    const riskColor = {
+        'low': 'success',
+        'medium': 'warning', 
+        'high': 'danger',
+        'critical': 'danger'
+    }[riskLevel] || 'secondary';
+    
+    const resultHtml = `
+        <div class="text-center mb-4">
+            <div class="display-4 text-${riskColor} mb-2">
+                <i class="bi bi-shield-${riskLevel === 'low' ? 'check' : riskLevel === 'critical' ? 'x' : 'exclamation'}"></i>
+            </div>
+            <h4 class="text-${riskColor}">${data.risk_level} Risk</h4>
+            <div class="h2 mb-3">${(data.risk_score * 100).toFixed(1)}%</div>
+        </div>
+        
+        <div class="alert alert-${riskColor}">
+            <h6>AI Recommendation:</h6>
+            <p class="mb-0">${data.recommendation}</p>
+        </div>
+        
+        <div class="mt-3">
+            <h6>Assessment Details:</h6>
+            <ul class="list-unstyled">
+                <li><strong>Assessment ID:</strong> ${data.assessment_id}</li>
+                <li><strong>Risk Score:</strong> ${(data.risk_score * 100).toFixed(1)}%</li>
+                <li><strong>Risk Level:</strong> ${data.risk_level}</li>
+            </ul>
+        </div>
+    `;
+    
+    document.getElementById('assessmentResult').innerHTML = resultHtml;
+    
+    // Show approve button for low/medium risk
+    const approveBtn = document.getElementById('approveBtn');
+    if (riskLevel === 'low' || riskLevel === 'medium') {
+        approveBtn.style.display = 'inline-block';
+        approveBtn.onclick = () => approveAssessment(data.assessment_id);
+    } else {
+        approveBtn.style.display = 'none';
+    }
+    
+    new bootstrap.Modal(document.getElementById('resultModal')).show();
+}
+
+function viewAssessment(assessmentId) {
+    // Implement assessment detail view
+    window.location.href = `/merchant/farmer-assessment/${assessmentId}/`;
+}
+
+function approveAssessment(assessmentId) {
+    TIMBUtils.showConfirmDialog(
+        'Approve this farmer for contract?',
+        () => {
+            fetch(`/merchant/api/farmer-assessments/${assessmentId}/approve/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': TIMBUtils.getCsrfToken(),
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    TIMBUtils.showNotification('Farmer approved for contract', 'success');
+                    location.reload();
+                } else {
+                    TIMBUtils.showNotification('Error: ' + data.error, 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                TIMBUtils.showNotification('Error approving farmer', 'danger');
+            });
+        }
+    );
+}
+
+function exportAssessments() {
+    window.open('/merchant/api/farmer-assessments/export/', '_blank');
+}
+
+function viewAnalytics() {
+    // Implement analytics view
+    TIMBUtils.showNotification('Analytics feature coming soon', 'info');
+}
+</script>
+{% endblock %}

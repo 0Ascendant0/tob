@@ -1,0 +1,478 @@
+{% extends 'base.html' %}
+
+{% block title %}Record Transaction - TIMB{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8">
+    <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg">
+        <!-- Header -->
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-primary-600 to-primary-700">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                        <i class="fas fa-plus-circle text-white text-xl"></i>
+                    </div>
+                </div>
+                <div class="ml-4">
+                    <h1 class="text-2xl font-bold text-white">Record New Transaction</h1>
+                    <p class="text-primary-100">Enter tobacco trading transaction details</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Form -->
+        <form id="transaction-form" class="p-6">
+            {% csrf_token %}
+            
+            <!-- Transaction Type & Floor -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label for="transaction_type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Transaction Type <span class="text-red-500">*</span>
+                    </label>
+                    <select name="transaction_type" id="transaction_type" required
+                            class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                        <option value="">Select transaction type</option>
+                        {% for value, label in transaction_types %}
+                            <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="floor" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Tobacco Floor
+                    </label>
+                    <select name="floor" id="floor"
+                            class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                        <option value="">Select floor (optional)</option>
+                        {% for floor in floors %}
+                            <option value="{{ floor.id }}">{{ floor.name }} - {{ floor.location }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Trading Parties -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label for="seller" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Seller <span class="text-red-500">*</span>
+                    </label>
+                    <select name="seller" id="seller" required
+                            class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                        <option value="">Select seller</option>
+                        {% for merchant in merchants %}
+                            <option value="{{ merchant.id }}">{{ merchant.username }} {% if merchant.merchant_profile.company_name %}({{ merchant.merchant_profile.company_name }}){% endif %}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="buyer" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Buyer <span class="text-red-500">*</span>
+                    </label>
+                    <select name="buyer" id="buyer" required
+                            class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                        <option value="">Select buyer</option>
+                        {% for merchant in merchants %}
+                            <option value="{{ merchant.id }}">{{ merchant.username }} {% if merchant.merchant_profile.company_name %}({{ merchant.merchant_profile.company_name }}){% endif %}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Product Details -->
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-6">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Product Details</h3>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    <div>
+                        <label for="grade" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Tobacco Grade <span class="text-red-500">*</span>
+                        </label>
+                        <select name="grade" id="grade" required
+                                class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            <option value="">Select grade</option>
+                            {% for grade in grades %}
+                                <option value="{{ grade.id }}" data-base-price="{{ grade.base_price }}">{{ grade.grade_code }} - {{ grade.grade_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="quantity" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Quantity (kg) <span class="text-red-500">*</span>
+                        </label>
+                        <input type="number" name="quantity" id="quantity" step="0.01" min="0" required
+                               class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                               placeholder="0.00">
+                    </div>
+                    
+                    <div>
+                        <label for="price_per_kg" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Price per kg (USD) <span class="text-red-500">*</span>
+                        </label>
+                        <input type="number" name="price_per_kg" id="price_per_kg" step="0.01" min="0" required
+                               class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                               placeholder="0.00">
+                        <div id="price-indicator" class="text-xs mt-1"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Additional Details -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label for="payment_method" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Payment Method
+                    </label>
+                    <select name="payment_method" id="payment_method"
+                            class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                        <option value="">Select payment method</option>
+                        <option value="CASH">Cash</option>
+                        <option value="BANK_TRANSFER">Bank Transfer</option>
+                        <option value="CHEQUE">Cheque</option>
+                        <option value="MOBILE_MONEY">Mobile Money</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="moisture_content" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Moisture Content (%)
+                    </label>
+                    <input type="number" name="moisture_content" id="moisture_content" step="0.1" min="0" max="100"
+                           class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                           placeholder="0.0">
+                </div>
+            </div>
+            
+            <!-- Quality Assessment -->
+            <div class="mb-6">
+                <label for="quality_assessment" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Quality Assessment
+                </label>
+                <textarea name="quality_assessment" id="quality_assessment" rows="3"
+                          class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                          placeholder="Enter quality assessment notes..."></textarea>
+            </div>
+            
+            <!-- Transaction Summary -->
+            <div class="bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-lg p-4 mb-6">
+                <h3 class="text-lg font-medium text-blue-900 dark:text-blue-100 mb-2">Transaction Summary</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+                    <div>
+                        <span class="text-blue-700 dark:text-blue-300">Quantity:</span>
+                        <span id="summary-quantity" class="font-medium text-blue-900 dark:text-blue-100 ml-2">0 kg</span>
+                    </div>
+                    <div>
+                        <span class="text-blue-700 dark:text-blue-300">Price per kg:</span>
+                        <span id="summary-price" class="font-medium text-blue-900 dark:text-blue-100 ml-2">$0.00</span>
+                    </div>
+                    <div>
+                        <span class="text-blue-700 dark:text-blue-300">Total Amount:</span>
+                        <span id="summary-total" class="font-medium text-blue-900 dark:text-blue-100 ml-2 text-lg">$0.00</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3">
+                <button type="button" onclick="resetForm()" 
+                        class="px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 transition duration-200">
+                    <i class="fas fa-redo mr-2"></i>Reset Form
+                </button>
+                
+                <button type="submit" id="submit-btn"
+                        class="px-6 py-3 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 transition duration-200">
+                    <i class="fas fa-save mr-2"></i>Record Transaction
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- AI Fraud Detection Results Modal -->
+<div id="fraud-detection-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full">
+            <div class="p-6">
+                <div class="flex items-center mb-4">
+                    <div id="fraud-icon" class="flex-shrink-0">
+                        <!-- Icon will be set by JavaScript -->
+                    </div>
+                    <h3 id="fraud-title" class="ml-3 text-lg font-medium text-gray-900 dark:text-white">
+                        <!-- Title will be set by JavaScript -->
+                    </h3>
+                </div>
+                
+                <div id="fraud-message" class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                    <!-- Message will be set by JavaScript -->
+                </div>
+                
+                <div id="fraud-details" class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 mb-4 hidden">
+                    <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-2">Risk Factors:</h4>
+                    <ul id="risk-factors-list" class="text-xs text-gray-600 dark:text-gray-400 space-y-1">
+                        <!-- Risk factors will be populated by JavaScript -->
+                    </ul>
+                </div>
+                
+                <div class="flex justify-end space-x-3">
+                    <button onclick="closeModal()" 
+                            class="px-4 py-2 text-gray-500 hover:text-gray-700 focus:outline-none">
+                        Close
+                    </button>
+                    <button onclick="proceedWithTransaction()" 
+                            class="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                        Proceed Anyway
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentFormData = null;
+let fraudDetectionResults = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    initializeForm();
+});
+
+function initializeForm() {
+    // Form validation and calculation
+    const quantityInput = document.getElementById('quantity');
+    const priceInput = document.getElementById('price_per_kg');
+    const gradeSelect = document.getElementById('grade');
+    
+    // Add event listeners for real-time calculations
+    [quantityInput, priceInput].forEach(input => {
+        input.addEventListener('input', updateSummary);
+    });
+    
+    gradeSelect.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        const basePrice = selectedOption.dataset.basePrice;
+        
+        if (basePrice) {
+            priceInput.value = basePrice;
+            updateSummary();
+            checkPriceDeviation();
+        }
+    });
+    
+    priceInput.addEventListener('input', checkPriceDeviation);
+    
+    // Form submission
+    document.getElementById('transaction-form').addEventListener('submit', handleFormSubmit);
+}
+
+function updateSummary() {
+    const quantity = parseFloat(document.getElementById('quantity').value) || 0;
+    const price = parseFloat(document.getElementById('price_per_kg').value) || 0;
+    const total = quantity * price;
+    
+    document.getElementById('summary-quantity').textContent = `${quantity.toFixed(2)} kg`;
+    document.getElementById('summary-price').textContent = `$${price.toFixed(2)}`;
+    document.getElementById('summary-total').textContent = `$${total.toFixed(2)}`;
+}
+
+function checkPriceDeviation() {
+    const gradeSelect = document.getElementById('grade');
+    const priceInput = document.getElementById('price_per_kg');
+    const priceIndicator = document.getElementById('price-indicator');
+    
+    const selectedOption = gradeSelect.options[gradeSelect.selectedIndex];
+    const basePrice = parseFloat(selectedOption.dataset.basePrice);
+    const currentPrice = parseFloat(priceInput.value);
+    
+    if (basePrice && currentPrice) {
+        const deviation = ((currentPrice - basePrice) / basePrice) * 100;
+        
+        if (Math.abs(deviation) > 20) {
+            priceIndicator.className = 'text-xs mt-1 text-red-600';
+            priceIndicator.textContent = `⚠️ ${deviation > 0 ? '+' : ''}${deviation.toFixed(1)}% from base price ($${basePrice})`;
+        } else if (Math.abs(deviation) > 10) {
+            priceIndicator.className = 'text-xs mt-1 text-yellow-600';
+            priceIndicator.textContent = `⚡ ${deviation > 0 ? '+' : ''}${deviation.toFixed(1)}% from base price ($${basePrice})`;
+        } else {
+            priceIndicator.className = 'text-xs mt-1 text-green-600';
+            priceIndicator.textContent = `✓ Within normal range (base: $${basePrice})`;
+        }
+    } else {
+        priceIndicator.textContent = '';
+    }
+}
+
+async function handleFormSubmit(event) {
+    event.preventDefault();
+    
+    const submitBtn = document.getElementById('submit-btn');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+    
+    try {
+        const formData = new FormData(event.target);
+        const data = Object.fromEntries(formData.entries());
+        
+        // Store form data for potential resubmission
+        currentFormData = data;
+        
+        const response = await fetch('', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            },
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            // Check for fraud detection results
+            if (result.fraud_detected) {
+                showFraudDetectionModal(result);
+            } else {
+                // Transaction recorded successfully
+                window.timbRealTime.showNotification('Transaction recorded successfully!', 'success');
+                resetForm();
+                
+                // Redirect to dashboard after a short delay
+                setTimeout(() => {
+                    window.location.href = '/timb/';
+                }, 2000);
+            }
+        } else {
+            window.timbRealTime.showNotification(result.error || 'Failed to record transaction', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        window.timbRealTime.showNotification('An error occurred while recording the transaction', 'error');
+    }
+    
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = '<i class="fas fa-save mr-2"></i>Record Transaction';
+}
+
+function showFraudDetectionModal(results) {
+    fraudDetectionResults = results;
+    
+    const modal = document.getElementById('fraud-detection-modal');
+    const icon = document.getElementById('fraud-icon');
+    const title = document.getElementById('fraud-title');
+    const message = document.getElementById('fraud-message');
+    const details = document.getElementById('fraud-details');
+    const riskFactorsList = document.getElementById('risk-factors-list');
+    
+    // Set content based on fraud confidence
+    if (results.confidence > 0.8) {
+        icon.innerHTML = '<div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center"><i class="fas fa-exclamation-triangle text-red-600 text-xl"></i></div>';
+        title.textContent = 'High Fraud Risk Detected';
+        message.textContent = `AI analysis indicates a ${(results.confidence * 100).toFixed(1)}% probability of fraud. Please review carefully before proceeding.`;
+    } else {
+        icon.innerHTML = '<div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center"><i class="fas fa-flag text-yellow-600 text-xl"></i></div>';
+        title.textContent = 'Transaction Flagged for Review';
+        message.textContent = `AI analysis detected potential issues with ${(results.confidence * 100).toFixed(1)}% confidence. Manual review recommended.`;
+    }
+    
+    // Show risk factors
+    if (results.risk_factors && results.risk_factors.length > 0) {
+        riskFactorsList.innerHTML = '';
+        results.risk_factors.forEach(factor => {
+            const li = document.createElement('li');
+            li.textContent = `• ${factor}`;
+            riskFactorsList.appendChild(li);
+        });
+        details.classList.remove('hidden');
+    }
+    
+    modal.classList.remove('hidden');
+}
+
+function closeModal() {
+    document.getElementById('fraud-detection-modal').classList.add('hidden');
+}
+
+async function proceedWithTransaction() {
+    if (!currentFormData) return;
+    
+    try {
+        // Add override flag to proceed despite fraud detection
+        const formData = new FormData();
+        Object.entries(currentFormData).forEach(([key, value]) => {
+            formData.append(key, value);
+        });
+        formData.append('override_fraud_detection', 'true');
+        
+        const response = await fetch('', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            },
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            closeModal();
+            window.timbRealTime.showNotification('Transaction recorded with fraud flag', 'warning');
+            resetForm();
+            
+            setTimeout(() => {
+                window.location.href = '/timb/';
+            }, 2000);
+        } else {
+            window.timbRealTime.showNotification(result.error || 'Failed to record transaction', 'error');
+        }
+    } catch (error) {
+        window.timbRealTime.showNotification('An error occurred', 'error');
+    }
+}
+
+function resetForm() {
+    document.getElementById('transaction-form').reset();
+    updateSummary();
+    document.getElementById('price-indicator').textContent = '';
+    currentFormData = null;
+    fraudDetectionResults = null;
+}
+
+// Auto-save form data to localStorage
+function saveFormState() {
+    const formData = new FormData(document.getElementById('transaction-form'));
+    const data = Object.fromEntries(formData.entries());
+    localStorage.setItem('transaction_form_draft', JSON.stringify(data));
+}
+
+function restoreFormState() {
+    const saved = localStorage.getItem('transaction_form_draft');
+    if (saved) {
+        const data = JSON.parse(saved);
+        Object.entries(data).forEach(([key, value]) => {
+            const element = document.querySelector(`[name="${key}"]`);
+            if (element) {
+                element.value = value;
+            }
+        });
+        updateSummary();
+    }
+}
+
+// Auto-save every 30 seconds
+setInterval(saveFormState, 30000);
+
+// Restore on page load
+window.addEventListener('load', restoreFormState);
+
+// Clear saved data on successful submission
+window.addEventListener('beforeunload', function() {
+    if (currentFormData) {
+        localStorage.removeItem('transaction_form_draft');
+    }
+});
+</script>
+{% endblock %}

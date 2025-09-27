@@ -1,511 +1,452 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="{{ request.theme|default:'timb' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}TIMB - Tobacco Trading System{% endblock %}</title>
+    <title>{% block title %}TIMB - Tobacco Trading Platform{% endblock %}</title>
     
-    <!-- CSS Libraries -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Chart.js -->
+    <!-- Custom theme configuration -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            500: '#5D5CDE',
+                            600: '#4338ca',
+                            700: '#3730a3',
+                            900: '#1e1b4b'
+                        },
+                        timb: {
+                            green: '#059669',
+                            gold: '#f59e0b',
+                            blue: '#3b82f6'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Chart.js for data visualization -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- Custom CSS -->
     <style>
-        :root {
-            /* TIMB Theme Colors */
-            --timb-primary: #2E7D32;
-            --timb-secondary: #4CAF50;
-            --timb-accent: #FFC107;
-            --timb-dark: #1B5E20;
-            --timb-light: #E8F5E8;
-            --timb-text: #263238;
-            --timb-gray: #ECEFF1;
-            
-            /* Merchant Theme Colors */
-            --merchant-primary: #1976D2;
-            --merchant-secondary: #2196F3;
-            --merchant-accent: #FF9800;
-            --merchant-dark: #0D47A1;
-            --merchant-light: #E3F2FD;
-            
-            /* Common Colors */
-            --danger: #D32F2F;
-            --warning: #F57C00;
-            --success: #388E3C;
-            --info: #1976D2;
-            
-            /* Shadows */
-            --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
-            --shadow-md: 0 4px 8px rgba(0,0,0,0.12);
-            --shadow-lg: 0 8px 16px rgba(0,0,0,0.15);
-            
-            /* Border Radius */
-            --radius-sm: 4px;
-            --radius-md: 8px;
-            --radius-lg: 12px;
-            --radius-xl: 16px;
+        /* Dark mode support */
+        .dark {
+            color-scheme: dark;
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, var(--timb-light) 0%, #f8f9fa 100%);
-            color: var(--timb-text);
-            line-height: 1.6;
-            min-height: 100vh;
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
         }
-
-        /* Theme Switching - Use User model fields */
-        .merchant-theme {
-            --primary: var(--merchant-primary);
-            --secondary: var(--merchant-secondary);
-            --accent: var(--merchant-accent);
-            --dark: var(--merchant-dark);
-            --light: var(--merchant-light);
+        
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
         }
-
-        .merchant-theme body {
-            background: linear-gradient(135deg, var(--merchant-light) 0%, #f8f9fa 100%);
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
         }
-
-        /* Header Styles */
-        .main-header {
-            background: linear-gradient(135deg, var(--timb-primary) 0%, var(--timb-dark) 100%);
-            color: white;
-            padding: 1rem 0;
-            box-shadow: var(--shadow-md);
-            position: sticky;
-            top: 0;
-            z-index: 1050;
+        
+        /* Real-time indicator */
+        .live-indicator {
+            animation: pulse 2s infinite;
         }
-
-        .merchant-theme .main-header {
-            background: linear-gradient(135deg, var(--merchant-primary) 0%, var(--merchant-dark) 100%);
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
-
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            font-size: 1.5rem;
-            font-weight: 700;
-            text-decoration: none;
-            color: white;
-        }
-
-        .logo i {
-            font-size: 2rem;
-            margin-right: 0.5rem;
-        }
-
-        .nav-controls {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-        }
-
-        .theme-toggle {
-            padding: 0.5rem 1rem;
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            border-radius: var(--radius-md);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 500;
-        }
-
-        .theme-toggle:hover {
-            background: rgba(255,255,255,0.3);
-            transform: translateY(-2px);
-        }
-
-        .theme-toggle.active {
-            background: var(--timb-accent);
-            color: var(--timb-dark);
-        }
-
-        .merchant-theme .theme-toggle.active {
-            background: var(--merchant-accent);
-            color: var(--merchant-dark);
-        }
-
-        .user-menu {
-            position: relative;
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
+        
+        /* Loading spinner */
+        .spinner {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #5D5CDE;
             border-radius: 50%;
-            background: rgba(255,255,255,0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
         }
-
-        .user-avatar:hover {
-            background: rgba(255,255,255,0.3);
-        }
-
-        /* Main Content */
-        .main-content {
-            min-height: calc(100vh - 100px);
-            padding: 2rem 0;
-        }
-
-        /* Card Styles */
-        .custom-card {
-            background: white;
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-sm);
-            border: none;
-            transition: all 0.3s ease;
-        }
-
-        .custom-card:hover {
-            box-shadow: var(--shadow-md);
-            transform: translateY(-2px);
-        }
-
-        .card-header-custom {
-            background: linear-gradient(135deg, var(--timb-primary) 0%, var(--timb-secondary) 100%);
-            color: white;
-            border-radius: var(--radius-lg) var(--radius-lg) 0 0 !important;
-            padding: 1rem 1.5rem;
-            border-bottom: none;
-            font-weight: 600;
-        }
-
-        .merchant-theme .card-header-custom {
-            background: linear-gradient(135deg, var(--merchant-primary) 0%, var(--merchant-secondary) 100%);
-        }
-
-        /* Statistics Cards */
-        .stat-card {
-            background: white;
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            box-shadow: var(--shadow-sm);
-            border-left: 5px solid var(--timb-secondary);
-            transition: all 0.3s ease;
-            height: 100%;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .merchant-theme .stat-card {
-            border-left-color: var(--merchant-secondary);
-        }
-
-        .stat-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--timb-primary) 0%, var(--timb-secondary) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .merchant-theme .stat-icon {
-            background: linear-gradient(135deg, var(--merchant-primary) 0%, var(--merchant-secondary) 100%);
-        }
-
-        .stat-value {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--timb-primary);
-            margin-bottom: 0.5rem;
-        }
-
-        .merchant-theme .stat-value {
-            color: var(--merchant-primary);
-        }
-
-        .stat-label {
-            color: #6c757d;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        .stat-change {
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin-top: 0.5rem;
-        }
-
-        .stat-change.positive {
-            color: var(--success);
-        }
-
-        .stat-change.negative {
-            color: var(--danger);
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .nav-controls {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-
-            .main-content {
-                padding: 1rem 0;
-            }
-
-            .stat-card {
-                text-align: center;
-            }
-
-            .stat-value {
-                font-size: 2rem;
-            }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
     
     {% block extra_css %}{% endblock %}
 </head>
-<body class="{% if user.is_merchant %}merchant-theme{% endif %}">
-    <!-- Header -->
-    <header class="main-header">
-        <div class="container">
-            <div class="header-content">
-                <a href="/" class="logo">
-                    <i class="bi bi-building"></i>
-                    {% if user.is_merchant %}
-                        Merchant Dashboard
-                    {% else %}
-                        TIMB Dashboard
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white dark:bg-gray-800 shadow-lg border-b border-gray-200 dark:border-gray-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <!-- Logo and main navigation -->
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <a href="{% url 'home' %}" class="flex items-center">
+                            <img class="h-8 w-auto" src="/static/images/timb-logo.png" alt="TIMB">
+                            <span class="ml-2 text-xl font-bold text-primary-600">TIMB</span>
+                        </a>
+                    </div>
+                    
+                    {% if user.is_authenticated %}
+                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        {% if user.is_timb_staff %}
+                            <a href="{% url 'timb_dashboard:dashboard' %}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                                <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
+                            </a>
+                            <a href="{% url 'timb_dashboard:record_transaction' %}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                                <i class="fas fa-plus-circle mr-2"></i>Record Transaction
+                            </a>
+                            <a href="{% url 'ai:ai_dashboard' %}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                                <i class="fas fa-robot mr-2"></i>AI Models
+                            </a>
+                        {% elif user.is_merchant %}
+                            <a href="{% url 'merchant_dashboard' %}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                                <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
+                            </a>
+                            <a href="{% url 'merchant_inventory' %}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                                <i class="fas fa-boxes mr-2"></i>Inventory
+                            </a>
+                            <a href="{% url 'merchant_orders' %}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                                <i class="fas fa-shopping-cart mr-2"></i>Orders
+                            </a>
+                            <a href="{% url 'merchant_ai_recommendations' %}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                                <i class="fas fa-lightbulb mr-2"></i>AI Insights
+                            </a>
+                        {% endif %}
+                        
+                        <a href="{% url 'realtime:realtime_dashboard' %}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            <i class="fas fa-broadcast-tower mr-2 live-indicator text-red-500"></i>Live Market
+                        </a>
+                    </div>
                     {% endif %}
-                </a>
+                </div>
                 
-                <div class="nav-controls">
-                    <button class="theme-toggle" id="themeToggle">
-                        <i class="bi bi-palette"></i>
-                        Switch Theme
+                <!-- Right side navigation -->
+                <div class="hidden sm:ml-6 sm:flex sm:items-center">
+                    <!-- Real-time indicators -->
+                    <div class="flex items-center space-x-4 mr-4">
+                        <div class="flex items-center text-sm text-gray-500">
+                            <div class="w-2 h-2 bg-green-500 rounded-full live-indicator mr-2"></div>
+                            Live Data
+                        </div>
+                    </div>
+                    
+                    <!-- Notifications -->
+                    {% if user.is_authenticated %}
+                    <div class="relative">
+                        <button id="notifications-btn" class="p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                            <i class="fas fa-bell"></i>
+                            <span id="notification-count" class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-400 hidden"></span>
+                        </button>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Theme toggle -->
+                    <button id="theme-toggle" class="ml-4 p-2 text-gray-400 hover:text-gray-500 focus:outline-none">
+                        <i id="theme-icon" class="fas fa-moon"></i>
                     </button>
                     
                     {% if user.is_authenticated %}
-                        <div class="user-menu">
-                            <div class="user-avatar" id="userMenuToggle">
-                                <i class="bi bi-person"></i>
+                    <!-- Profile dropdown -->
+                    <div class="ml-3 relative">
+                        <div>
+                            <button id="user-menu-btn" class="bg-white dark:bg-gray-800 flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                                {% if user.profile.profile_picture %}
+                                    <img class="h-8 w-8 rounded-full" src="{{ user.profile.profile_picture.url }}" alt="">
+                                {% else %}
+                                    <div class="h-8 w-8 rounded-full bg-primary-500 flex items-center justify-center">
+                                        <span class="text-sm font-medium text-white">{{ user.first_name.0|default:user.username.0|upper }}</span>
+                                    </div>
+                                {% endif %}
+                            </button>
+                        </div>
+                        
+                        <div id="user-menu" class="hidden origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-50">
+                            <div class="py-1">
+                                <div class="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+                                    <p class="text-sm font-medium">{{ user.get_full_name|default:user.username }}</p>
+                                    <p class="text-xs text-gray-500">{{ user.get_user_type }}</p>
+                                </div>
+                                <a href="{% url 'profile' %}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                    <i class="fas fa-user mr-2"></i>Profile
+                                </a>
+                                {% if user.is_merchant %}
+                                <a href="{% url 'merchant_profile_customization' %}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                    <i class="fas fa-cog mr-2"></i>Settings
+                                </a>
+                                {% endif %}
+                                <a href="{% url 'logout' %}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                    <i class="fas fa-sign-out-alt mr-2"></i>Sign out
+                                </a>
                             </div>
                         </div>
-                        <span class="text-light">{{ user.get_full_name|default:user.username }}</span>
-                        <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm">
-                            <i class="bi bi-box-arrow-right"></i> Logout
-                        </a>
+                    </div>
                     {% else %}
-                        <a href="{% url 'login' %}" class="btn btn-outline-light">
-                            <i class="bi bi-box-arrow-in-right"></i> Login
+                    <div class="flex space-x-4">
+                        <a href="{% url 'login' %}" class="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">
+                            Login
                         </a>
+                        <a href="{% url 'register' %}" class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+                            Register
+                        </a>
+                    </div>
                     {% endif %}
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="sm:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500">
+                        <i class="fas fa-bars"></i>
+                    </button>
                 </div>
             </div>
         </div>
-    </header>
-
-    <!-- Main Content -->
-    <main class="main-content">
-        <div class="container">
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                        <i class="bi bi-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'warning' %}exclamation-triangle{% elif message.tags == 'error' %}x-circle{% else %}info-circle{% endif %} me-2"></i>
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-            
-            {% block content %}{% endblock %}
+        
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="sm:hidden hidden">
+            <div class="pt-2 pb-3 space-y-1">
+                {% if user.is_authenticated %}
+                    {% if user.is_timb_staff %}
+                        <a href="{% url 'timb_dashboard:dashboard' %}" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300">Dashboard</a>
+                        <a href="{% url 'timb_dashboard:record_transaction' %}" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300">Record Transaction</a>
+                        <a href="{% url 'ai:ai_dashboard' %}" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300">AI Models</a>
+                    {% elif user.is_merchant %}
+                        <a href="{% url 'merchant_dashboard' %}" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300">Dashboard</a>
+                        <a href="{% url 'merchant_inventory' %}" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300">Inventory</a>
+                        <a href="{% url 'merchant_orders' %}" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300">Orders</a>
+                    {% endif %}
+                {% endif %}
+            </div>
         </div>
-    </main>
-
-    <!-- JavaScript Libraries -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </nav>
     
-    <!-- WebSocket for Real-time Updates -->
+    <!-- Main content -->
+    <main class="flex-1">
+        <!-- Messages -->
+        {% if messages %}
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+            {% for message in messages %}
+            <div class="mb-4 p-4 rounded-md {% if message.tags == 'error' %}bg-red-50 border border-red-200 text-red-700{% elif message.tags == 'warning' %}bg-yellow-50 border border-yellow-200 text-yellow-700{% elif message.tags == 'success' %}bg-green-50 border border-green-200 text-green-700{% else %}bg-blue-50 border border-blue-200 text-blue-700{% endif %}">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        {% if message.tags == 'error' %}
+                            <i class="fas fa-exclamation-circle"></i>
+                        {% elif message.tags == 'warning' %}
+                            <i class="fas fa-exclamation-triangle"></i>
+                        {% elif message.tags == 'success' %}
+                            <i class="fas fa-check-circle"></i>
+                        {% else %}
+                            <i class="fas fa-info-circle"></i>
+                        {% endif %}
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm">{{ message }}</p>
+                    </div>
+                    <div class="ml-auto pl-3">
+                        <button onclick="this.parentElement.parentElement.parentElement.remove()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-auto">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="text-sm text-gray-500">
+                    &copy; 2024 Tobacco Industry and Marketing Board (TIMB). All rights reserved.
+                </div>
+                <div class="mt-4 md:mt-0 flex space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-gray-500">
+                        <i class="fab fa-facebook"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-gray-500">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-gray-500">
+                        <i class="fab fa-linkedin"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Real-time connection status -->
+    <div id="connection-status" class="fixed bottom-4 right-4 px-4 py-2 rounded-lg shadow-lg text-white text-sm hidden">
+        <div class="flex items-center">
+            <div id="connection-indicator" class="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+            <span id="connection-text">Connected</span>
+        </div>
+    </div>
+    
+    <!-- Base JavaScript -->
     <script>
-        // WebSocket connection for real-time updates
-        const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
-        const wsPath = wsScheme + '://' + window.location.host + '/ws/realtime/';
-        let socket;
-        
-        function connectWebSocket() {
-            try {
-                socket = new WebSocket(wsPath);
-
-                socket.onmessage = function(e) {
-                    const data = JSON.parse(e.data);
-                    handleRealtimeUpdate(data);
-                };
-
-                socket.onclose = function(e) {
-                    console.error('WebSocket closed unexpectedly');
-                    // Attempt to reconnect after 3 seconds
-                    setTimeout(connectWebSocket, 3000);
-                };
-
-                socket.onerror = function(e) {
-                    console.error('WebSocket error:', e);
-                };
-            } catch (error) {
-                console.error('WebSocket connection error:', error);
-                // Fallback to polling if WebSocket fails
-                setTimeout(connectWebSocket, 5000);
-            }
-        }
-        
-        // Initialize WebSocket connection
-        if (typeof WebSocket !== 'undefined') {
-            connectWebSocket();
-        }
-
-        function handleRealtimeUpdate(data) {
-            // Handle different types of real-time updates
-            switch(data.type) {
-                case 'price_update':
-                    updatePriceData(data.payload);
-                    break;
-                case 'transaction':
-                    addTransactionToFeed(data.payload);
-                    break;
-                case 'fraud_alert':
-                    showFraudAlert(data.payload);
-                    break;
-                case 'yield_prediction':
-                    updateYieldPrediction(data.payload);
-                    break;
-            }
-        }
-
-        // Theme switching
-        document.addEventListener('DOMContentLoaded', function() {
-            const themeToggle = document.getElementById('themeToggle');
-            if (themeToggle) {
-                themeToggle.addEventListener('click', function() {
-                    document.body.classList.toggle('merchant-theme');
-                    const isTheme = document.body.classList.contains('merchant-theme');
-                    localStorage.setItem('theme', isTheme ? 'merchant' : 'timb');
-                });
-            }
-
-            // Load saved theme
+        // Theme management
+        function initTheme() {
             const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'merchant') {
-                document.body.classList.add('merchant-theme');
-            }
-        });
-
-        // Utility functions
-        function formatCurrency(amount) {
-            return new Intl.NumberFormat('en-ZW', {
-                style: 'currency',
-                currency: 'USD'
-            }).format(amount);
-        }
-
-        function formatWeight(weight) {
-            return new Intl.NumberFormat('en-ZW', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            }).format(weight) + ' kg';
-        }
-
-        function timeAgo(timestamp) {
-            const now = new Date();
-            const time = new Date(timestamp);
-            const diffInSeconds = Math.floor((now - time) / 1000);
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             
-            if (diffInSeconds < 60) return 'Just now';
-            if (diffInSeconds < 3600) return Math.floor(diffInSeconds / 60) + ' minutes ago';
-            if (diffInSeconds < 86400) return Math.floor(diffInSeconds / 3600) + ' hours ago';
-            return Math.floor(diffInSeconds / 86400) + ' days ago';
+            if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+                document.documentElement.classList.add('dark');
+                document.getElementById('theme-icon').className = 'fas fa-sun';
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.getElementById('theme-icon').className = 'fas fa-moon';
+            }
         }
         
-        // Placeholder functions for real-time updates
-        function updatePriceData(data) {
-            console.log('Price update:', data);
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.contains('dark');
+            
+            if (isDark) {
+                document.documentElement.classList.remove('dark');
+                document.getElementById('theme-icon').className = 'fas fa-moon';
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                document.getElementById('theme-icon').className = 'fas fa-sun';
+                localStorage.setItem('theme', 'dark');
+            }
         }
-
-        function addTransactionToFeed(data) {
-            const feed = document.getElementById('realtimeFeed');
-            if (feed) {
-                const feedItem = document.createElement('div');
-                feedItem.className = 'feed-item';
-                feedItem.innerHTML = `
-                    <div class="feed-time">${new Date().toLocaleTimeString()}</div>
-                    <div class="feed-content">
-                        <strong>New Transaction:</strong> ${data.quantity}kg of ${data.grade} 
-                        traded at $${data.price}/kg on ${data.floor}
+        
+        // Menu toggles
+        function toggleUserMenu() {
+            const menu = document.getElementById('user-menu');
+            menu.classList.toggle('hidden');
+        }
+        
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+        
+        // Real-time connection status
+        function updateConnectionStatus(connected) {
+            const status = document.getElementById('connection-status');
+            const indicator = document.getElementById('connection-indicator');
+            const text = document.getElementById('connection-text');
+            
+            if (connected) {
+                indicator.className = 'w-2 h-2 bg-green-500 rounded-full mr-2';
+                text.textContent = 'Connected';
+                status.className = 'fixed bottom-4 right-4 px-4 py-2 rounded-lg shadow-lg text-white text-sm bg-green-600';
+            } else {
+                indicator.className = 'w-2 h-2 bg-red-500 rounded-full mr-2';
+                text.textContent = 'Disconnected';
+                status.className = 'fixed bottom-4 right-4 px-4 py-2 rounded-lg shadow-lg text-white text-sm bg-red-600';
+            }
+            
+            status.classList.remove('hidden');
+            setTimeout(() => status.classList.add('hidden'), 3000);
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initTheme();
+            
+            // Event listeners
+            if (document.getElementById('theme-toggle')) {
+                document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+            }
+            
+            if (document.getElementById('user-menu-btn')) {
+                document.getElementById('user-menu-btn').addEventListener('click', toggleUserMenu);
+            }
+            
+            if (document.getElementById('mobile-menu-btn')) {
+                document.getElementById('mobile-menu-btn').addEventListener('click', toggleMobileMenu);
+            }
+            
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', function(event) {
+                const userMenu = document.getElementById('user-menu');
+                const userMenuBtn = document.getElementById('user-menu-btn');
+                
+                if (userMenu && !userMenu.contains(event.target) && !userMenuBtn.contains(event.target)) {
+                    userMenu.classList.add('hidden');
+                }
+            });
+            
+            // Auto-hide messages after 5 seconds
+            setTimeout(() => {
+                const messages = document.querySelectorAll('[class*="bg-red-50"], [class*="bg-yellow-50"], [class*="bg-green-50"], [class*="bg-blue-50"]');
+                messages.forEach(message => {
+                    if (message.parentElement) {
+                        message.style.transition = 'opacity 0.5s ease';
+                        message.style.opacity = '0';
+                        setTimeout(() => message.remove(), 500);
+                    }
+                });
+            }, 5000);
+        });
+        
+        // Global real-time update functions
+        window.timbRealTime = {
+            updateConnectionStatus: updateConnectionStatus,
+            
+            // Show notification
+            showNotification: function(message, type = 'info') {
+                const notification = document.createElement('div');
+                notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg text-white z-50 ${
+                    type === 'success' ? 'bg-green-600' :
+                    type === 'error' ? 'bg-red-600' :
+                    type === 'warning' ? 'bg-yellow-600' :
+                    'bg-blue-600'
+                }`;
+                notification.innerHTML = `
+                    <div class="flex items-center">
+                        <i class="fas fa-${
+                            type === 'success' ? 'check-circle' :
+                            type === 'error' ? 'exclamation-circle' :
+                            type === 'warning' ? 'exclamation-triangle' :
+                            'info-circle'
+                        } mr-2"></i>
+                        <span>${message}</span>
+                        <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
+                            <i class="fas fa-times"></i>
+                        </button>
                     </div>
                 `;
                 
-                feed.insertBefore(feedItem, feed.firstChild);
+                document.body.appendChild(notification);
                 
-                // Remove old items (keep only last 10)
-                while (feed.children.length > 10) {
-                    feed.removeChild(feed.lastChild);
-                }
-            }
-        }
-
-        function showFraudAlert(data) {
-            // Show notification
-            const alertDiv = document.createElement('div');
-            alertDiv.className = 'alert alert-danger alert-dismissible fade show';
-            alertDiv.innerHTML = `
-                <i class="bi bi-exclamation-triangle me-2"></i>
-                <strong>Fraud Alert:</strong> ${data.title}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            `;
-            
-            const container = document.querySelector('.container');
-            if (container) {
-                container.insertBefore(alertDiv, container.firstChild);
-                
-                // Auto-dismiss after 10 seconds
+                // Auto-remove after 5 seconds
                 setTimeout(() => {
-                    if (alertDiv.parentNode) {
-                        alertDiv.remove();
+                    if (notification.parentElement) {
+                        notification.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                        notification.style.opacity = '0';
+                        notification.style.transform = 'translateX(100%)';
+                        setTimeout(() => notification.remove(), 500);
                     }
-                }, 10000);
+                }, 5000);
             }
-        }
-
-        function updateYieldPrediction(data) {
-            console.log('Yield prediction update:', data);
-        }
+        };
     </script>
     
     {% block extra_js %}{% endblock %}

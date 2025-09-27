@@ -1,370 +1,565 @@
 {% extends 'base.html' %}
-{% load static %}
 
 {% block title %}TIMB Dashboard{% endblock %}
 
 {% block extra_css %}
 <style>
     .metric-card {
-        background: linear-gradient(135deg, var(--timb-primary), var(--timb-secondary));
-        color: white;
-        border-radius: var(--radius-lg);
-        padding: 1.5rem;
-        margin-bottom: 1rem;
+        transition: transform 0.2s ease-in-out;
     }
-    
-    .metric-value {
-        font-size: 2.5rem;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
+    .metric-card:hover {
+        transform: translateY(-2px);
     }
     
     .chart-container {
-        height: 400px;
-        background: white;
-        border-radius: var(--radius-lg);
-        padding: 1rem;
-        box-shadow: var(--shadow-sm);
-    }
-    
-    .alert-item {
-        border-left: 4px solid var(--danger);
-        background: #fff5f5;
-        padding: 1rem;
-        margin-bottom: 0.5rem;
-        border-radius: var(--radius-md);
-    }
-    
-    .alert-item.medium {
-        border-left-color: var(--warning);
-        background: #fffbf0;
-    }
-    
-    .alert-item.low {
-        border-left-color: var(--info);
-        background: #f0f9ff;
+        position: relative;
+        height: 300px;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="row mb-4">
-    <div class="col-12">
-        <h1 class="h3 mb-0">TIMB Trading Dashboard</h1>
-        <p class="text-muted">Real-time tobacco trading monitoring and analytics</p>
-    </div>
-</div>
-
-<!-- Key Metrics -->
-<div class="row mb-4">
-    <div class="col-lg-3 col-md-6">
-        <div class="metric-card">
-            <div class="d-flex align-items-center">
-                <div class="flex-grow-1">
-                    <div class="metric-value">{{ stats.total_merchants }}</div>
-                    <div>Active Merchants</div>
-                </div>
-                <div class="metric-icon">
-                    <i class="bi bi-building fs-1"></i>
-                </div>
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="mb-8">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">TIMB Dashboard</h1>
+                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                    Real-time tobacco trading oversight • <span id="current-time"></span>
+                </p>
+            </div>
+            <div class="flex space-x-3">
+                <button onclick="refreshDashboard()" class="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition duration-200">
+                    <i class="fas fa-sync-alt mr-2"></i>Refresh
+                </button>
+                <a href="{% url 'timb_dashboard:record_transaction' %}" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-200">
+                    <i class="fas fa-plus mr-2"></i>Record Transaction
+                </a>
             </div>
         </div>
     </div>
     
-    <div class="col-lg-3 col-md-6">
-        <div class="metric-card">
-            <div class="d-flex align-items-center">
-                <div class="flex-grow-1">
-                    <div class="metric-value">{{ stats.total_transactions_today }}</div>
-                    <div>Today's Transactions</div>
-                </div>
-                <div class="metric-icon">
-                    <i class="bi bi-arrow-left-right fs-1"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-lg-3 col-md-6">
-        <div class="metric-card">
-            <div class="d-flex align-items-center">
-                <div class="flex-grow-1">
-                    <div class="metric-value">{{ stats.total_volume_today|floatformat:0 }}kg</div>
-                    <div>Volume Traded Today</div>
-                </div>
-                <div class="metric-icon">
-                    <i class="bi bi-box-seam fs-1"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-lg-3 col-md-6">
-        <div class="metric-card">
-            <div class="d-flex align-items-center">
-                <div class="flex-grow-1">
-                    <div class="metric-value">{{ stats.active_alerts }}</div>
-                    <div>Active Alerts</div>
-                </div>
-                <div class="metric-icon">
-                    <i class="bi bi-exclamation-triangle fs-1"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Charts and Data -->
-<div class="row mb-4">
-    <div class="col-lg-8">
-        <div class="custom-card">
-            <div class="card-header-custom">
-                <h5 class="mb-0">Price Trends (Last 30 Days)</h5>
-            </div>
-            <div class="card-body">
-                <div class="chart-container">
-                    <canvas id="priceChart"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-lg-4">
-        <div class="custom-card">
-            <div class="card-header-custom">
-                <h5 class="mb-0">AI Yield Prediction</h5>
-            </div>
-            <div class="card-body">
-                {% if yield_prediction %}
-                    <div class="text-center mb-3">
-                        <div class="display-6 fw-bold text-primary">
-                            {{ yield_prediction.predicted_yield_kg|floatformat:0 }} kg
-                        </div>
-                        <div class="text-muted">Predicted Yield {{ yield_prediction.year }}</div>
-                    </div>
-                    
-                    <div class="row text-center">
-                        <div class="col-6">
-                            <div class="fw-bold">{{ yield_prediction.number_of_farmers|floatformat:0 }}</div>
-                            <div class="small text-muted">Farmers</div>
-                        </div>
-                        <div class="col-6">
-                            <div class="fw-bold">{{ yield_prediction.total_hectarage|floatformat:0 }} ha</div>
-                            <div class="small text-muted">Total Area</div>
+    <!-- Real-time Statistics -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="metric-card bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-blue-100 rounded-md flex items-center justify-center">
+                            <i class="fas fa-store text-blue-600"></i>
                         </div>
                     </div>
-                    
-                    {% if yield_prediction.actual_yield_kg %}
-                    <div class="mt-3 p-2 bg-light rounded">
-                        <small class="text-muted">
-                            Actual: {{ yield_prediction.actual_yield_kg|floatformat:0 }} kg
-                            ({{ yield_prediction.prediction_accuracy|floatformat:1 }}% accuracy)
-                        </small>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Active Merchants</dt>
+                            <dd id="active-merchants" class="text-lg font-medium text-gray-900 dark:text-white">{{ stats.total_merchants }}</dd>
+                        </dl>
                     </div>
-                    {% endif %}
-                {% else %}
-                    <div class="text-center text-muted">
-                        <i class="bi bi-graph-up fs-1"></i>
-                        <p>No prediction available</p>
-                    </div>
-                {% endif %}
+                </div>
             </div>
         </div>
-    </div>
-</div>
-
-<!-- Recent Activity and Alerts -->
-<div class="row">
-    <div class="col-lg-6">
-        <div class="custom-card">
-            <div class="card-header-custom">
-                <h5 class="mb-0">Recent Transactions</h5>
+        
+        <div class="metric-card bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-green-100 rounded-md flex items-center justify-center">
+                            <i class="fas fa-exchange-alt text-green-600"></i>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Today's Transactions</dt>
+                            <dd id="todays-transactions" class="text-lg font-medium text-gray-900 dark:text-white">{{ stats.total_transactions_today }}</dd>
+                        </dl>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-sm">
-                        <thead>
-                            <tr>
-                                <th>Time</th>
-                                <th>Grade</th>
-                                <th>Quantity</th>
-                                <th>Price</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for transaction in recent_transactions %}
-                            <tr>
-                                <td>{{ transaction.timestamp|date:"H:i" }}</td>
-                                <td>{{ transaction.grade.grade_name }}</td>
-                                <td>{{ transaction.quantity|floatformat:0 }}kg</td>
-                                <td>${{ transaction.price_per_kg|floatformat:2 }}</td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="4" class="text-center text-muted">No recent transactions</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+        </div>
+        
+        <div class="metric-card bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-yellow-100 rounded-md flex items-center justify-center">
+                            <i class="fas fa-weight text-yellow-600"></i>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Volume Traded (kg)</dt>
+                            <dd id="volume-traded" class="text-lg font-medium text-gray-900 dark:text-white">{{ stats.total_volume_today|floatformat:0 }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="metric-card bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-red-100 rounded-md flex items-center justify-center">
+                            <i class="fas fa-exclamation-triangle text-red-600"></i>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Active Alerts</dt>
+                            <dd id="active-alerts" class="text-lg font-medium text-gray-900 dark:text-white">
+                                {{ stats.active_alerts }}
+                                {% if stats.critical_alerts > 0 %}
+                                    <span class="text-red-600">({{ stats.critical_alerts }} critical)</span>
+                                {% endif %}
+                            </dd>
+                        </dl>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     
-    <div class="col-lg-6">
-        <div class="custom-card">
-            <div class="card-header-custom">
-                <h5 class="mb-0">Fraud Alerts</h5>
-            </div>
-            <div class="card-body">
-                <div style="max-height: 300px; overflow-y: auto;">
-                    {% for alert in fraud_alerts %}
-                    <div class="alert-item {{ alert.severity|lower }}">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <strong>{{ alert.get_alert_type_display }}</strong>
-                                <p class="mb-1 small">{{ alert.description }}</p>
-                                <small class="text-muted">{{ alert.created_at|timesince }} ago</small>
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Recent Transactions -->
+        <div class="lg:col-span-2">
+            <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                            <i class="fas fa-list mr-2 text-primary-600"></i>Recent Transactions
+                        </h3>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-3 h-3 bg-green-500 rounded-full live-indicator"></div>
+                            <span class="text-sm text-gray-500">Live</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="overflow-hidden">
+                    <div id="transactions-list" class="divide-y divide-gray-200 dark:divide-gray-700 max-h-96 overflow-y-auto">
+                        {% for transaction in recent_transactions %}
+                        <div class="p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-200 {% if transaction.is_flagged %}bg-red-50 dark:bg-red-900{% endif %}">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4">
+                                    <div class="flex-shrink-0">
+                                        {% if transaction.is_flagged %}
+                                            <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                                                <i class="fas fa-flag text-red-600"></i>
+                                            </div>
+                                        {% else %}
+                                            <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                                                <i class="fas fa-check text-green-600"></i>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                            {{ transaction.transaction_id }}
+                                        </div>
+                                        <div class="text-sm text-gray-500">
+                                            {{ transaction.seller.username }} → {{ transaction.buyer.username }}
+                                        </div>
+                                        <div class="text-xs text-gray-400">
+                                            {{ transaction.grade.grade_name }} • {{ transaction.quantity }}kg @ ${{ transaction.price_per_kg }}/kg
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                        ${{ transaction.total_amount|floatformat:2 }}
+                                    </div>
+                                    <div class="text-xs text-gray-500">
+                                        {{ transaction.timestamp|timesince }} ago
+                                    </div>
+                                </div>
                             </div>
-                            <span class="badge bg-{{ alert.severity|lower }}">{{ alert.severity }}</span>
+                        </div>
+                        {% empty %}
+                        <div class="p-8 text-center text-gray-500">
+                            <i class="fas fa-inbox text-4xl mb-4 text-gray-300"></i>
+                            <p>No transactions today</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="px-6 py-3 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600">
+                    <a href="#" class="text-sm text-primary-600 hover:text-primary-500">View all transactions →</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Alerts and Quick Actions -->
+        <div class="space-y-6">
+            <!-- Fraud Alerts -->
+            <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                        <i class="fas fa-shield-alt mr-2 text-red-600"></i>Fraud Alerts
+                    </h3>
+                </div>
+                <div class="divide-y divide-gray-200 dark:divide-gray-700 max-h-64 overflow-y-auto">
+                    {% for alert in fraud_alerts %}
+                    <div class="p-4">
+                        <div class="flex items-start space-x-3">
+                            <div class="flex-shrink-0">
+                                <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-exclamation-triangle text-red-600 text-sm"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                    {{ alert.title }}
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1">
+                                    {{ alert.created_at|timesince }} ago
+                                </div>
+                                <div class="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                                    {{ alert.description|truncatewords:10 }}
+                                </div>
+                            </div>
                         </div>
                     </div>
                     {% empty %}
-                    <div class="text-center text-muted">
-                        <i class="bi bi-shield-check fs-1"></i>
-                        <p>No active alerts</p>
+                    <div class="p-4 text-center text-gray-500">
+                        <i class="fas fa-check-circle text-green-500 text-2xl mb-2"></i>
+                        <p class="text-sm">No active alerts</p>
                     </div>
                     {% endfor %}
+                </div>
+                {% if fraud_alerts %}
+                <div class="px-6 py-3 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600">
+                    <a href="#" class="text-sm text-red-600 hover:text-red-500">View all alerts →</a>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                        <i class="fas fa-bolt mr-2 text-yellow-600"></i>Quick Actions
+                    </h3>
+                </div>
+                <div class="p-4 space-y-3">
+                    <a href="{% url 'timb_dashboard:record_transaction' %}" class="block w-full text-left px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-200">
+                        <div class="flex items-center">
+                            <i class="fas fa-plus-circle text-green-600 mr-3"></i>
+                            <span class="text-sm font-medium text-gray-900 dark:text-white">Record Transaction</span>
+                        </div>
+                    </a>
+                    
+                    <a href="{% url 'timb_dashboard:price_monitoring' %}" class="block w-full text-left px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-200">
+                        <div class="flex items-center">
+                            <i class="fas fa-chart-line text-blue-600 mr-3"></i>
+                            <span class="text-sm font-medium text-gray-900 dark:text-white">Price Monitoring</span>
+                        </div>
+                    </a>
+                    
+                    <button onclick="updateDailyPrices()" class="block w-full text-left px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-200">
+                        <div class="flex items-center">
+                            <i class="fas fa-sync-alt text-purple-600 mr-3"></i>
+                            <span class="text-sm font-medium text-gray-900 dark:text-white">Update Daily Prices</span>
+                        </div>
+                    </button>
+                    
+                    <a href="{% url 'ai:ai_dashboard' %}" class="block w-full text-left px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-200">
+                        <div class="flex items-center">
+                            <i class="fas fa-robot text-indigo-600 mr-3"></i>
+                            <span class="text-sm font-medium text-gray-900 dark:text-white">AI Dashboard</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Yield Prediction -->
+            {% if yield_prediction %}
+            <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                        <i class="fas fa-seedling mr-2 text-green-600"></i>Yield Forecast {{ yield_prediction.year }}
+                    </h3>
+                </div>
+                <div class="p-4">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                            {{ yield_prediction.predicted_yield_kg|floatformat:0 }} kg
+                        </div>
+                        <div class="text-sm text-gray-500 mb-4">
+                            Confidence: {{ yield_prediction.confidence_level }}%
+                        </div>
+                        <div class="text-xs text-gray-600 dark:text-gray-400">
+                            {{ yield_prediction.prediction_type }} prediction for {{ yield_prediction.region|default:"Zimbabwe" }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Trading Volume Chart -->
+    <div class="mt-8">
+        <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                    <i class="fas fa-chart-area mr-2 text-primary-600"></i>Trading Volume Trends (Last 7 Days)
+                </h3>
+            </div>
+            <div class="p-6">
+                <div class="chart-container">
+                    <canvas id="volumeChart"></canvas>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Real-time Feed -->
-<div class="row mt-4">
-    <div class="col-12">
-        <div class="custom-card">
-            <div class="card-header-custom">
-                <h5 class="mb-0">Real-time Trading Feed</h5>
-            </div>
-            <div class="card-body">
-                <div id="realtimeFeed" class="realtime-feed">
-                    <div class="text-center text-muted">
-                        <div class="loading-spinner"></div>
-                        <p>Connecting to real-time feed...</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+<!-- Real-time update indicator -->
+<div id="update-indicator" class="fixed top-20 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm hidden">
+    <i class="fas fa-sync-alt animate-spin mr-1"></i>
+    Updating...
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
+// Global variables
+let volumeChart;
+let updateInterval;
+
+// Initialize dashboard
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize price chart
-    const ctx = document.getElementById('priceChart').getContext('2d');
-    
-    // Fetch price trend data
-    fetch('{% url "api_price_trends" %}?days=30')
-        .then(response => response.json())
-        .then(data => {
-            const chart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: data.map(item => item.date),
-                    datasets: [{
-                        label: 'Average Price',
-                        data: data.map(item => item.avg_price),
-                        borderColor: getComputedStyle(document.documentElement).getPropertyValue('--timb-primary'),
-                        backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--timb-light'),
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: false,
-                            title: {
-                                display: true,
-                                text: 'Price (USD/kg)'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Date'
-                            }
-                        }
-                    }
-                }
-            });
-        })
-        .catch(error => {
-            console.error('Error fetching price data:', error);
-        });
+    initializeVolumeChart();
+    startRealTimeUpdates();
+    updateCurrentTime();
+    setInterval(updateCurrentTime, 1000);
 });
 
-// Real-time feed functions
-function addTransactionToFeed(data) {
-    const feed = document.getElementById('realtimeFeed');
-    const feedItem = document.createElement('div');
-    feedItem.className = 'feed-item';
-    feedItem.innerHTML = `
-        <div class="feed-time">${new Date().toLocaleTimeString()}</div>
-        <div class="feed-content">
-            <strong>New Transaction:</strong> ${data.quantity}kg of ${data.grade} 
-            traded at $${data.price}/kg on ${data.floor}
-        </div>
-    `;
+// Current time display
+function updateCurrentTime() {
+    const now = new Date();
+    document.getElementById('current-time').textContent = now.toLocaleString();
+}
+
+// Initialize volume chart
+function initializeVolumeChart() {
+    const ctx = document.getElementById('volumeChart').getContext('2d');
+    const volumeData = {{ volume_trends|safe }};
     
-    feed.insertBefore(feedItem, feed.firstChild);
+    volumeChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: volumeData.map(item => new Date(item.date).toLocaleDateString()),
+            datasets: [{
+                label: 'Volume Traded (kg)',
+                data: volumeData.map(item => item.volume),
+                borderColor: '#5D5CDE',
+                backgroundColor: 'rgba(93, 92, 222, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(156, 163, 175, 0.1)'
+                    }
+                },
+                x: {
+                    grid: {
+                        color: 'rgba(156, 163, 175, 0.1)'
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Real-time updates
+function startRealTimeUpdates() {
+    updateInterval = setInterval(async () => {
+        try {
+            showUpdateIndicator();
+            const response = await fetch('/timb/api/realtime-data/');
+            const data = await response.json();
+            
+            if (data) {
+                updateDashboardStats(data);
+            }
+            
+            hideUpdateIndicator();
+        } catch (error) {
+            console.error('Error fetching real-time data:', error);
+            hideUpdateIndicator();
+        }
+    }, 30000); // Update every 30 seconds
+}
+
+// Update dashboard statistics
+function updateDashboardStats(data) {
+    document.getElementById('todays-transactions').textContent = data.transactions_today;
+    document.getElementById('volume-traded').textContent = Math.round(data.volume_today).toLocaleString();
+    document.getElementById('active-alerts').textContent = data.fraud_alerts;
+}
+
+// Show/hide update indicator
+function showUpdateIndicator() {
+    document.getElementById('update-indicator').classList.remove('hidden');
+}
+
+function hideUpdateIndicator() {
+    document.getElementById('update-indicator').classList.add('hidden');
+}
+
+// Manual refresh
+async function refreshDashboard() {
+    showUpdateIndicator();
     
-    // Remove old items (keep only last 10)
-    while (feed.children.length > 10) {
-        feed.removeChild(feed.lastChild);
+    try {
+        // Fetch fresh data
+        const response = await fetch('/timb/api/realtime-data/');
+        const data = await response.json();
+        
+        if (data) {
+            updateDashboardStats(data);
+            window.timbRealTime.showNotification('Dashboard refreshed successfully', 'success');
+        }
+    } catch (error) {
+        window.timbRealTime.showNotification('Failed to refresh dashboard', 'error');
+    }
+    
+    hideUpdateIndicator();
+}
+
+// Update daily prices
+async function updateDailyPrices() {
+    try {
+        window.timbRealTime.showNotification('Updating daily prices...', 'info');
+        
+        const response = await fetch('/timb/update-daily-prices/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json',
+            },
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            window.timbRealTime.showNotification(`Updated prices for ${data.updated_count} grades`, 'success');
+        } else {
+            window.timbRealTime.showNotification('Failed to update prices', 'error');
+        }
+    } catch (error) {
+        window.timbRealTime.showNotification('Error updating prices', 'error');
     }
 }
 
-function updatePriceData(data) {
-    // Update any price displays
-    console.log('Price update:', data);
+// WebSocket connection for real-time updates
+if (window.WebSocket) {
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = `${protocol}//${window.location.host}/ws/realtime/dashboard/timb/`;
+    
+    const ws = new WebSocket(wsUrl);
+    
+    ws.onopen = function() {
+        window.timbRealTime.updateConnectionStatus(true);
+    };
+    
+    ws.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        
+        if (data.type === 'dashboard_update') {
+            updateDashboardStats(data.data);
+        } else if (data.type === 'transaction_update') {
+            // Add new transaction to the list
+            addNewTransactionToList(data.data);
+        }
+    };
+    
+    ws.onclose = function() {
+        window.timbRealTime.updateConnectionStatus(false);
+        // Attempt to reconnect after 5 seconds
+        setTimeout(() => {
+            location.reload();
+        }, 5000);
+    };
+    
+    ws.onerror = function() {
+        window.timbRealTime.updateConnectionStatus(false);
+    };
 }
 
-function showFraudAlert(data) {
-    // Show notification
-    const alertDiv = document.createElement('div');
-    alertDiv.className = 'alert alert-danger-custom alert-dismissible fade show';
-    alertDiv.innerHTML = `
-        <i class="bi bi-exclamation-triangle me-2"></i>
-        <strong>Fraud Alert:</strong> ${data.title}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+// Add new transaction to list
+function addNewTransactionToList(transaction) {
+    const transactionsList = document.getElementById('transactions-list');
+    
+    const transactionElement = document.createElement('div');
+    transactionElement.className = `p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-200 ${transaction.is_flagged ? 'bg-red-50 dark:bg-red-900' : ''}`;
+    
+    transactionElement.innerHTML = `
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <div class="flex-shrink-0">
+                    ${transaction.is_flagged ? 
+                        '<div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center"><i class="fas fa-flag text-red-600"></i></div>' :
+                        '<div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center"><i class="fas fa-check text-green-600"></i></div>'
+                    }
+                </div>
+                <div>
+                    <div class="text-sm font-medium text-gray-900 dark:text-white">
+                        ${transaction.transaction_id}
+                    </div>
+                    <div class="text-sm text-gray-500">
+                        ${transaction.seller} → ${transaction.buyer}
+                    </div>
+                    <div class="text-xs text-gray-400">
+                        ${transaction.grade} • ${transaction.quantity}kg @ $${transaction.price}/kg
+                    </div>
+                </div>
+            </div>
+            <div class="text-right">
+                <div class="text-sm font-medium text-gray-900 dark:text-white">
+                    $${transaction.total.toFixed(2)}
+                </div>
+                <div class="text-xs text-gray-500">
+                    Just now
+                </div>
+            </div>
+        </div>
     `;
     
-    const container = document.querySelector('.container');
-    container.insertBefore(alertDiv, container.firstChild);
+    // Add to top of list
+    transactionsList.insertBefore(transactionElement, transactionsList.firstChild);
     
-    // Auto-dismiss after 10 seconds
-    setTimeout(() => {
-        if (alertDiv.parentNode) {
-            alertDiv.remove();
-        }
-    }, 10000);
+    // Remove last item if list is too long
+    if (transactionsList.children.length > 10) {
+        transactionsList.removeChild(transactionsList.lastChild);
+    }
+    
+    // Show notification for flagged transactions
+    if (transaction.is_flagged) {
+        window.timbRealTime.showNotification(`Flagged transaction detected: ${transaction.transaction_id}`, 'warning');
+    }
 }
 
-function updateYieldPrediction(data) {
-    // Update yield prediction display
-    console.log('Yield prediction update:', data);
-}
+// Cleanup on page unload
+window.addEventListener('beforeunload', function() {
+    if (updateInterval) {
+        clearInterval(updateInterval);
+    }
+});
 </script>
 {% endblock %}

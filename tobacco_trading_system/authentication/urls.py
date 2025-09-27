@@ -2,9 +2,17 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.LoginView.as_view(), name='login'),
-    path('login/', views.LoginView.as_view(), name='login'),
-    path('register/', views.RegisterView.as_view(), name='register'),
+    # Authentication
+    path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
+    path('register/', views.register_view, name='register'),
+    
+    # Profile Management
     path('profile/', views.profile_view, name='profile'),
+    path('profile/change-password/', views.change_password, name='change_password'),
+    path('profile/end-session/', views.end_session, name='end_session'),
+    
+    # QR Code Features
+    path('qr/generate/', views.generate_secure_qr, name='generate_secure_qr'),
+    path('qr/verify/<str:token>/', views.verify_qr_token, name='verify_qr_token'),
 ]

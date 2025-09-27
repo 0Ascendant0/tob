@@ -1,182 +1,141 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
-from django.contrib.auth.models import AnonymousUser
 from django.utils import timezone
-from datetime import datetime
 
-class RealtimeDataConsumer(AsyncWebsocketConsumer):
+
+class PriceConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        # Check authentication
-        if self.scope["user"] == AnonymousUser():
-            await self.close()
-            return
+        self.group_name = 'price_updates'
         
-        # Join real-time data group
+        # Join price updates group
         await self.channel_layer.group_add(
-            "realtime_data",
+            self.group_name,
             self.channel_name
         )
         
         await self.accept()
-        
-        # Send initial data
-        await self.send_initial_data()
     
     async def disconnect(self, close_code):
-        # Leave real-time data group
+        # Leave price updates group
         await self.channel_layer.group_discard(
-            "realtime_data",
+            self.group_name,
             self.channel_name
         )
     
-    async def receive(self, text_data):
-        data = json.loads(text_data)
-        message_type = data.get('type')
-        
-        if message_type == 'subscribe_prices':
-            # Subscribe to price updates for specific grades
-            grades = data.get('grades', [])
-            await self.subscribe_to_prices(grades)
-        
-        elif message_type == 'subscribe_transactions':
-            # Subscribe to transaction updates
-            await self.subscribe_to_transactions()
-    
-    async def send_initial_data(self):
-        """Send initial real-time data when client connects"""
-        # Get current prices
-        current_prices = await self.get_current_prices()
-        
-        await self.send(text_data=json.dumps({
-            'type': 'initial_data',
-            'data': {
-                'prices': current_prices,
-                'timestamp': timezone.now().isoformat()
-            }
-        }))
-    
     async def price_update(self, event):
-        """Handle price update events"""
+        # Send price update to WebSocket
         await self.send(text_data=json.dumps({
             'type': 'price_update',
-            'payload': event['data']
+            'data': event['data']
         }))
+
+
+class TransactionConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        self.user = self.scope["user"]
+        
+        # Determine group based on user type
+        if hasattr(self.user, 'is_timb_staff') and self.user.is_timb_staff:
+            self.group_name = 'timb_staff'
+        elif hasattr(self.user, 'is_merchant') and self.user.is_merchant:
+            self.group_name = f'merchant_{self.user.id}'
+        else:
+            await self.close()
+            return
+        
+        # Join group
+        await self.channel_layer.group_add(
+            self.group_name,
+            self.channel_name
+        )
+        
+        await self.accept()
+    
+    async def disconnect(self, close_code):
+        # Leave group
+        if hasattr(self, 'group_name'):
+            await self.channel_layer.group_discard(
+                self.group_name,
+                self.channel_name
+            )
     
     async def transaction_update(self, event):
-        """Handle transaction update events"""
+        # Send transaction update to WebSocket
         await self.send(text_data=json.dumps({
-            'type': 'transaction',
-            'payload': event['data']
+            'type': 'transaction_update',
+            'data': event['data']
+        }))
+
+
+class AlertConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        self.group_name = 'market_alerts'
+        
+        # Join alerts group
+        await self.channel_layer.group_add(
+            self.group_name,
+            self.channel_name
+        )
+        
+        await self.accept()
+    
+    async def disconnect(self, close_code):
+        # Leave alerts group
+        await self.channel_layer.group_discard(
+            self.group_name,
+            self.channel_name
+        )
+    
+    async def market_alert(self, event):
+        # Send alert to WebSocket
+        await self.send(text_data=json.dumps({
+            'type': 'market_alert',
+            'data': event['data']
         }))
     
     async def fraud_alert(self, event):
-        """Handle fraud alert events"""
+        # Send fraud alert to WebSocket
         await self.send(text_data=json.dumps({
             'type': 'fraud_alert',
-            'payload': event['data']
+            'data': event['data']
         }))
-    
-    async def yield_prediction_update(self, event):
-        """Handle yield prediction updates"""
-        await self.send(text_data=json.dumps({
-            'type': 'yield_prediction',
-            'payload': event['data']
-        }))
-    
-    @database_sync_to_async
-    def get_current_prices(self):
-        """Get current market prices"""
-        from .models import RealTimePrice
-        
-        prices = []
-        for price_obj in RealTimePrice.objects.select_related('grade', 'floor').all():
-            prices.append({
-                'grade': price_obj.grade.grade_name,
-                'floor': price_obj.floor.name,
-                'current_price': float(price_obj.current_price),
-                'price_change': float(price_obj.price_change),
-                'volume_traded': float(price_obj.volume_traded_today),
-                'last_updated': price_obj.last_updated.isoformat()
-            })
-        
-        return prices
-    
-    async def subscribe_to_prices(self, grades):
-        """Subscribe to price updates for specific grades"""
-        # Join grade-specific groups
-        for grade in grades:
-            await self.channel_layer.group_add(
-                f"price_updates_{grade}",
-                self.channel_name
-            )
-    
-    async def subscribe_to_transactions(self):
-        """Subscribe to transaction updates"""
-        await self.channel_layer.group_add(
-            "transaction_updates",
-            self.channel_name
-        )
 
-class MerchantDataConsumer(AsyncWebsocketConsumer):
-    """Specialized consumer for merchant-specific data"""
-    
+
+class DashboardConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        if self.scope["user"] == AnonymousUser():
+        self.user = self.scope["user"]
+        self.user_type = self.scope['url_route']['kwargs']['user_type']
+        
+        # Validate user type
+        if self.user_type == 'timb' and not (hasattr(self.user, 'is_timb_staff') and self.user.is_timb_staff):
+            await self.close()
+            return
+        elif self.user_type == 'merchant' and not (hasattr(self.user, 'is_merchant') and self.user.is_merchant):
             await self.close()
             return
         
-        # Check if user is a merchant
-        user = self.scope["user"]
-        if not hasattr(user, 'profile') or not user.profile.is_merchant:
-            await self.close()
-            return
+        self.group_name = f'{self.user_type}_dashboard'
         
-        # Get merchant ID
-        merchant_id = await self.get_merchant_id(user)
-        
-        # Join merchant-specific group
+        # Join dashboard group
         await self.channel_layer.group_add(
-            f"merchant_{merchant_id}",
+            self.group_name,
             self.channel_name
         )
         
         await self.accept()
     
     async def disconnect(self, close_code):
-        if hasattr(self, 'merchant_id'):
+        # Leave dashboard group
+        if hasattr(self, 'group_name'):
             await self.channel_layer.group_discard(
-                f"merchant_{self.merchant_id}",
+                self.group_name,
                 self.channel_name
             )
     
-    async def inventory_update(self, event):
-        """Handle inventory updates"""
+    async def dashboard_update(self, event):
+        # Send dashboard update to WebSocket
         await self.send(text_data=json.dumps({
-            'type': 'inventory_update',
-            'payload': event['data']
+            'type': 'dashboard_update',
+            'data': event['data']
         }))
-    
-    async def order_update(self, event):
-        """Handle order updates"""
-        await self.send(text_data=json.dumps({
-            'type': 'order_update',
-            'payload': event['data']
-        }))
-    
-    async def recommendation_update(self, event):
-        """Handle new recommendations"""
-        await self.send(text_data=json.dumps({
-            'type': 'recommendation',
-            'payload': event['data']
-        }))
-    
-    @database_sync_to_async
-    def get_merchant_id(self, user):
-        """Get merchant ID for the user"""
-        try:
-            from timb_dashboard.models import Merchant
-            merchant = Merchant.objects.get(user=user)
-            return merchant.id
-        except Merchant.DoesNotExist:
-            return None

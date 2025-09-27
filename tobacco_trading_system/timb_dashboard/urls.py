@@ -1,16 +1,28 @@
 from django.urls import path
 from . import views
 
+app_name = 'timb_dashboard'
+
 urlpatterns = [
-    path('', views.dashboard, name='timb_dashboard'),
-    path('merchants/', views.merchants_view, name='timb_merchants'),
-    path('transactions/', views.transactions_view, name='timb_transactions'),
-    path('fraud-detection/', views.fraud_detection_view, name='timb_fraud_detection'),
-    path('yield-prediction/', views.yield_prediction_view, name='timb_yield_prediction'),
-    path('price-monitoring/', views.price_monitoring_view, name='timb_price_monitoring'),
+    # Main dashboard
+    path('', views.dashboard_view, name='dashboard'),
+    
+    # Transaction management
+    path('record-transaction/', views.record_transaction_view, name='record_transaction'),
+    path('transactions/', views.TransactionListView.as_view(), name='transaction_list'),
+    path('transactions/<str:transaction_id>/', views.TransactionDetailView.as_view(), name='transaction_detail'),
+    path('analytics/', views.transaction_analytics_view, name='transaction_analytics'),
+    
+    # Price management
+    path('prices/', views.price_monitoring_view, name='price_monitoring'),
+    path('update-daily-prices/', views.update_daily_prices, name='update_daily_prices'),
+    
+    # Floor management
+    path('floors/', views.floor_management_view, name='floor_management'),
+    
+    # Grade management
+    path('grades/', views.grade_management_view, name='grade_management'),
     
     # API endpoints
-    path('api/transaction-data/', views.api_transaction_data, name='api_transaction_data'),
-    path('api/price-trends/', views.api_price_trends, name='api_price_trends'),
-    path('api/secure-report/', views.generate_secure_report, name='api_secure_report'),
+    path('api/realtime-data/', views.api_realtime_data, name='api_realtime_data'),
 ]

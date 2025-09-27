@@ -1,0 +1,740 @@
+{% extends 'base.html' %}
+
+{% block title %}Real-time Data Dashboard - TIMB{% endblock %}
+
+{% block extra_css %}
+<style>
+    .data-stream {
+        height: 400px;
+        overflow-y: auto;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+    }
+    
+    .data-point {
+        animation: slideInRight 0.5s ease-out;
+    }
+    
+    .connection-status {
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        z-index: 1000;
+    }
+    
+    .metric-live {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .metric-live::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 4px;
+        height: 100%;
+        background: #4CAF50;
+        animation: pulse 2s infinite;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="mb-8">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Real-time Data Dashboard</h1>
+                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                    Live tobacco market data and system monitoring
+                </p>
+            </div>
+            <div class="flex space-x-3">
+                <button onclick="pauseStreams()" id="pause-btn" class="bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700 transition duration-200">
+                    <i class="fas fa-pause mr-2"></i>Pause Streams
+                </button>
+                <button onclick="clearAllStreams()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-200">
+                    <i class="fas fa-trash mr-2"></i>Clear All
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Connection Status -->
+    <div id="connection-status" class="connection-status">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-3 border-l-4 border-green-500">
+            <div class="flex items-center">
+                <div id="status-indicator" class="w-3 h-3 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+                <span id="status-text" class="text-sm font-medium text-gray-700 dark:text-gray-300">Connected</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Metrics -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="metric-live bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-blue-100 rounded-md flex items-center justify-center">
+                            <i class="fas fa-exchange-alt text-blue-600"></i>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Live Transactions</dt>
+                            <dd id="live-transactions" class="text-lg font-medium text-gray-900 dark:text-white">0</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="metric-live bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-green-100 rounded-md flex items-center justify-center">
+                            <i class="fas fa-chart-line text-green-600"></i>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Current Price (USD/kg)</dt>
+                            <dd id="current-price" class="text-lg font-medium text-gray-900 dark:text-white">$0.00</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="metric-live bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-purple-100 rounded-md flex items-center justify-center">
+                            <i class="fas fa-users text-purple-600"></i>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Active Users</dt>
+                            <dd id="active-users" class="text-lg font-medium text-gray-900 dark:text-white">0</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="metric-live bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-red-100 rounded-md flex items-center justify-center">
+                            <i class="fas fa-exclamation-triangle text-red-600"></i>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">System Alerts</dt>
+                            <dd id="system-alerts" class="text-lg font-medium text-gray-900 dark:text-white">0</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Streams Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- Transaction Stream -->
+        <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-600 to-blue-700">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-lg font-medium text-white">
+                        <i class="fas fa-stream mr-2"></i>Transaction Stream
+                    </h3>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                        <span class="text-blue-100 text-sm">Live</span>
+                    </div>
+                </div>
+            </div>
+            <div class="data-stream p-4" id="transaction-stream">
+                <div class="text-center text-gray-500 py-8">
+                    <i class="fas fa-satellite-dish text-4xl mb-4 text-gray-300"></i>
+                    <p>Waiting for transaction data...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Price Updates Stream -->
+        <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-green-600 to-green-700">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-lg font-medium text-white">
+                        <i class="fas fa-chart-area mr-2"></i>Price Updates
+                    </h3>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                        <span class="text-green-100 text-sm">Live</span>
+                    </div>
+                </div>
+            </div>
+            <div class="data-stream p-4" id="price-stream">
+                <div class="text-center text-gray-500 py-8">
+                    <i class="fas fa-chart-line text-4xl mb-4 text-gray-300"></i>
+                    <p>Waiting for price data...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Events Stream -->
+        <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-purple-600 to-purple-700">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-lg font-medium text-white">
+                        <i class="fas fa-cog mr-2"></i>System Events
+                    </h3>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                        <span class="text-purple-100 text-sm">Live</span>
+                    </div>
+                </div>
+            </div>
+            <div class="data-stream p-4" id="system-stream">
+                <div class="text-center text-gray-500 py-8">
+                    <i class="fas fa-server text-4xl mb-4 text-gray-300"></i>
+                    <p>Monitoring system events...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Monitoring Stream -->
+        <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-orange-600 to-orange-700">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-lg font-medium text-white">
+                        <i class="fas fa-plug mr-2"></i>API Monitoring
+                    </h3>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                        <span class="text-orange-100 text-sm">Live</span>
+                    </div>
+                </div>
+            </div>
+            <div class="data-stream p-4" id="api-stream">
+                <div class="text-center text-gray-500 py-8">
+                    <i class="fas fa-network-wired text-4xl mb-4 text-gray-300"></i>
+                    <p>Monitoring API requests...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Real-time Charts -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Live Price Chart -->
+        <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                    <i class="fas fa-chart-line mr-2 text-primary-600"></i>Live Price Movement
+                </h3>
+            </div>
+            <div class="p-6">
+                <div class="h-64">
+                    <canvas id="live-price-chart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transaction Volume Chart -->
+        <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                    <i class="fas fa-chart-bar mr-2 text-primary-600"></i>Transaction Volume
+                </h3>
+            </div>
+            <div class="p-6">
+                <div class="h-64">
+                    <canvas id="volume-chart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let streamsPaused = false;
+let priceChart, volumeChart;
+let priceData = [];
+let volumeData = [];
+
+// Initialize dashboard
+document.addEventListener('DOMContentLoaded', function() {
+    initializeCharts();
+    startDataStreams();
+    updateConnectionStatus('Connected', 'green');
+});
+
+// Initialize real-time charts
+function initializeCharts() {
+    // Price chart
+    const priceCtx = document.getElementById('live-price-chart').getContext('2d');
+    priceChart = new Chart(priceCtx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Price (USD/kg)',
+                data: [],
+                borderColor: '#5D5CDE',
+                backgroundColor: 'rgba(93, 92, 222, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 0,
+                pointHoverRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: false,
+            scales: {
+                x: {
+                    type: 'realtime',
+                    realtime: {
+                        duration: 60000,
+                        refresh: 1000,
+                        delay: 1000,
+                        onRefresh: updatePriceChart
+                    }
+                },
+                y: {
+                    beginAtZero: false,
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + value.toFixed(2);
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+
+    // Volume chart
+    const volumeCtx = document.getElementById('volume-chart').getContext('2d');
+    volumeChart = new Chart(volumeCtx, {
+        type: 'bar',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Volume (kg)',
+                data: [],
+                backgroundColor: 'rgba(76, 175, 80, 0.8)',
+                borderColor: '#4CAF50',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: false,
+            scales: {
+                x: {
+                    type: 'realtime',
+                    realtime: {
+                        duration: 300000, // 5 minutes
+                        refresh: 5000,    // 5 seconds
+                        delay: 2000
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return value.toLocaleString() + ' kg';
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+}
+
+function updatePriceChart(chart) {
+    if (priceData.length > 0) {
+        const now = Date.now();
+        chart.data.datasets[0].data.push({
+            x: now,
+            y: priceData[priceData.length - 1].price
+        });
+    }
+}
+
+// Start data streams
+function startDataStreams() {
+    // WebSocket connections
+    if (window.WebSocket) {
+        connectToRealTimeData();
+    } else {
+        // Fallback to polling
+        startPollingStreams();
+    }
+}
+
+function connectToRealTimeData() {
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = `${protocol}//${window.location.host}/ws/realtime/dashboard/`;
+    
+    const ws = new WebSocket(wsUrl);
+    
+    ws.onopen = function() {
+        updateConnectionStatus('Connected', 'green');
+        console.log('WebSocket connected');
+    };
+    
+    ws.onmessage = function(event) {
+        if (streamsPaused) return;
+        
+        const data = JSON.parse(event.data);
+        handleRealtimeData(data);
+    };
+    
+    ws.onclose = function(event) {
+        updateConnectionStatus('Disconnected', 'red');
+        console.log('WebSocket disconnected:', event.code);
+        
+        // Attempt to reconnect after 3 seconds
+        setTimeout(() => {
+            if (!streamsPaused) {
+                connectToRealTimeData();
+            }
+        }, 3000);
+    };
+    
+    ws.onerror = function(error) {
+        updateConnectionStatus('Error', 'red');
+        console.error('WebSocket error:', error);
+    };
+}
+
+function startPollingStreams() {
+    setInterval(() => {
+        if (!streamsPaused) {
+            pollRealTimeData();
+        }
+    }, 2000);
+}
+
+async function pollRealTimeData() {
+    try {
+        const response = await fetch('/api/realtime/data/');
+        const data = await response.json();
+        
+        if (data.success) {
+            handleRealtimeData(data);
+            updateConnectionStatus('Connected (Polling)', 'yellow');
+        }
+    } catch (error) {
+        console.error('Polling error:', error);
+        updateConnectionStatus('Error', 'red');
+    }
+}
+
+function handleRealtimeData(data) {
+    switch (data.type) {
+        case 'transaction':
+            addTransactionToStream(data.payload);
+            updateLiveMetric('live-transactions', data.payload.count);
+            break;
+        case 'price_update':
+            addPriceUpdateToStream(data.payload);
+            updateLiveMetric('current-price', '$' + data.payload.price.toFixed(2));
+            priceData.push(data.payload);
+            break;
+        case 'system_event':
+            addSystemEventToStream(data.payload);
+            break;
+        case 'api_request':
+            addApiEventToStream(data.payload);
+            break;
+        case 'user_activity':
+            updateLiveMetric('active-users', data.payload.count);
+            break;
+        case 'alert':
+            updateLiveMetric('system-alerts', data.payload.count);
+            break;
+    }
+}
+
+function addTransactionToStream(transaction) {
+    const stream = document.getElementById('transaction-stream');
+    
+    const item = document.createElement('div');
+    item.className = 'data-point p-3 mb-2 bg-blue-50 dark:bg-blue-900 border-l-4 border-blue-500 rounded';
+    item.innerHTML = `
+        <div class="flex justify-between items-center">
+            <div>
+                <div class="text-sm font-medium text-gray-900 dark:text-white">
+                    ${transaction.transaction_id}
+                </div>
+                <div class="text-xs text-gray-500">
+                    ${transaction.seller} → ${transaction.buyer}
+                </div>
+                <div class="text-xs text-gray-600">
+                    ${transaction.quantity}kg @ $${transaction.price}/kg
+                </div>
+            </div>
+            <div class="text-right">
+                <div class="text-sm font-bold text-gray-900 dark:text-white">
+                    $${transaction.total.toFixed(2)}
+                </div>
+                <div class="text-xs text-gray-500">
+                    ${new Date().toLocaleTimeString()}
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Remove placeholder if exists
+    const placeholder = stream.querySelector('.text-center');
+    if (placeholder) placeholder.remove();
+    
+    stream.insertBefore(item, stream.firstChild);
+    
+    // Keep only last 20 items
+    while (stream.children.length > 20) {
+        stream.removeChild(stream.lastChild);
+    }
+}
+
+function addPriceUpdateToStream(priceUpdate) {
+    const stream = document.getElementById('price-stream');
+    
+    const changeClass = priceUpdate.change >= 0 ? 'text-green-600' : 'text-red-600';
+    const changeIcon = priceUpdate.change >= 0 ? 'fa-arrow-up' : 'fa-arrow-down';
+    
+    const item = document.createElement('div');
+    item.className = 'data-point p-3 mb-2 bg-green-50 dark:bg-green-900 border-l-4 border-green-500 rounded';
+    item.innerHTML = `
+        <div class="flex justify-between items-center">
+            <div>
+                <div class="text-sm font-medium text-gray-900 dark:text-white">
+                    ${priceUpdate.grade_code}
+                </div>
+                <div class="text-xs text-gray-500">
+                    ${priceUpdate.grade_name}
+                </div>
+            </div>
+            <div class="text-right">
+                <div class="text-sm font-bold text-gray-900 dark:text-white">
+                    $${priceUpdate.price.toFixed(2)}/kg
+                </div>
+                <div class="text-xs ${changeClass}">
+                    <i class="fas ${changeIcon} mr-1"></i>
+                    ${Math.abs(priceUpdate.change).toFixed(2)}%
+                </div>
+                <div class="text-xs text-gray-500">
+                    ${new Date().toLocaleTimeString()}
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Remove placeholder if exists
+    const placeholder = stream.querySelector('.text-center');
+    if (placeholder) placeholder.remove();
+    
+    stream.insertBefore(item, stream.firstChild);
+    
+    // Keep only last 15 items
+    while (stream.children.length > 15) {
+        stream.removeChild(stream.lastChild);
+    }
+}
+
+function addSystemEventToStream(event) {
+    const stream = document.getElementById('system-stream');
+    
+    const severityClass = {
+        'INFO': 'border-blue-500 bg-blue-50 dark:bg-blue-900',
+        'WARNING': 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900',
+        'ERROR': 'border-red-500 bg-red-50 dark:bg-red-900'
+    }[event.severity] || 'border-gray-500 bg-gray-50 dark:bg-gray-900';
+    
+    const item = document.createElement('div');
+    item.className = `data-point p-3 mb-2 ${severityClass} border-l-4 rounded`;
+    item.innerHTML = `
+        <div class="flex justify-between items-start">
+            <div class="flex-1">
+                <div class="text-sm font-medium text-gray-900 dark:text-white">
+                    ${event.title}
+                </div>
+                <div class="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                    ${event.message}
+                </div>
+            </div>
+            <div class="text-xs text-gray-500 ml-4">
+                ${new Date().toLocaleTimeString()}
+            </div>
+        </div>
+    `;
+    
+    // Remove placeholder if exists
+    const placeholder = stream.querySelector('.text-center');
+    if (placeholder) placeholder.remove();
+    
+    stream.insertBefore(item, stream.firstChild);
+    
+    // Keep only last 15 items
+    while (stream.children.length > 15) {
+        stream.removeChild(stream.lastChild);
+    }
+}
+
+function addApiEventToStream(apiEvent) {
+    const stream = document.getElementById('api-stream');
+    
+    const statusClass = apiEvent.status >= 400 ? 'border-red-500 bg-red-50 dark:bg-red-900' :
+                       apiEvent.status >= 300 ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900' :
+                       'border-green-500 bg-green-50 dark:bg-green-900';
+    
+    const item = document.createElement('div');
+    item.className = `data-point p-3 mb-2 ${statusClass} border-l-4 rounded`;
+    item.innerHTML = `
+        <div class="flex justify-between items-center">
+            <div>
+                <div class="text-sm font-medium text-gray-900 dark:text-white">
+                    ${apiEvent.method} ${apiEvent.endpoint}
+                </div>
+                <div class="text-xs text-gray-500">
+                    ${apiEvent.user} • ${apiEvent.response_time}ms
+                </div>
+            </div>
+            <div class="text-right">
+                <div class="text-sm font-bold ${apiEvent.status >= 400 ? 'text-red-600' : 'text-green-600'}">
+                    ${apiEvent.status}
+                </div>
+                <div class="text-xs text-gray-500">
+                    ${new Date().toLocaleTimeString()}
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Remove placeholder if exists
+    const placeholder = stream.querySelector('.text-center');
+    if (placeholder) placeholder.remove();
+    
+    stream.insertBefore(item, stream.firstChild);
+    
+    // Keep only last 15 items
+    while (stream.children.length > 15) {
+        stream.removeChild(stream.lastChild);
+    }
+}
+
+function updateLiveMetric(elementId, value) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        // Add animation effect
+        element.style.transform = 'scale(1.1)';
+        element.style.transition = 'transform 0.2s ease';
+        
+        setTimeout(() => {
+            element.textContent = value;
+            element.style.transform = 'scale(1)';
+        }, 100);
+    }
+}
+
+function updateConnectionStatus(status, color) {
+    const indicator = document.getElementById('status-indicator');
+    const text = document.getElementById('status-text');
+    
+    if (indicator && text) {
+        indicator.className = `w-3 h-3 rounded-full mr-2`;
+        
+        switch (color) {
+            case 'green':
+                indicator.classList.add('bg-green-500', 'animate-pulse');
+                break;
+            case 'yellow':
+                indicator.classList.add('bg-yellow-500', 'animate-pulse');
+                break;
+            case 'red':
+                indicator.classList.add('bg-red-500');
+                break;
+        }
+        
+        text.textContent = status;
+    }
+}
+
+function pauseStreams() {
+    const btn = document.getElementById('pause-btn');
+    
+    if (streamsPaused) {
+        streamsPaused = false;
+        btn.innerHTML = '<i class="fas fa-pause mr-2"></i>Pause Streams';
+        btn.className = 'bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700 transition duration-200';
+        startDataStreams();
+    } else {
+        streamsPaused = true;
+        btn.innerHTML = '<i class="fas fa-play mr-2"></i>Resume Streams';
+        btn.className = 'bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-200';
+    }
+}
+
+function clearAllStreams() {
+    if (window.TIMBUtils) {
+        window.TIMBUtils.showConfirmDialog(
+            'Are you sure you want to clear all data streams?',
+            () => {
+                document.getElementById('transaction-stream').innerHTML = '<div class="text-center text-gray-500 py-8"><i class="fas fa-satellite-dish text-4xl mb-4 text-gray-300"></i><p>Stream cleared</p></div>';
+                document.getElementById('price-stream').innerHTML = '<div class="text-center text-gray-500 py-8"><i class="fas fa-chart-line text-4xl mb-4 text-gray-300"></i><p>Stream cleared</p></div>';
+                document.getElementById('system-stream').innerHTML = '<div class="text-center text-gray-500 py-8"><i class="fas fa-server text-4xl mb-4 text-gray-300"></i><p>Stream cleared</p></div>';
+                document.getElementById('api-stream').innerHTML = '<div class="text-center text-gray-500 py-8"><i class="fas fa-network-wired text-4xl mb-4 text-gray-300"></i><p>Stream cleared</p></div>';
+                
+                // Reset metrics
+                document.getElementById('live-transactions').textContent = '0';
+                document.getElementById('current-price').textContent = '$0.00';
+                document.getElementById('active-users').textContent = '0';
+                document.getElementById('system-alerts').textContent = '0';
+                
+                // Clear chart data
+                priceData = [];
+                volumeData = [];
+                
+                if (window.TIMBUtils) {
+                    window.TIMBUtils.showNotification('All streams cleared', 'success');
+                }
+            }
+        );
+    }
+}
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', function() {
+    streamsPaused = true;
+    if (priceChart) priceChart.destroy();
+    if (volumeChart) volumeChart.destroy();
+});
+</script>
+{% endblock %}

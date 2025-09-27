@@ -4,6 +4,7 @@ from timb_dashboard.models import TobaccoGrade, TobaccoFloor, Transaction, User
 from realtime_data.models import RealTimePrice, LiveTransaction
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
+from decimal import Decimal
 import random
 import time
 import threading
@@ -57,8 +58,8 @@ class Command(BaseCommand):
                     floor=floor,
                     grade=grade,
                     defaults={
-                        'current_price': float(grade.base_price) * random.uniform(0.8, 1.2),
-                        'volume_traded_today': 0
+                        'current_price': Decimal(str(float(grade.base_price) * random.uniform(0.8, 1.2))),
+                        'volume_traded_today': Decimal('0')
                     }
                 )
                 
@@ -84,8 +85,8 @@ class Command(BaseCommand):
             transaction_id=transaction_id,
             floor=floor,
             grade=grade,
-            quantity=quantity,
-            price=price,
+            quantity=Decimal(str(quantity)),
+            price=Decimal(str(price)),
             buyer_info=f"Buyer-{random.randint(1, 100)}",
             seller_info=f"Seller-{random.randint(1, 50)}"
         )
@@ -95,16 +96,16 @@ class Command(BaseCommand):
             floor=floor,
             grade=grade,
             defaults={
-                'current_price': price,
-                'volume_traded_today': quantity
+                'current_price': Decimal(str(price)),
+                'volume_traded_today': Decimal(str(quantity))
             }
         )
         
         if not created:
             price_obj.previous_price = price_obj.current_price
-            price_obj.current_price = price
-            price_obj.price_change = price - (price_obj.previous_price or price)
-            price_obj.volume_traded_today += quantity
+            price_obj.current_price = Decimal(str(price))
+            price_obj.price_change = Decimal(str(price)) - (price_obj.previous_price or Decimal(str(price)))
+            price_obj.volume_traded_today += Decimal(str(quantity))
             price_obj.save()
         
         # Broadcast via WebSocket

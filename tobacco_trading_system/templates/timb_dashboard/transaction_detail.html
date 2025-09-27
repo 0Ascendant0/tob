@@ -1,0 +1,434 @@
+{% extends 'base.html' %}
+
+{% block title %}Transaction {{ transaction.transaction_id }} - TIMB{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="mb-8">
+        <div class="flex justify-between items-center">
+            <div>
+                <nav class="flex" aria-label="Breadcrumb">
+                    <ol class="flex items-center space-x-4">
+                        <li>
+                            <a href="{% url 'timb_dashboard:dashboard' %}" class="text-gray-400 hover:text-gray-500">
+                                <i class="fas fa-home"></i>
+                            </a>
+                        </li>
+                        <li>
+                            <div class="flex items-center">
+                                <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                                <a href="{% url 'timb_dashboard:transaction_list' %}" class="text-gray-400 hover:text-gray-500">Transactions</a>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="flex items-center">
+                                <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                                <span class="text-gray-500">{{ transaction.transaction_id }}</span>
+                            </div>
+                        </li>
+                    </ol>
+                </nav>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">Transaction Details</h1>
+                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">{{ transaction.transaction_id }}</p>
+            </div>
+            <div class="flex space-x-3">
+                {% if transaction.status == 'PENDING' %}
+                <button onclick="updateStatus('COMPLETED')" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-200">
+                    <i class="fas fa-check mr-2"></i>Approve
+                </button>
+                <button onclick="updateStatus('CANCELLED')" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-200">
+                    <i class="fas fa-times mr-2"></i>Cancel
+                </button>
+                {% endif %}
+                <button onclick="generateReceipt()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200">
+                    <i class="fas fa-file-pdf mr-2"></i>Receipt
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transaction Status Banner -->
+    {% if transaction.is_flagged %}
+    <div class="mb-6 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg p-4">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <i class="fas fa-exclamation-triangle text-red-400 text-xl"></i>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-sm font-medium text-red-800 dark:text-red-200">
+                    Fraud Alert - Transaction Flagged
+                </h3>
+                <div class="mt-2 text-sm text-red-700 dark:text-red-300">
+                    <p>This transaction has been flagged with a {{ transaction.fraud_score|floatformat:1 }}% fraud score.</p>
+                    <ul class="list-disc list-inside mt-2">
+                        {% for reason in transaction.fraud_reasons %}
+                            <li>{{ reason }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Transaction Details -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Basic Information -->
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">Transaction Information</h3>
+                </div>
+                <div class="px-6 py-4">
+                    <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Transaction ID</dt>
+                            <dd class="mt-1 text-sm text-gray-900 dark:text-white font-mono">{{ transaction.transaction_id }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Type</dt>
+                            <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ transaction.get_transaction_type_display }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Status</dt>
+                            <dd class="mt-1">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                    {% if transaction.status == 'COMPLETED' %}bg-green-100 text-green-800
+                                    {% elif transaction.status == 'PENDING' %}bg-yellow-100 text-yellow-800
+                                    {% elif transaction.status == 'CANCELLED' %}bg-red-100 text-red-800
+                                    {% elif transaction.status == 'DISPUTED' %}bg-purple-100 text-purple-800
+                                    {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                    {{ transaction.get_status_display }}
+                                </span>
+                            </dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Date & Time</dt>
+                            <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ transaction.timestamp|date:"F d, Y \a\t H:i" }}</dd>
+                        </div>
+                        {% if transaction.floor %}
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Floor</dt>
+                            <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ transaction.floor.name }}</dd>
+                        </div>
+                        {% endif %}
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Created By</dt>
+                            <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ transaction.created_by.get_full_name|default:transaction.created_by.username }}</dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+
+            <!-- Trading Parties -->
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">Trading Parties</h3>
+                </div>
+                <div class="px-6 py-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Seller -->
+                        <div>
+                            <h4 class="text-md font-medium text-gray-900 dark:text-white mb-3">Seller</h4>
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0">
+                                    {% if transaction.seller.userprofile.profile_picture %}
+                                        <img class="h-10 w-10 rounded-full" src="{{ transaction.seller.userprofile.profile_picture.url }}" alt="">
+                                    {% else %}
+                                        <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                            <span class="text-sm font-medium text-blue-800">{{ transaction.seller.first_name.0|default:transaction.seller.username.0|upper }}</span>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                        {{ transaction.seller.get_full_name|default:transaction.seller.username }}
+                                    </div>
+                                    <div class="text-sm text-gray-500">{{ transaction.seller.email }}</div>
+                                    {% if transaction.seller.merchant_profile.company_name %}
+                                        <div class="text-sm text-gray-500">{{ transaction.seller.merchant_profile.company_name }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Buyer -->
+                        <div>
+                            <h4 class="text-md font-medium text-gray-900 dark:text-white mb-3">Buyer</h4>
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0">
+                                    {% if transaction.buyer.userprofile.profile_picture %}
+                                        <img class="h-10 w-10 rounded-full" src="{{ transaction.buyer.userprofile.profile_picture.url }}" alt="">
+                                    {% else %}
+                                        <div class="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+                                            <span class="text-sm font-medium text-green-800">{{ transaction.buyer.first_name.0|default:transaction.buyer.username.0|upper }}</span>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                        {{ transaction.buyer.get_full_name|default:transaction.buyer.username }}
+                                    </div>
+                                    <div class="text-sm text-gray-500">{{ transaction.buyer.email }}</div>
+                                    {% if transaction.buyer.merchant_profile.company_name %}
+                                        <div class="text-sm text-gray-500">{{ transaction.buyer.merchant_profile.company_name }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Details -->
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">Product Details</h3>
+                </div>
+                <div class="px-6 py-4">
+                    <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Grade Code</dt>
+                            <dd class="mt-1 text-sm font-bold text-gray-900 dark:text-white">{{ transaction.grade.grade_code }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Grade Name</dt>
+                            <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ transaction.grade.grade_name }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Category</dt>
+                            <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ transaction.grade.get_category_display }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Quality Level</dt>
+                            <dd class="mt-1 text-sm text-gray-900 dark:text-white">
+                                {% if transaction.grade.quality_level %}
+                                    Grade {{ transaction.grade.quality_level }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Quantity</dt>
+                            <dd class="mt-1 text-lg font-bold text-gray-900 dark:text-white">{{ transaction.quantity|floatformat:2 }} kg</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Price per kg</dt>
+                            <dd class="mt-1 text-lg font-bold text-gray-900 dark:text-white">${{ transaction.price_per_kg|floatformat:2 }}</dd>
+                        </div>
+                        {% if transaction.moisture_content %}
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Moisture Content</dt>
+                            <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ transaction.moisture_content }}%</dd>
+                        </div>
+                        {% endif %}
+                        {% if transaction.quality_score %}
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Quality Score</dt>
+                            <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ transaction.quality_score }}/100</dd>
+                        </div>
+                        {% endif %}
+                    </dl>
+                    
+                    {% if transaction.quality_assessment %}
+                    <div class="mt-6">
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Quality Assessment</dt>
+                        <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ transaction.quality_assessment }}</dd>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Payment Information -->
+            {% if transaction.payment_method or transaction.payment_reference %}
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">Payment Information</h3>
+                </div>
+                <div class="px-6 py-4">
+                    <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+                        {% if transaction.payment_method %}
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Payment Method</dt>
+                            <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ transaction.get_payment_method_display }}</dd>
+                        </div>
+                        {% endif %}
+                        {% if transaction.payment_reference %}
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Payment Reference</dt>
+                            <dd class="mt-1 text-sm text-gray-900 dark:text-white font-mono">{{ transaction.payment_reference }}</dd>
+                        </div>
+                        {% endif %}
+                        {% if transaction.payment_date %}
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Payment Date</dt>
+                            <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ transaction.payment_date|date:"F d, Y \a\t H:i" }}</dd>
+                        </div>
+                        {% endif %}
+                    </dl>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-6">
+            <!-- Financial Summary -->
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">Financial Summary</h3>
+                </div>
+                <div class="px-6 py-4">
+                    <div class="space-y-4">
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-500">Quantity:</span>
+                            <span class="text-sm font-medium text-gray-900 dark:text-white">{{ transaction.quantity|floatformat:2 }} kg</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-500">Price per kg:</span>
+                            <span class="text-sm font-medium text-gray-900 dark:text-white">${{ transaction.price_per_kg|floatformat:2 }}</span>
+                        </div>
+                        <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
+                            <div class="flex justify-between">
+                                <span class="text-base font-medium text-gray-900 dark:text-white">Total Amount:</span>
+                                <span class="text-lg font-bold text-gray-900 dark:text-white">${{ transaction.total_amount|floatformat:2 }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Price Analysis -->
+            {% if transaction.grade.base_price %}
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">Price Analysis</h3>
+                </div>
+                <div class="px-6 py-4">
+                    {% with deviation=transaction.price_per_kg|floatformat:2|add:0|sub:transaction.grade.base_price percentage=transaction.price_per_kg|floatformat:2|add:0|sub:transaction.grade.base_price|div:transaction.grade.base_price|mul:100 %}
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-500">Base Price:</span>
+                            <span class="text-sm text-gray-900 dark:text-white">${{ transaction.grade.base_price|floatformat:2 }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-500">Transaction Price:</span>
+                            <span class="text-sm text-gray-900 dark:text-white">${{ transaction.price_per_kg|floatformat:2 }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-500">Deviation:</span>
+                            <span class="text-sm {% if percentage > 0 %}text-green-600{% elif percentage < 0 %}text-red-600{% else %}text-gray-600{% endif %}">
+                                {% if percentage > 0 %}+{% endif %}{{ percentage|floatformat:1 }}%
+                            </span>
+                        </div>
+                        <div class="border-t border-gray-200 dark:border-gray-700 pt-3">
+                            <div class="text-xs text-gray-500">
+                                Range: ${{ transaction.grade.minimum_price|floatformat:2 }} - ${{ transaction.grade.maximum_price|floatformat:2 }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endwith %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Alerts -->
+            {% if alerts %}
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">Related Alerts</h3>
+                </div>
+                <div class="px-6 py-4">
+                    <div class="space-y-3">
+                        {% for alert in alerts %}
+                        <div class="p-3 rounded-lg {% if alert.severity == 'CRITICAL' %}bg-red-50 border border-red-200{% elif alert.severity == 'HIGH' %}bg-orange-50 border border-orange-200{% elif alert.severity == 'MEDIUM' %}bg-yellow-50 border border-yellow-200{% else %}bg-blue-50 border border-blue-200{% endif %}">
+                            <div class="flex justify-between items-start">
+                                <div class="flex-1">
+                                    <div class="text-sm font-medium {% if alert.severity == 'CRITICAL' %}text-red-800{% elif alert.severity == 'HIGH' %}text-orange-800{% elif alert.severity == 'MEDIUM' %}text-yellow-800{% else %}text-blue-800{% endif %}">
+                                        {{ alert.title }}
+                                    </div>
+                                    <div class="text-xs {% if alert.severity == 'CRITICAL' %}text-red-600{% elif alert.severity == 'HIGH' %}text-orange-600{% elif alert.severity == 'MEDIUM' %}text-yellow-600{% else %}text-blue-600{% endif %} mt-1">
+                                        {{ alert.message|truncatewords:15 }}
+                                    </div>
+                                </div>
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium {% if alert.severity == 'CRITICAL' %}bg-red-100 text-red-800{% elif alert.severity == 'HIGH' %}bg-orange-100 text-orange-800{% elif alert.severity == 'MEDIUM' %}bg-yellow-100 text-yellow-800{% else %}bg-blue-100 text-blue-800{% endif %}">
+                                    {{ alert.get_severity_display }}
+                                </span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+async function updateStatus(newStatus) {
+    if (window.TIMBUtils) {
+        window.TIMBUtils.showConfirmDialog(
+            `Are you sure you want to ${newStatus.toLowerCase()} this transaction?`,
+            async () => {
+                try {
+                    const response = await fetch(`/timb/transactions/{{ transaction.transaction_id }}/update-status/`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: JSON.stringify({ status: newStatus })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        window.timbRealTime.showNotification(`Transaction ${newStatus.toLowerCase()}`, 'success');
+                        setTimeout(() => window.location.reload(), 1000);
+                    } else {
+                        window.timbRealTime.showNotification('Failed to update transaction', 'error');
+                    }
+                } catch (error) {
+                    window.timbRealTime.showNotification('Error updating transaction', 'error');
+                }
+            }
+        );
+    }
+}
+
+async function generateReceipt() {
+    try {
+        window.timbRealTime.showNotification('Generating receipt...', 'info');
+        
+        const response = await fetch(`/timb/transactions/{{ transaction.transaction_id }}/receipt/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        });
+        
+        if (response.ok) {
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `receipt-{{ transaction.transaction_id }}.pdf`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+            
+            window.timbRealTime.showNotification('Receipt downloaded successfully!', 'success');
+        } else {
+            window.timbRealTime.showNotification('Failed to generate receipt', 'error');
+        }
+    } catch (error) {
+        window.timbRealTime.showNotification('Error generating receipt', 'error');
+    }
+}
+</script>
+{% endblock %}

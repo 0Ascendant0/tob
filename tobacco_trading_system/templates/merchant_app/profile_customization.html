@@ -1,0 +1,360 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Profile Customization - {{ merchant.company_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .branding-preview {
+        border: 2px solid #ddd;
+        border-radius: 12px;
+        padding: 2rem;
+        background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+        position: sticky;
+        top: 2rem;
+    }
+    
+    .logo-upload-area {
+        border: 2px dashed #ddd;
+        border-radius: 8px;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .logo-upload-area:hover {
+        border-color: var(--merchant-primary);
+        background: var(--merchant-light);
+    }
+    
+    .color-picker {
+        width: 50px;
+        height: 40px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+    
+    .certification-tag {
+        background: linear-gradient(135deg, var(--merchant-secondary), var(--merchant-accent));
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        margin: 0.25rem;
+        display: inline-block;
+    }
+    
+    .section-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="h3 mb-0">Profile Customization</h1>
+        <p class="text-muted">Customize your company profile and branding</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Branding Section -->
+        <div class="section-card">
+            <h5 class="mb-4">Company Branding</h5>
+            
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="update_branding">
+                
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <label class="form-label">Company Logo</label>
+                        <div class="logo-upload-area" onclick="document.getElementById('logoInput').click()">
+                            {% if profile.company_logo %}
+                                <img src="{{ profile.company_logo.url }}" alt="Company Logo" style="max-height: 100px;">
+                            {% else %}
+                                <i class="bi bi-cloud-upload display-4 text-muted"></i>
+                                <p class="text-muted mb-0">Click to upload logo</p>
+                            {% endif %}
+                        </div>
+                        <input type="file" id="logoInput" name="company_logo" accept="image/*" style="display: none;">
+                    </div>
+                    
+                    <div class="col-md-6 mb-4">
+                        <label class="form-label">Company Banner</label>
+                        <div class="logo-upload-area" onclick="document.getElementById('bannerInput').click()">
+                            {% if profile.company_banner %}
+                                <img src="{{ profile.company_banner.url }}" alt="Company Banner" style="max-height: 100px; width: 100%; object-fit: cover;">
+                            {% else %}
+                                <i class="bi bi-image display-4 text-muted"></i>
+                                <p class="text-muted mb-0">Click to upload banner</p>
+                            {% endif %}
+                        </div>
+                        <input type="file" id="bannerInput" name="company_banner" accept="image/*" style="display: none;">
+                    </div>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Primary Color</label>
+                        <input type="color" class="color-picker" name="primary_color" 
+                               value="{{ profile.brand_colors.primary|default:'#1976D2' }}" onchange="updatePreview()">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Secondary Color</label>
+                        <input type="color" class="color-picker" name="secondary_color" 
+                               value="{{ profile.brand_colors.secondary|default:'#2196F3' }}" onchange="updatePreview()">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Accent Color</label>
+                        <input type="color" class="color-picker" name="accent_color" 
+                               value="{{ profile.brand_colors.accent|default:'#FF9800' }}" onchange="updatePreview()">
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Business Type</label>
+                        <select class="form-select" name="business_type">
+                            {% for value, label in business_types %}
+                                <option value="{{ value }}" {% if profile.business_type == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Founding Year</label>
+                        <input type="number" class="form-control" name="founding_year" 
+                               value="{{ profile.founding_year|default:'' }}" min="1900" max="2024">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Number of Employees</label>
+                        <input type="text" class="form-control" name="number_of_employees" 
+                               value="{{ profile.number_of_employees }}" placeholder="e.g., 50-100">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Annual Capacity (kg)</label>
+                        <input type="number" class="form-control" name="annual_capacity" 
+                               value="{{ profile.annual_capacity|default:'' }}" step="0.01">
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label class="form-label">Business Description</label>
+                        <textarea class="form-control" name="business_description" rows="4" 
+                                  placeholder="Describe your business, specializations, and unique value proposition...">{{ profile.business_description }}</textarea>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary-custom">
+                    <i class="bi bi-save"></i> Save Branding
+                </button>
+            </form>
+        </div>
+        
+        <!-- Contact Information Section -->
+        <div class="section-card">
+            <h5 class="mb-4">Contact Information</h5>
+            
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="update_contact">
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Primary Phone</label>
+                        <input type="tel" class="form-control" name="phone_primary" 
+                               value="{{ profile.phone_primary }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Secondary Phone</label>
+                        <input type="tel" class="form-control" name="phone_secondary" 
+                               value="{{ profile.phone_secondary }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Business Email</label>
+                        <input type="email" class="form-control" name="email_business" 
+                               value="{{ profile.email_business }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Website URL</label>
+                        <input type="url" class="form-control" name="website_url" 
+                               value="{{ profile.website_url }}">
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label class="form-label">Headquarters Address</label>
+                        <textarea class="form-control" name="headquarters_address" rows="3">{{ profile.headquarters_address }}</textarea>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary-custom">
+                    <i class="bi bi-save"></i> Save Contact Info
+                </button>
+            </form>
+        </div>
+        
+        <!-- Visibility Settings Section -->
+        <div class="section-card">
+            <h5 class="mb-4">Profile Visibility</h5>
+            
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="update_visibility">
+                
+                <div class="row">
+                    <div class="col-12 mb-4">
+                        <label class="form-label">Profile Visibility</label>
+                        <select class="form-select" name="profile_visibility">
+                            {% for value, label in visibility_choices %}
+                                <option value="{{ value }}" {% if profile.profile_visibility == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text">
+                            Public profiles appear in the merchant directory and can be viewed by anyone.
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" name="show_contact_info" 
+                                   {% if profile.show_contact_info %}checked{% endif %}>
+                            <label class="form-check-label">Show Contact Information</label>
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" name="show_business_stats" 
+                                   {% if profile.show_business_stats %}checked{% endif %}>
+                            <label class="form-check-label">Show Business Statistics</label>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" name="show_certifications" 
+                                   {% if profile.show_certifications %}checked{% endif %}>
+                            <label class="form-check-label">Show Certifications</label>
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" name="allow_direct_contact" 
+                                   {% if profile.allow_direct_contact %}checked{% endif %}>
+                            <label class="form-check-label">Allow Direct Contact</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary-custom">
+                    <i class="bi bi-save"></i> Save Visibility Settings
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Preview Panel -->
+    <div class="col-lg-4">
+        <div class="branding-preview" id="brandingPreview">
+            <h6 class="mb-3">Profile Preview</h6>
+            
+            <div class="text-center mb-4">
+                {% if profile.company_logo %}
+                    <img src="{{ profile.company_logo.url }}" alt="Logo" style="max-height: 80px;" id="previewLogo">
+                {% else %}
+                    <div class="bg-light rounded p-3" id="previewLogo">
+                        <i class="bi bi-building display-4 text-muted"></i>
+                    </div>
+                {% endif %}
+                <h5 class="mt-2">{{ merchant.company_name }}</h5>
+                <span class="badge" id="businessTypeBadge">{{ profile.get_business_type_display }}</span>
+            </div>
+            
+            {% if profile.business_description %}
+            <div class="mb-3">
+                <p class="small">{{ profile.business_description|truncatewords:20 }}</p>
+            </div>
+            {% endif %}
+            
+            <div class="mb-3">
+                <div class="d-flex justify-content-between small">
+                    <span>Founded:</span>
+                    <span>{{ profile.founding_year|default:"Not specified" }}</span>
+                </div>
+                <div class="d-flex justify-content-between small">
+                    <span>Employees:</span>
+                    <span>{{ profile.number_of_employees|default:"Not specified" }}</span>
+                </div>
+                {% if profile.annual_capacity %}
+                <div class="d-flex justify-content-between small">
+                    <span>Capacity:</span>
+                    <span>{{ profile.annual_capacity|floatformat:0 }} kg/year</span>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="mb-3">
+                <h6 class="small">Brand Colors:</h6>
+                <div class="d-flex gap-2">
+                    <div class="rounded" style="width: 30px; height: 30px; background: {{ profile.brand_colors.primary|default:'#1976D2' }}" 
+                         id="previewPrimary"></div>
+                    <div class="rounded" style="width: 30px; height: 30px; background: {{ profile.brand_colors.secondary|default:'#2196F3' }}" 
+                         id="previewSecondary"></div>
+                    <div class="rounded" style="width: 30px; height: 30px; background: {{ profile.brand_colors.accent|default:'#FF9800' }}" 
+                         id="previewAccent"></div>
+                </div>
+            </div>
+            
+            <div class="alert alert-info-custom">
+                <small>
+                    <i class="bi bi-info-circle me-1"></i>
+                    Visibility: {{ profile.get_profile_visibility_display }}
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function updatePreview() {
+    const primaryColor = document.querySelector('[name="primary_color"]').value;
+    const secondaryColor = document.querySelector('[name="secondary_color"]').value;
+    const accentColor = document.querySelector('[name="accent_color"]').value;
+    
+    document.getElementById('previewPrimary').style.background = primaryColor;
+    document.getElementById('previewSecondary').style.background = secondaryColor;
+    document.getElementById('previewAccent').style.background = accentColor;
+    
+    // Update business type badge
+    const businessType = document.querySelector('[name="business_type"]').selectedOptions[0].text;
+    document.getElementById('businessTypeBadge').textContent = businessType;
+    document.getElementById('businessTypeBadge').style.background = secondaryColor;
+}
+
+// File upload preview
+document.getElementById('logoInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('previewLogo').innerHTML = 
+                `<img src="${e.target.result}" alt="Logo" style="max-height: 80px;">`;
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+// Initialize preview on page load
+document.addEventListener('DOMContentLoaded', function() {
+    updatePreview();
+});
+</script>
+{% endblock %}

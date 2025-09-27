@@ -1,439 +1,404 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.conf import settings
 from django.utils import timezone
 from utils.encryption import encryption
 import json
-import uuid
+
 
 class User(AbstractUser):
-    """
-    Custom User model extending Django's AbstractUser for tobacco trading system
-    """
+    """Enhanced custom user model for TIMB system"""
     
-    # Override groups and user_permissions to avoid reverse accessor clashes
-    groups = models.ManyToManyField(
-        'auth.Group',
-        verbose_name='groups',
-        blank=True,
-        help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.',
-        related_name='tobacco_user_set',
-        related_query_name='tobacco_user',
-    )
-    user_permissions = models.ManyToManyField(
-        'auth.Permission',
-        verbose_name='user permissions',
-        blank=True,
-        help_text='Specific permissions for this user.',
-        related_name='tobacco_user_set',
-        related_query_name='tobacco_user',
-    )
+    # Additional user types
+    is_timb_staff = models.BooleanField(default=False, help_text='TIMB staff member')
+    is_merchant = models.BooleanField(default=False, help_text='Tobacco merchant')
     
-    # Additional user fields
-    email = models.EmailField(unique=True, verbose_name='Email Address')
-    phone = models.CharField(
-        max_length=15, 
-        blank=True, 
-        null=True,
-        verbose_name='Phone Number',
-        help_text='Contact phone number'
-    )
+    # Enhanced user information
+    phone = models.CharField(max_length=20, blank=True)
+    national_id = models.CharField(max_length=50, blank=True)
     
-    # Tobacco trading specific fields
-    is_timb_staff = models.BooleanField(
-        default=False,
-        verbose_name='TIMB Staff',
-        help_text='Designates whether the user is a TIMB staff member with administrative privileges.'
-    )
-    is_merchant = models.BooleanField(
-        default=False,
-        verbose_name='Merchant',
-        help_text='Designates whether the user is a registered tobacco merchant.'
-    )
+    # Account status
+    is_verified = models.BooleanField(default=False)
+    verification_token = models.CharField(max_length=100, blank=True)
+    verification_sent_at = models.DateTimeField(blank=True, null=True)
     
-    # Audit fields
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    # Security settings
+    two_factor_enabled = models.BooleanField(default=False)
+    backup_codes = models.JSONField(default=list, blank=True)
+    login_attempts = models.IntegerField(default=0)
+    locked_until = models.DateTimeField(blank=True, null=True)
+    
+    # Login tracking
+    last_login_ip = models.GenericIPAddressField(blank=True, null=True)
+    last_login_device = models.CharField(max_length=200, blank=True)
+    login_history = models.JSONField(default=list, blank=True)
+    
+    # Password management
+    password_changed_at = models.DateTimeField(auto_now_add=True)
+    password_reset_required = models.BooleanField(default=False)
+    
+    # Notification preferences
+    email_notifications = models.BooleanField(default=True)
+    sms_notifications = models.BooleanField(default=False)
+    push_notifications = models.BooleanField(default=True)
     
     class Meta:
         verbose_name = 'User'
         verbose_name_plural = 'Users'
-        db_table = 'tobacco_auth_user'
     
     def __str__(self):
-        return self.username
-    
-    @property
-    def full_name(self):
-        """Return the user's full name"""
-        return f"{self.first_name} {self.last_name}".strip() or self.username
-    
-    @property
-    def is_tobacco_user(self):
-        """Check if user has any tobacco trading permissions"""
-        return self.is_timb_staff or self.is_merchant
+        return f"{self.username} ({self.get_user_type()})"
     
     def get_user_type(self):
-        """Return user type as string"""
+        """Get user type for display"""
         if self.is_superuser:
-            return 'Super Admin'
+            return "Administrator"
         elif self.is_timb_staff:
-            return 'TIMB Staff'
+            return "TIMB Staff"
         elif self.is_merchant:
-            return 'Merchant'
+            return "Merchant"
         else:
-            return 'Regular User'
+            return "User"
     
-    def get_theme_preference(self):
-        """Get user's theme preference from profile"""
-        if hasattr(self, 'profile'):
-            return self.profile.theme_preference
-        return 'timb'  # Default theme
+    def can_login(self):
+        """Check if user can login (not locked)"""
+        if self.locked_until:
+            return timezone.now() > self.locked_until
+        return True
+    
+    def lock_account(self, duration_minutes=30):
+        """Lock account for specified duration"""
+        self.locked_until = timezone.now() + timezone.timedelta(minutes=duration_minutes)
+        self.save()
+    
+    def unlock_account(self):
+        """Unlock account"""
+        self.locked_until = None
+        self.login_attempts = 0
+        self.save()
+    
+    def record_login_attempt(self, success=False, ip_address=None, device_info=''):
+        """Record login attempt"""
+        if success:
+            self.login_attempts = 0
+            self.last_login_ip = ip_address
+            self.last_login_device = device_info
+            
+            # Add to login history (keep last 10)
+            login_record = {
+                'timestamp': timezone.now().isoformat(),
+                'ip': ip_address,
+                'device': device_info,
+                'success': True
+            }
+            
+            self.login_history.append(login_record)
+            if len(self.login_history) > 10:
+                self.login_history = self.login_history[-10:]
+        else:
+            self.login_attempts += 1
+            if self.login_attempts >= 5:
+                self.lock_account()
+        
+        self.save()
 
 
 class UserProfile(models.Model):
-    """
-    Extended user profile for additional tobacco trading information
-    """
+    """Enhanced user profile with business information"""
     
     THEME_CHOICES = [
         ('timb', 'TIMB Theme'),
         ('merchant', 'Merchant Theme'),
+        ('light', 'Light Theme'),
+        ('dark', 'Dark Theme'),
+        ('custom', 'Custom Theme'),
     ]
     
-    user = models.OneToOneField(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name='profile',
-        verbose_name='User'
-    )
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     
-    # Company/Business Information
-    company_name = models.CharField(
-        max_length=200, 
-        blank=True, 
-        null=True,
-        verbose_name='Company Name',
-        help_text='Name of the company or business'
-    )
-    license_number = models.CharField(
-        max_length=100, 
-        blank=True, 
-        null=True,
-        verbose_name='License Number',
-        help_text='Trading license or registration number'
-    )
-    registration_date = models.DateField(
-        blank=True, 
-        null=True,
-        verbose_name='Registration Date',
-        help_text='Date when the license was issued'
-    )
+    # Business Information
+    company_name = models.CharField(max_length=200, blank=True)
+    license_number = models.CharField(max_length=100, blank=True)
+    registration_date = models.DateField(blank=True, null=True)
+    business_address = models.TextField(blank=True)
     
     # Contact Information
-    address = models.TextField(
-        blank=True, 
-        null=True,
-        verbose_name='Address',
-        help_text='Business or contact address'
-    )
-    website = models.URLField(
-        blank=True, 
-        null=True,
-        verbose_name='Website',
-        help_text='Company website URL'
-    )
+    address = models.TextField(blank=True)
+    website = models.URLField(blank=True)
+    linkedin_url = models.URLField(blank=True)
     
-    # Preferences
-    theme_preference = models.CharField(
-        max_length=20,
-        choices=THEME_CHOICES,
-        default='timb',
-        verbose_name='Theme Preference',
-        help_text='Preferred dashboard theme'
-    )
+    # Profile customization
+    profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
+    bio = models.TextField(max_length=500, blank=True)
+    theme_preference = models.CharField(max_length=20, choices=THEME_CHOICES, default='timb')
     
-    # Settings
-    email_notifications = models.BooleanField(
-        default=True,
-        verbose_name='Email Notifications',
-        help_text='Receive email notifications for important updates'
-    )
-    sms_notifications = models.BooleanField(
-        default=False,
-        verbose_name='SMS Notifications',
-        help_text='Receive SMS notifications for urgent alerts'
-    )
+    # Notification preferences
+    email_notifications = models.BooleanField(default=True)
+    sms_notifications = models.BooleanField(default=False)
     
-    # Encrypted sensitive data storage
-    encrypted_sensitive_data = models.TextField(
-        blank=True, 
-        null=True,
-        verbose_name='Encrypted Data',
-        help_text='Encrypted storage for sensitive information'
-    )
+    # Dashboard preferences
+    dashboard_layout = models.JSONField(default=dict, blank=True)
+    widget_preferences = models.JSONField(default=dict, blank=True)
+    
+    # Privacy settings
+    profile_visibility = models.CharField(max_length=20, choices=[
+        ('PUBLIC', 'Public'),
+        ('MERCHANTS_ONLY', 'Merchants Only'),
+        ('PRIVATE', 'Private'),
+    ], default='MERCHANTS_ONLY')
+    
+    show_activity_status = models.BooleanField(default=True)
+    allow_contact = models.BooleanField(default=True)
+    
+    # Encrypted sensitive data
+    encrypted_sensitive_data = models.TextField(blank=True)
     
     # Metadata
-    profile_picture = models.ImageField(
-        upload_to='profile_pictures/',
-        blank=True,
-        null=True,
-        verbose_name='Profile Picture'
-    )
-    bio = models.TextField(
-        max_length=500,
-        blank=True,
-        null=True,
-        verbose_name='Bio',
-        help_text='Short biography or description'
-    )
-    
-    # Audit fields
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
         verbose_name = 'User Profile'
         verbose_name_plural = 'User Profiles'
-        db_table = 'tobacco_user_profile'
     
     def __str__(self):
-        return f"{self.user.username}'s Profile"
+        return f"{self.user.username} - Profile"
     
     def set_sensitive_data(self, data):
-        """
-        Encrypt and store sensitive user data
-        """
+        """Encrypt and store sensitive data"""
         if data:
-            try:
-                self.encrypted_sensitive_data = encryption.encrypt_data(data)
-            except Exception as e:
-                print(f"Error encrypting user data: {e}")
-                self.encrypted_sensitive_data = None
+            self.encrypted_sensitive_data = encryption.encrypt_data(data)
     
     def get_sensitive_data(self):
-        """
-        Decrypt and retrieve sensitive user data
-        """
+        """Decrypt and retrieve sensitive data"""
         if self.encrypted_sensitive_data:
-            try:
-                return encryption.decrypt_data(self.encrypted_sensitive_data)
-            except Exception as e:
-                print(f"Error decrypting user data: {e}")
-                return {}
+            return encryption.decrypt_data(self.encrypted_sensitive_data)
         return {}
     
-    def get_display_name(self):
-        """Get display name for the user"""
-        if self.company_name:
-            return self.company_name
-        return self.user.full_name
-    
     def is_profile_complete(self):
-        """Check if user profile is complete"""
-        required_fields = ['company_name', 'address']
-        if self.user.is_merchant:
-            required_fields.append('license_number')
+        """Check if profile is complete"""
+        required_fields = ['company_name'] if self.user.is_merchant else []
         
         for field in required_fields:
             if not getattr(self, field):
                 return False
+        
         return True
 
 
 class QRToken(models.Model):
-    """
-    Model for storing QR code tokens in separate database for security
-    """
-    token = models.CharField(max_length=100, unique=True, db_index=True)
-    data_ref = models.CharField(max_length=100, unique=True)
+    """Secure QR code tokens for data access"""
+    
+    token = models.CharField(max_length=100, unique=True)
+    data_ref = models.CharField(max_length=100)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-    expires_at = models.DateTimeField()
+    
+    # Token metadata
+    token_type = models.CharField(max_length=50, default='data_access')
+    description = models.CharField(max_length=200, blank=True)
+    
+    # Access control
     access_count = models.IntegerField(default=0)
-    is_active = models.BooleanField(default=True)
+    max_uses = models.IntegerField(default=10)
+    expires_at = models.DateTimeField()
+    
+    # Security
+    is_revoked = models.BooleanField(default=False)
+    revoked_at = models.DateTimeField(blank=True, null=True)
+    revoked_by = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, related_name='revoked_tokens')
+    
+    # Audit
+    created_at = models.DateTimeField(auto_now_add=True)
+    last_accessed = models.DateTimeField(blank=True, null=True)
     
     class Meta:
-        app_label = 'qr_tokens'
-        db_table = 'qr_tokens'
         verbose_name = 'QR Token'
         verbose_name_plural = 'QR Tokens'
         indexes = [
             models.Index(fields=['token']),
-            models.Index(fields=['data_ref']),
             models.Index(fields=['expires_at']),
         ]
     
     def __str__(self):
-        return f"QR Token {self.token[:8]}..."
+        return f"QR Token {self.token[:8]}... ({self.token_type})"
     
-    def is_expired(self):
-        """Check if the token has expired"""
-        return timezone.now() > self.expires_at
+    def is_valid(self):
+        """Check if token is still valid"""
+        if self.is_revoked:
+            return False
+        if timezone.now() > self.expires_at:
+            return False
+        if self.access_count >= self.max_uses:
+            return False
+        return True
     
-    def increment_access(self):
-        """Increment access count"""
-        self.access_count += 1
-        self.save(update_fields=['access_count'])
+    def use_token(self):
+        """Use the token (increment access count)"""
+        if self.is_valid():
+            self.access_count += 1
+            self.last_accessed = timezone.now()
+            self.save()
+            return True
+        return False
+    
+    def revoke(self, revoked_by=None):
+        """Revoke the token"""
+        self.is_revoked = True
+        self.revoked_at = timezone.now()
+        self.revoked_by = revoked_by
+        self.save()
 
 
 class EncryptedData(models.Model):
-    """
-    Model for storing encrypted data referenced by QR tokens
-    """
+    """Secure storage for encrypted data referenced by QR tokens"""
+    
     data_ref = models.CharField(max_length=100, unique=True, db_index=True)
     encrypted_content = models.TextField()
-    data_type = models.CharField(max_length=50)
+    content_type = models.CharField(max_length=50)
+    
+    # Access control
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    access_permissions = models.JSONField(default=dict, blank=True)
+    
+    # Lifecycle
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    expires_at = models.DateTimeField(blank=True, null=True)
     
     class Meta:
         verbose_name = 'Encrypted Data'
         verbose_name_plural = 'Encrypted Data'
-        db_table = 'tobacco_encrypted_data'
-        indexes = [
-            models.Index(fields=['data_ref']),
-            models.Index(fields=['data_type']),
-        ]
+        db_table = 'qr_tokens_encrypteddata'
     
     def __str__(self):
-        return f"Encrypted Data {self.data_ref[:8]}... ({self.data_type})"
+        return f"Encrypted Data {self.data_ref} ({self.content_type})"
     
-    def set_data(self, data, data_type):
-        """Encrypt and store data"""
-        try:
-            self.encrypted_content = encryption.encrypt_data(data)
-            self.data_type = data_type
-        except Exception as e:
-            raise ValueError(f"Failed to encrypt data: {str(e)}")
+    def get_content(self):
+        """Decrypt and return content"""
+        return encryption.decrypt_data(self.encrypted_content)
     
-    def get_data(self):
-        """Decrypt and return data"""
-        try:
-            return encryption.decrypt_data(self.encrypted_content)
-        except Exception as e:
-            raise ValueError(f"Failed to decrypt data: {str(e)}")
-
-
-class LoginAttempt(models.Model):
-    """
-    Model to track login attempts for security
-    """
-    username = models.CharField(max_length=150)
-    ip_address = models.GenericIPAddressField()
-    user_agent = models.TextField(blank=True)
-    success = models.BooleanField(default=False)
-    timestamp = models.DateTimeField(auto_now_add=True)
+    def set_content(self, content):
+        """Encrypt and store content"""
+        self.encrypted_content = encryption.encrypt_data(content)
     
-    class Meta:
-        verbose_name = 'Login Attempt'
-        verbose_name_plural = 'Login Attempts'
-        db_table = 'tobacco_login_attempts'
-        indexes = [
-            models.Index(fields=['username', 'timestamp']),
-            models.Index(fields=['ip_address', 'timestamp']),
-        ]
-    
-    def __str__(self):
-        status = "Success" if self.success else "Failed"
-        return f"{status} login attempt for {self.username} at {self.timestamp}"
+    def is_expired(self):
+        """Check if data has expired"""
+        if self.expires_at:
+            return timezone.now() > self.expires_at
+        return False
 
 
 class UserSession(models.Model):
-    """
-    Model to track active user sessions
-    """
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    """Enhanced user session tracking"""
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_sessions')
     session_key = models.CharField(max_length=40, unique=True)
+    
+    # Session details
     ip_address = models.GenericIPAddressField()
-    user_agent = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    last_activity = models.DateTimeField(auto_now=True)
+    user_agent = models.TextField()
+    device_type = models.CharField(max_length=50, blank=True)
+    browser_info = models.CharField(max_length=200, blank=True)
+    
+    # Location (if available)
+    country = models.CharField(max_length=100, blank=True)
+    city = models.CharField(max_length=100, blank=True)
+    
+    # Session status
     is_active = models.BooleanField(default=True)
+    login_time = models.DateTimeField(auto_now_add=True)
+    last_activity = models.DateTimeField(auto_now=True)
+    logout_time = models.DateTimeField(blank=True, null=True)
+    
+    # Security flags
+    is_suspicious = models.BooleanField(default=False)
+    security_score = models.DecimalField(max_digits=5, decimal_places=2, default=100.00)
     
     class Meta:
         verbose_name = 'User Session'
         verbose_name_plural = 'User Sessions'
-        db_table = 'tobacco_user_sessions'
+        ordering = ['-last_activity']
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.ip_address} ({self.login_time})"
+    
+    def end_session(self):
+        """End the session"""
+        self.is_active = False
+        self.logout_time = timezone.now()
+        self.save()
+    
+    @property
+    def duration(self):
+        """Calculate session duration"""
+        end_time = self.logout_time or timezone.now()
+        return end_time - self.login_time
+
+
+class SecurityLog(models.Model):
+    """Security event logging"""
+    
+    EVENT_TYPES = [
+        ('LOGIN_SUCCESS', 'Successful Login'),
+        ('LOGIN_FAILED', 'Failed Login'),
+        ('LOGOUT', 'Logout'),
+        ('PASSWORD_CHANGE', 'Password Change'),
+        ('PROFILE_UPDATE', 'Profile Update'),
+        ('SUSPICIOUS_ACTIVITY', 'Suspicious Activity'),
+        ('ACCOUNT_LOCKED', 'Account Locked'),
+        ('ACCOUNT_UNLOCKED', 'Account Unlocked'),
+        ('TOKEN_GENERATED', 'Token Generated'),
+        ('TOKEN_USED', 'Token Used'),
+        ('DATA_ACCESS', 'Data Access'),
+        ('PERMISSION_CHANGE', 'Permission Change'),
+    ]
+    
+    SEVERITY_LEVELS = [
+        ('LOW', 'Low'),
+        ('MEDIUM', 'Medium'),
+        ('HIGH', 'High'),
+        ('CRITICAL', 'Critical'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    event_type = models.CharField(max_length=30, choices=EVENT_TYPES)
+    severity = models.CharField(max_length=10, choices=SEVERITY_LEVELS, default='LOW')
+    
+    # Event details
+    description = models.TextField()
+    ip_address = models.GenericIPAddressField(blank=True, null=True)
+    user_agent = models.TextField(blank=True)
+    
+    # Additional context
+    additional_data = models.JSONField(default=dict, blank=True)
+    
+    # Timestamps
+    timestamp = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = 'Security Log'
+        verbose_name_plural = 'Security Logs'
+        ordering = ['-timestamp']
         indexes = [
-            models.Index(fields=['user', 'is_active']),
-            models.Index(fields=['session_key']),
+            models.Index(fields=['event_type', 'timestamp']),
+            models.Index(fields=['user', 'timestamp']),
+            models.Index(fields=['severity', 'timestamp']),
         ]
     
     def __str__(self):
-        return f"Session for {self.user.username}"
+        return f"{self.get_event_type_display()} - {self.user.username if self.user else 'Anonymous'}"
 
 
-# Signals to automatically create and save user profiles
-from django.db.models.signals import post_save, post_delete
+# Signal handlers to create profiles automatically
+from django.db.models.signals import post_save
 from django.dispatch import receiver
-
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
-    """
-    Create a UserProfile when a new User is created
-    """
+    """Create user profile when user is created"""
     if created:
-        UserProfile.objects.get_or_create(user=instance)
-
+        UserProfile.objects.create(user=instance)
 
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
-    """
-    Save the UserProfile when the User is saved
-    """
+    """Save user profile when user is saved"""
     if hasattr(instance, 'profile'):
         instance.profile.save()
-    else:
-        # Create profile if it doesn't exist
-        UserProfile.objects.get_or_create(user=instance)
-
-
-@receiver(post_delete, sender=User)
-def delete_user_profile(sender, instance, **kwargs):
-    """
-    Clean up when user is deleted
-    """
-    # Profile will be deleted automatically due to CASCADE
-    pass
-
-
-# Security-related signals
-@receiver(post_save, sender=User)
-def log_user_creation(sender, instance, created, **kwargs):
-    """
-    Log user creation for audit purposes
-    """
-    if created:
-        print(f"New user created: {instance.username} ({instance.get_user_type()})")
-
-
-# Additional utility functions
-def get_user_by_email(email):
-    """Get user by email address"""
-    try:
-        return User.objects.get(email=email)
-    except User.DoesNotExist:
-        return None
-
-
-def create_qr_token_for_user(user, data, expiry_minutes=30):
-    """Create a QR token for user data"""
-    from utils.qr_code import qr_manager
-    
-    return qr_manager.generate_access_token(data, expiry_minutes)
-
-
-def validate_user_permissions(user, required_permission):
-    """Validate if user has required permissions"""
-    if user.is_superuser:
-        return True
-    
-    if required_permission == 'timb_access' and user.is_timb_staff:
-        return True
-    
-    if required_permission == 'merchant_access' and user.is_merchant:
-        return True
-    
-    return False
