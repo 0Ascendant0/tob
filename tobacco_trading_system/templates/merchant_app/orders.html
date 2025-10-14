@@ -6,19 +6,36 @@
 {% block extra_css %}
 <style>
     .order-card {
-        border: 2px solid #e9ecef;
+        border: 1px solid #e5e7eb;
         border-radius: var(--radius-lg);
-        transition: all 0.3s ease;
+        transition: box-shadow 0.25s ease, transform 0.25s ease;
         position: relative;
+        background: #fff;
+        box-shadow: 0 1px 2px rgba(16,24,40,0.04);
     }
     .order-card:hover {
-        border-color: var(--merchant-secondary);
         transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(16,24,40,0.12);
     }
     .order-status {
         position: absolute;
         top: 1rem;
         right: 1rem;
+    }
+    .order-meta {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.75rem 1rem;
+    }
+    .order-meta .label {
+        font-size: 0.75rem;
+        color: #6b7280;
+        margin-bottom: 0.25rem;
+    }
+    .order-divider {
+        height: 1px;
+        background: #eef2f7;
+        margin: 12px 0;
     }
     .progress-ring {
         width: 60px;
@@ -65,113 +82,98 @@
         width: 40px;
         height: 40px;
         border-radius: 50%;
-        background: var(--merchant-light);
+        background: rgba(93,92,222,0.12);
         display: flex;
         align-items: center;
         justify-content: center;
         font-weight: bold;
+        color: var(--merchant-primary);
+    }
+    .empty-state {
+        border: 1px dashed #e5e7eb;
+        border-radius: var(--radius-lg);
+        background: #fafafa;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="row mb-4">
-    <div class="col-12">
-        <h1 class="h3 mb-0">Order Management</h1>
-        <p class="text-muted">Track and manage client orders</p>
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="mb-8">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Order Management</h1>
+                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Track and manage client orders</p>
+            </div>
+            <a href="{% url 'merchant_create_order' %}" class="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition duration-200">
+                <i class="fas fa-plus mr-2"></i>New Order
+            </a>
+        </div>
     </div>
-</div>
 
-<!-- Order Statistics -->
-<div class="row mb-4">
-    <div class="col-lg-3 col-md-6">
-        <div class="merchant-card">
-            <div class="d-flex align-items-center">
-                <div class="flex-grow-1">
-                    <div class="metric-value">{{ order_stats.pending }}</div>
-                    <div>Pending Orders</div>
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+            <div class="p-5 flex items-center">
+                <i class="fas fa-clock text-blue-600 text-2xl"></i>
+                <div class="ml-4">
+                    <div class="text-sm text-gray-500 dark:text-gray-400">Pending Orders</div>
+                    <div class="text-lg font-semibold text-gray-900 dark:text-white">{{ order_stats.pending }}</div>
                 </div>
-                <div class="metric-icon">
-                    <i class="bi bi-clock fs-1"></i>
+            </div>
+        </div>
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+            <div class="p-5 flex items-center">
+                <i class="fas fa-cogs text-indigo-600 text-2xl"></i>
+                <div class="ml-4">
+                    <div class="text-sm text-gray-500 dark:text-gray-400">Processing</div>
+                    <div class="text-lg font-semibold text-gray-900 dark:text-white">{{ order_stats.processing }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+            <div class="p-5 flex items-center">
+                <i class="fas fa-check-circle text-green-600 text-2xl"></i>
+                <div class="ml-4">
+                    <div class="text-sm text-gray-500 dark:text-gray-400">Completed</div>
+                    <div class="text-lg font-semibold text-gray-900 dark:text-white">{{ order_stats.completed }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+            <div class="p-5 flex items-center">
+                <i class="fas fa-dollar-sign text-yellow-600 text-2xl"></i>
+                <div class="ml-4">
+                    <div class="text-sm text-gray-500 dark:text-gray-400">Total Value</div>
+                    <div class="text-lg font-semibold text-gray-900 dark:text-white">${{ order_stats.total_value|floatformat:2 }}</div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-lg-3 col-md-6">
-        <div class="merchant-card">
-            <div class="d-flex align-items-center">
-                <div class="flex-grow-1">
-                    <div class="metric-value">{{ order_stats.processing }}</div>
-                    <div>Processing</div>
-                </div>
-                <div class="metric-icon">
-                    <i class="bi bi-gear fs-1"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-3 col-md-6">
-        <div class="merchant-card">
-            <div class="d-flex align-items-center">
-                <div class="flex-grow-1">
-                    <div class="metric-value">{{ order_stats.completed }}</div>
-                    <div>Completed</div>
-                </div>
-                <div class="metric-icon">
-                    <i class="bi bi-check-circle fs-1"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-3 col-md-6">
-        <div class="merchant-card">
-            <div class="d-flex align-items-center">
-                <div class="flex-grow-1">
-                    <div class="metric-value">${{ order_stats.total_value|floatformat:2 }}</div>
-                    <div>Total Value</div>
-                </div>
-                <div class="metric-icon">
-                    <i class="bi bi-currency-dollar fs-1"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Quick Actions -->
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="custom-card">
-            <div class="card-header-custom">
-                <h5 class="mb-0">Quick Actions</h5>
+    <!-- Filters & Actions -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg mb-6">
+        <div class="px-6 py-4 flex flex-wrap items-center gap-3">
+            <h5 class="text-base font-medium text-gray-900 dark:text-white mr-auto">Filters</h5>
+            <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400"><i class="fas fa-search"></i></span>
+                <input type="text" class="pl-9 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-sm text-gray-900 dark:text-white" placeholder="Search orders..." oninput="searchOrders(this.value)">
             </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-3">
-                        <a href="{% url 'merchant_create_order' %}" class="btn btn-primary-custom w-100 mb-2">
-                            <i class="bi bi-plus-circle me-2"></i>New Order
-                        </a>
-                    </div>
-                    <div class="col-md-3">
-                        <button class="btn btn-outline-success w-100 mb-2" onclick="bulkProcess()">
-                            <i class="bi bi-gear me-2"></i>Bulk Process
-                        </button>
-                    </div>
-                    <div class="col-md-3">
-                        <button class="btn btn-outline-info w-100 mb-2" onclick="generateOrderReport()">
-                            <i class="bi bi-file-earmark-text me-2"></i>Order Report
-                        </button>
-                    </div>
-                    <div class="col-md-3">
-                        <button class="btn btn-outline-warning w-100 mb-2" onclick="exportOrders()">
-                            <i class="bi bi-download me-2"></i>Export Orders
-                        </button>
-                    </div>
-                </div>
+            <div class="flex flex-wrap gap-2">
+                <a href="?" class="px-3 py-1.5 rounded-md border text-sm {% if not status_filter %}bg-primary-50 text-primary-700 border-primary-200{% else %}text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600{% endif %}">All</a>
+                <a href="?status=PENDING" class="px-3 py-1.5 rounded-md border text-sm {% if status_filter == 'PENDING' %}bg-primary-50 text-primary-700 border-primary-200{% else %}text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600{% endif %}">Pending</a>
+                <a href="?status=CONFIRMED" class="px-3 py-1.5 rounded-md border text-sm {% if status_filter == 'CONFIRMED' %}bg-primary-50 text-primary-700 border-primary-200{% else %}text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600{% endif %}">Confirmed</a>
+                <a href="?status=IN_PROGRESS" class="px-3 py-1.5 rounded-md border text-sm {% if status_filter == 'IN_PROGRESS' %}bg-primary-50 text-primary-700 border-primary-200{% else %}text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600{% endif %}">In Progress</a>
+                <a href="?status=READY" class="px-3 py-1.5 rounded-md border text-sm {% if status_filter == 'READY' %}bg-primary-50 text-primary-700 border-primary-200{% else %}text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600{% endif %}">Ready</a>
+                <a href="?status=DELIVERED" class="px-3 py-1.5 rounded-md border text-sm {% if status_filter == 'DELIVERED' %}bg-primary-50 text-primary-700 border-primary-200{% else %}text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600{% endif %}">Delivered</a>
+                <a href="?status=CANCELLED" class="px-3 py-1.5 rounded-md border text-sm {% if status_filter == 'CANCELLED' %}bg-primary-50 text-primary-700 border-primary-200{% else %}text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600{% endif %}">Cancelled</a>
+            </div>
+            <div class="relative">
+                <button class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm text-gray-700 dark:text-gray-300" onclick="exportOrders()"><i class="fas fa-file-export mr-2"></i>Export CSV</button>
             </div>
         </div>
     </div>
-</div>
 
 <!-- Orders Grid -->
 <div class="row mb-4">
@@ -180,16 +182,7 @@
             <div class="card-header-custom">
                 <div class="d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Current Orders</h5>
-                    <div class="d-flex gap-2">
-                        <select class="form-select form-select-sm" onchange="filterOrders(this.value)">
-                            <option value="">All Orders</option>
-                            <option value="PENDING">Pending</option>
-                            <option value="PROCESSING">Processing</option>
-                            <option value="PARTIALLY_FILLED">Partially Filled</option>
-                            <option value="COMPLETED">Completed</option>
-                            <option value="CANCELLED">Cancelled</option>
-                        </select>
-                    </div>
+                    <div class="text-muted small">Showing {% if status_filter %}{{ status_filter|title }}{% else %}All{% endif %} orders</div>
                 </div>
             </div>
             <div class="card-body">
@@ -197,7 +190,7 @@
                     {% for order in orders %}
                     <div class="col-lg-6 mb-3 order-item" data-status="{{ order.status }}">
                         <div class="order-card p-3">
-                            <span class="badge bg-{% if order.status == 'COMPLETED' %}success{% elif order.status == 'PROCESSING' %}primary{% elif order.status == 'PARTIALLY_FILLED' %}warning{% elif order.status == 'CANCELLED' %}danger{% else %}secondary{% endif %} order-status">
+                            <span class="badge bg-{% if order.status == 'DELIVERED' %}success{% elif order.status == 'IN_PROGRESS' or order.status == 'READY' %}primary{% elif order.status == 'PARTIALLY_FILLED' %}warning{% elif order.status == 'CANCELLED' %}danger{% elif order.status == 'CONFIRMED' %}info{% else %}secondary{% endif %} order-status">
                                 {{ order.get_status_display }}
                             </span>
                             
@@ -215,35 +208,35 @@
                                     <svg class="progress-ring" viewBox="0 0 60 60">
                                         <circle cx="30" cy="30" r="25" fill="none" stroke="#e9ecef" stroke-width="4"/>
                                         <circle cx="30" cy="30" r="25" fill="none" stroke="var(--merchant-secondary)" stroke-width="4" 
-                                                class="progress-circle" style="stroke-dashoffset: {{ 157|sub:progress|mul:1.57 }}"/>
+                                                class="progress-circle"/>
                                         <text x="30" y="35" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--merchant-primary)">{{ progress }}%</text>
                                     </svg>
                                 </div>
                             </div>
                             
-                            <div class="row mb-3">
-                                <div class="col-6">
-                                    <div class="small text-muted">Requested Quantity</div>
-                                    <div class="fw-bold">{{ order.requested_quantity|floatformat:0 }}kg</div>
+                            <div class="order-meta mb-2">
+                                <div>
+                                    <div class="label">Requested Quantity</div>
+                                    <div class="fw-bold">{{ order.requested_quantity|floatformat:0 }} kg</div>
                                 </div>
-                                <div class="col-6">
-                                    <div class="small text-muted">Target Price</div>
+                                <div>
+                                    <div class="label">Target Price</div>
                                     <div class="fw-bold">${{ order.target_price|floatformat:2 }}/kg</div>
                                 </div>
-                            </div>
-                            
-                            <div class="row mb-3">
-                                <div class="col-6">
-                                    <div class="small text-muted">Filled Quantity</div>
-                                    <div class="fw-bold text-success">{{ order.filled_quantity|floatformat:0 }}kg</div>
+                                <div>
+                                    <div class="label">Filled Quantity</div>
+                                    <div class="fw-bold text-success">{{ order.filled_quantity|floatformat:0 }} kg</div>
                                 </div>
-                                <div class="col-6">
-                                    <div class="small text-muted">Delivery Date</div>
-                                    <div class="fw-bold {% if order.delivery_date < today %}text-danger{% elif order.delivery_date == today %}text-warning{% endif %}">
-                                        {{ order.delivery_date|date:"M d" }}
+                                <div>
+                                    <div class="label">Delivery Date</div>
+                                    <div class="fw-bold {% if order.expected_delivery_date and order.expected_delivery_date < today %}text-danger{% elif order.expected_delivery_date and order.expected_delivery_date == today %}text-warning{% endif %}">
+                                        {{ order.expected_delivery_date|date:"M d" }}
                                     </div>
                                 </div>
                             </div>
+                            <div class="order-divider"></div>
+                            
+                            
                             
                             {% if order.custom_grade %}
                             <div class="mb-3">
@@ -252,20 +245,24 @@
                             </div>
                             {% endif %}
                             
-                            <div class="progress mb-3" style="height: 6px;">
-                                <div class="progress-bar bg-{% if progress == 100 %}success{% elif progress > 50 %}primary{% else %}warning{% endif %}" 
-                                     style="width: {{ progress }}%"></div>
+                            <div class="progress mb-2" style="height: 6px;">
+                                <div class="progress-bar bg-{% if progress == 100 %}success{% elif progress > 50 %}primary{% else %}warning{% endif %}"
+                                     role="progressbar" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ progress }}%"></div>
+                            </div>
+                            <div class="d-flex justify-content-between small text-muted mb-2">
+                                <span>{{ order.filled_quantity|floatformat:0 }} kg filled</span>
+                                <span>{{ progress }}% complete</span>
                             </div>
                             
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <div class="fw-bold text-primary">Total: ${{ order.requested_quantity|mul:order.target_price|floatformat:2 }}</div>
+                                    <div class="fw-bold text-primary">Total: ${{ order.total_amount|floatformat:2 }}</div>
                                 </div>
                                 <div class="btn-group btn-group-sm">
                                     <button class="btn btn-outline-primary" onclick="viewOrder('{{ order.id }}')">
                                         <i class="bi bi-eye"></i>
                                     </button>
-                                    {% if order.status == 'PENDING' or order.status == 'PROCESSING' %}
+                                    {% if order.status == 'PENDING' or order.status == 'CONFIRMED' or order.status == 'IN_PROGRESS' or order.status == 'PARTIALLY_FILLED' %}
                                     <button class="btn btn-outline-success" onclick="processOrder('{{ order.id }}')">
                                         <i class="bi bi-gear"></i>
                                     </button>
@@ -550,4 +547,555 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+{% endblock %}
+                        </div>
+
+                    </div>
+
+                    {% empty %}
+
+                    <div class="col-12">
+
+                        <div class="text-center text-muted py-5">
+
+                            <i class="bi bi-clipboard-x display-1"></i>
+
+                            <h5>No orders found</h5>
+
+                            <p>Create your first order to get started.</p>
+
+                            <a href="{% url 'merchant_create_order' %}" class="btn btn-primary-custom">
+
+                                <i class="bi bi-plus-circle me-2"></i>Create First Order
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- Order Detail Modal -->
+
+<div class="modal fade" id="orderModal" tabindex="-1">
+
+    <div class="modal-dialog modal-xl">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">Order Details</h5>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <div id="orderDetails">
+
+                    <!-- Order details will be loaded here -->
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+                <button type="button" class="btn btn-primary-custom" id="updateOrderBtn">Update Order</button>
+
+                <button type="button" class="btn btn-success" id="fulfillOrderBtn">Mark Fulfilled</button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- Process Order Modal -->
+
+<div class="modal fade" id="processModal" tabindex="-1">
+
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">Process Order</h5>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <form id="processForm">
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">Quantity to Fill (kg)</label>
+
+                            <input type="number" class="form-control" name="fill_quantity" step="0.01" min="0" required>
+
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">Source Inventory</label>
+
+                            <select class="form-select" name="source_inventory" required>
+
+                                <option value="">Select Source</option>
+
+                                <!-- Populated from available inventory -->
+
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">Quality Notes</label>
+
+                            <textarea class="form-control" name="quality_notes" rows="3"></textarea>
+
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">Expected Ship Date</label>
+
+                            <input type="date" class="form-control" name="ship_date" required>
+
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
+                <button type="button" class="btn btn-primary-custom" onclick="submitProcess()">Process Order</button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+
+{% block extra_js %}
+
+<script>
+
+function filterOrders(status) {
+
+    const items = document.querySelectorAll('.order-item');
+
+    items.forEach(item => {
+
+        if (status === '' || item.dataset.status === status) {
+
+            item.style.display = 'block';
+
+        } else {
+
+            item.style.display = 'none';
+
+        }
+
+    });
+
+}
+
+
+
+function viewOrder(orderId) {
+
+    fetch(`/merchant/api/orders/${orderId}/`)
+
+        .then(response => response.json())
+
+        .then(data => {
+
+            displayOrderDetails(data);
+
+            new bootstrap.Modal(document.getElementById('orderModal')).show();
+
+        })
+
+        .catch(error => {
+
+            console.error('Error:', error);
+
+            TIMBUtils.showNotification('Error loading order details', 'danger');
+
+        });
+
+}
+
+
+
+function displayOrderDetails(order) {
+
+    const detailsHtml = `
+
+        <div class="row">
+
+            <div class="col-md-6">
+
+                <h6>Order Information</h6>
+
+                <p><strong>Order Number:</strong> ${order.order_number}</p>
+
+                <p><strong>Client:</strong> ${order.client_name}</p>
+
+                <p><strong>Status:</strong> <span class="badge bg-primary">${order.status}</span></p>
+
+                <p><strong>Created:</strong> ${new Date(order.created_at).toLocaleDateString()}</p>
+
+                <p><strong>Delivery Date:</strong> ${new Date(order.delivery_date).toLocaleDateString()}</p>
+
+            </div>
+
+            <div class="col-md-6">
+
+                <h6>Order Details</h6>
+
+                <p><strong>Requested Quantity:</strong> ${order.requested_quantity} kg</p>
+
+                <p><strong>Filled Quantity:</strong> ${order.filled_quantity} kg</p>
+
+                <p><strong>Target Price:</strong> $${order.target_price}/kg</p>
+
+                <p><strong>Total Value:</strong> $${(order.requested_quantity * order.target_price).toFixed(2)}</p>
+
+            </div>
+
+        </div>
+
+        
+
+        <div class="row mt-4">
+
+            <div class="col-12">
+
+                <h6>Order Timeline</h6>
+
+                <div class="order-timeline">
+
+                    <div class="timeline-item">
+
+                        <strong>Order Created</strong>
+
+                        <div class="text-muted small">${new Date(order.created_at).toLocaleString()}</div>
+
+                    </div>
+
+                    ${order.status !== 'PENDING' ? `
+
+                    <div class="timeline-item">
+
+                        <strong>Processing Started</strong>
+
+                        <div class="text-muted small">${new Date(order.updated_at).toLocaleString()}</div>
+
+                    </div>
+
+                    ` : ''}
+
+                    ${order.filled_quantity > 0 ? `
+
+                    <div class="timeline-item">
+
+                        <strong>Partial Fulfillment</strong>
+
+                        <div class="text-muted small">${order.filled_quantity} kg processed</div>
+
+                    </div>
+
+                    ` : ''}
+
+                </div>
+
+            </div>
+
+        </div>
+
+        
+
+        ${order.special_requirements ? `
+
+        <div class="row mt-4">
+
+            <div class="col-12">
+
+                <h6>Special Requirements</h6>
+
+                <p>${order.special_requirements}</p>
+
+            </div>
+
+        </div>
+
+        ` : ''}
+
+    `;
+
+    
+
+    document.getElementById('orderDetails').innerHTML = detailsHtml;
+
+}
+
+
+
+function processOrder(orderId) {
+
+    // Load available inventory for the order
+
+    fetch(`/merchant/api/orders/${orderId}/available-inventory/`)
+
+        .then(response => response.json())
+
+        .then(data => {
+
+            const inventorySelect = document.querySelector('[name="source_inventory"]');
+
+            inventorySelect.innerHTML = '<option value="">Select Source</option>';
+
+            
+
+            data.inventory.forEach(item => {
+
+                const option = document.createElement('option');
+
+                option.value = item.id;
+
+                option.textContent = `${item.grade} - ${item.quantity}kg available at ${item.location}`;
+
+                inventorySelect.appendChild(option);
+
+            });
+
+            
+
+            document.getElementById('processForm').dataset.orderId = orderId;
+
+            new bootstrap.Modal(document.getElementById('processModal')).show();
+
+        })
+
+        .catch(error => {
+
+            console.error('Error:', error);
+
+            TIMBUtils.showNotification('Error loading inventory data', 'danger');
+
+        });
+
+}
+
+
+
+function submitProcess() {
+
+    const form = document.getElementById('processForm');
+
+    const formData = new FormData(form);
+
+    const data = Object.fromEntries(formData);
+
+    const orderId = form.dataset.orderId;
+
+    
+
+    fetch(`/merchant/api/orders/${orderId}/process/`, {
+
+        method: 'POST',
+
+        headers: {
+
+            'X-CSRFToken': TIMBUtils.getCsrfToken(),
+
+            'Content-Type': 'application/json'
+
+        },
+
+        body: JSON.stringify(data)
+
+    })
+
+    .then(response => response.json())
+
+    .then(data => {
+
+        if (data.success) {
+
+            TIMBUtils.showNotification('Order processed successfully', 'success');
+
+            bootstrap.Modal.getInstance(document.getElementById('processModal')).hide();
+
+            location.reload();
+
+        } else {
+
+            TIMBUtils.showNotification('Error processing order: ' + data.error, 'danger');
+
+        }
+
+    })
+
+    .catch(error => {
+
+        console.error('Error:', error);
+
+        TIMBUtils.showNotification('Error processing order', 'danger');
+
+    });
+
+}
+
+
+
+function communicateWithClient(orderId) {
+
+    // Open communication interface
+
+    TIMBUtils.showNotification('Client communication feature coming soon', 'info');
+
+}
+
+
+
+function bulkProcess() {
+
+    // Bulk processing interface
+
+    TIMBUtils.showNotification('Bulk processing feature coming soon', 'info');
+
+}
+
+
+
+function generateOrderReport() {
+
+    TIMBUtils.showLoader();
+
+    
+
+    fetch('/merchant/api/orders/report/', {
+
+        method: 'POST',
+
+        headers: {
+
+            'X-CSRFToken': TIMBUtils.getCsrfToken(),
+
+            'Content-Type': 'application/json'
+
+        }
+
+    })
+
+    .then(response => response.blob())
+
+    .then(blob => {
+
+        TIMBUtils.hideLoader();
+
+        
+
+        const url = window.URL.createObjectURL(blob);
+
+        const link = document.createElement('a');
+
+        link.href = url;
+
+        link.download = `orders-report-${new Date().toISOString().split('T')[0]}.pdf`;
+
+        link.click();
+
+        window.URL.revokeObjectURL(url);
+
+        
+
+        TIMBUtils.showNotification('Orders report generated', 'success');
+
+    })
+
+    .catch(error => {
+
+        TIMBUtils.hideLoader();
+
+        console.error('Error:', error);
+
+        TIMBUtils.showNotification('Error generating report', 'danger');
+
+    });
+
+}
+
+
+
+function exportOrders() {
+
+    window.open('/merchant/api/orders/export/', '_blank');
+
+}
+
+
+
+// Initialize progress circles
+
+document.addEventListener('DOMContentLoaded', function() {
+
+    const progressCircles = document.querySelectorAll('.progress-circle');
+
+    progressCircles.forEach(circle => {
+
+        const progress = parseInt(circle.nextElementSibling.textContent);
+
+        const offset = 157 - (progress / 100) * 157;
+
+        circle.style.strokeDashoffset = offset;
+
+    });
+
+});
+
+</script>
+
 {% endblock %}

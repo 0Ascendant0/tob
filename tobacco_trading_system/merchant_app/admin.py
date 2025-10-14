@@ -1,7 +1,5 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from django.urls import reverse
-from django.utils.safestring import mark_safe
 from .models import (
     MerchantProfile,
     MerchantInventory,
@@ -262,7 +260,7 @@ class MerchantInventoryAdmin(admin.ModelAdmin):
     merchant_name.admin_order_field = 'merchant__company_name'
     
     def grade_name(self, obj):
-        return obj.grade.grade_name
+        return obj.grade.grade_name if obj.grade else '-'
     grade_name.short_description = 'Grade'
     grade_name.admin_order_field = 'grade__grade_name'
     
@@ -565,7 +563,7 @@ class InterMerchantTradeAdmin(admin.ModelAdmin):
     buyer_name.admin_order_field = 'buyer_merchant__company_name'
     
     def grade_name(self, obj):
-        return obj.grade.grade_name
+        return obj.grade.grade_name if obj.grade else (obj.custom_grade.custom_grade_name if obj.custom_grade else '-')
     grade_name.short_description = 'Grade'
     grade_name.admin_order_field = 'grade__grade_name'
     
@@ -643,7 +641,6 @@ class PurchaseRecommendationAdmin(admin.ModelAdmin):
             'fields': (
                 'recommended_quantity',
                 'estimated_cost',
-                'target_price',
                 'expected_roi'
             )
         }),

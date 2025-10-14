@@ -2750,3 +2750,513 @@ INFO 2025-09-27 12:51:51,792 autoreload 35696 26556 C:\Users\Dell\Desktop\Tobacc
 INFO 2025-09-27 12:51:59,577 autoreload 30516 7608 Watching for file changes with StatReloader
 INFO 2025-09-27 12:52:09,147 autoreload 30516 7608 C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_trading_system\merchant_app\views.py changed, reloading.
 INFO 2025-09-27 12:52:15,935 autoreload 20320 33948 Watching for file changes with StatReloader
+INFO 2025-10-14 11:59:14,364 autoreload 16472 19880 Watching for file changes with StatReloader
+INFO 2025-10-14 11:59:33,360 basehttp 16472 1292 "GET / HTTP/1.1" 302 0
+INFO 2025-10-14 11:59:33,406 basehttp 16472 1292 "GET /auth/login/ HTTP/1.1" 200 18339
+INFO 2025-10-14 11:59:33,867 basehttp 16472 1292 "GET /static/images/timb-logo.png HTTP/1.1" 200 9959
+WARNING 2025-10-14 11:59:34,834 log 16472 1292 Not Found: /favicon.ico
+WARNING 2025-10-14 11:59:34,836 basehttp 16472 1292 "GET /favicon.ico HTTP/1.1" 404 3133
+INFO 2025-10-14 11:59:46,969 basehttp 16472 16852 "GET / HTTP/1.1" 302 0
+INFO 2025-10-14 11:59:46,996 basehttp 16472 16852 "GET /auth/login/ HTTP/1.1" 200 18339
+INFO 2025-10-14 11:59:47,169 basehttp 16472 16852 "GET /static/images/timb-logo.png HTTP/1.1" 200 9959
+WARNING 2025-10-14 11:59:48,400 log 16472 16852 Not Found: /favicon.ico
+INFO 2025-10-14 11:59:48,421 basehttp 16472 16852 - Broken pipe from ('127.0.0.1', 63085)
+INFO 2025-10-14 11:59:58,002 basehttp 16472 17296 "POST /auth/login/ HTTP/1.1" 302 0
+INFO 2025-10-14 11:59:58,132 basehttp 16472 17296 "GET /timb/ HTTP/1.1" 200 39433
+WARNING 2025-10-14 11:59:58,505 log 16472 20260 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-14 11:59:58,507 basehttp 16472 20260 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3181
+INFO 2025-10-14 12:00:04,521 basehttp 16472 17296 "GET /timb/ HTTP/1.1" 200 38509
+WARNING 2025-10-14 12:00:05,044 log 16472 18132 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-14 12:00:05,053 basehttp 16472 18132 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3181
+INFO 2025-10-14 12:00:10,094 basehttp 16472 17296 "GET /auth/logout/ HTTP/1.1" 302 0
+INFO 2025-10-14 12:00:10,110 basehttp 16472 17296 "GET /auth/login/ HTTP/1.1" 200 19276
+INFO 2025-10-14 12:00:17,139 basehttp 16472 17296 "POST /auth/login/ HTTP/1.1" 302 0
+INFO 2025-10-14 12:00:17,176 basehttp 16472 17296 "GET /merchant/ HTTP/1.1" 302 0
+INFO 2025-10-14 12:00:17,236 basehttp 16472 17296 "GET /auth/profile/ HTTP/1.1" 200 46718
+ERROR 2025-10-14 12:00:36,853 log 16472 17296 Internal Server Error: /merchant/aggregation/
+Traceback (most recent call last):
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\views\decorators\http.py", line 43, in inner
+    return func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco\tobacco_trading_system\merchant_app\views.py", line 462, in aggregation_dashboard
+    merchant = request.user.merchant_profile
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\utils\functional.py", line 268, in inner
+    return func(_wrapped, *args)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\db\models\fields\related_descriptors.py", line 492, in __get__
+    raise self.RelatedObjectDoesNotExist(
+authentication.models.User.merchant_profile.RelatedObjectDoesNotExist: User has no merchant_profile.
+ERROR 2025-10-14 12:00:36,882 basehttp 16472 17296 "GET /merchant/aggregation/ HTTP/1.1" 500 101945
+INFO 2025-10-14 12:01:08,067 basehttp 16472 17296 "GET /merchant/inventory/ HTTP/1.1" 302 0
+INFO 2025-10-14 12:01:08,109 basehttp 16472 17296 "GET /auth/profile/ HTTP/1.1" 200 45894
+INFO 2025-10-14 12:01:18,154 basehttp 16472 17296 "GET /merchant/orders/ HTTP/1.1" 302 0
+INFO 2025-10-14 12:01:18,208 basehttp 16472 17296 "GET /auth/profile/ HTTP/1.1" 200 45893
+INFO 2025-10-14 12:01:18,355 basehttp 16472 17296 "GET /static/images/timb-logo.png HTTP/1.1" 304 0
+INFO 2025-10-14 12:01:24,048 basehttp 16472 17296 "POST /auth/profile/ HTTP/1.1" 200 45871
+INFO 2025-10-14 12:01:27,870 basehttp 16472 17296 "GET /merchant/inventory/ HTTP/1.1" 302 0
+INFO 2025-10-14 12:01:27,926 basehttp 16472 17296 "GET /auth/profile/ HTTP/1.1" 200 45893
+INFO 2025-10-14 12:01:29,833 basehttp 16472 17296 "GET /merchant/inventory/ HTTP/1.1" 302 0
+INFO 2025-10-14 12:01:29,877 basehttp 16472 17296 "GET /auth/profile/ HTTP/1.1" 200 45893
+INFO 2025-10-14 12:01:31,688 basehttp 16472 17296 "GET /merchant/orders/ HTTP/1.1" 302 0
+INFO 2025-10-14 12:01:31,724 basehttp 16472 17296 "GET /auth/profile/ HTTP/1.1" 200 45893
+ERROR 2025-10-14 12:01:33,553 log 16472 17296 Internal Server Error: /merchant/aggregation/
+Traceback (most recent call last):
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\views\decorators\http.py", line 43, in inner
+    return func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco\tobacco_trading_system\merchant_app\views.py", line 462, in aggregation_dashboard
+    merchant = request.user.merchant_profile
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\utils\functional.py", line 268, in inner
+    return func(_wrapped, *args)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\db\models\fields\related_descriptors.py", line 492, in __get__
+    raise self.RelatedObjectDoesNotExist(
+authentication.models.User.merchant_profile.RelatedObjectDoesNotExist: User has no merchant_profile.
+ERROR 2025-10-14 12:01:33,573 basehttp 16472 17296 "GET /merchant/aggregation/ HTTP/1.1" 500 101945
+INFO 2025-10-14 12:01:55,814 basehttp 16472 17296 "GET /realtime/ HTTP/1.1" 200 46382
+INFO 2025-10-14 12:01:58,450 basehttp 16472 17296 "GET /merchant/ai/recommendations/ HTTP/1.1" 302 0
+INFO 2025-10-14 12:01:58,510 basehttp 16472 17296 "GET /auth/profile/ HTTP/1.1" 200 45893
+INFO 2025-10-14 12:02:00,413 basehttp 16472 17296 "GET /merchant/ai/recommendations/ HTTP/1.1" 302 0
+INFO 2025-10-14 12:02:00,457 basehttp 16472 17296 "GET /auth/profile/ HTTP/1.1" 200 45893
+ERROR 2025-10-14 12:02:11,246 log 16472 17296 Internal Server Error: /merchant/aggregation/
+Traceback (most recent call last):
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\views\decorators\http.py", line 43, in inner
+    return func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco\tobacco_trading_system\merchant_app\views.py", line 462, in aggregation_dashboard
+    merchant = request.user.merchant_profile
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\utils\functional.py", line 268, in inner
+    return func(_wrapped, *args)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\db\models\fields\related_descriptors.py", line 492, in __get__
+    raise self.RelatedObjectDoesNotExist(
+authentication.models.User.merchant_profile.RelatedObjectDoesNotExist: User has no merchant_profile.
+ERROR 2025-10-14 12:02:11,271 basehttp 16472 17296 "GET /merchant/aggregation/ HTTP/1.1" 500 101945
+INFO 2025-10-14 12:14:52,539 autoreload 16472 19880 C:\Users\Dell\Desktop\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-14 12:14:57,962 autoreload 17812 8388 Watching for file changes with StatReloader
+INFO 2025-10-14 12:15:36,190 autoreload 17812 8388 C:\Users\Dell\Desktop\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-14 12:15:44,765 autoreload 8156 17320 Watching for file changes with StatReloader
+INFO 2025-10-14 12:15:54,145 autoreload 8156 17320 C:\Users\Dell\Desktop\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-14 12:15:58,940 autoreload 6200 20988 Watching for file changes with StatReloader
+INFO 2025-10-14 12:16:31,931 autoreload 6200 20988 C:\Users\Dell\Desktop\Tobacco\tobacco_trading_system\merchant_app\admin.py changed, reloading.
+INFO 2025-10-14 12:16:35,577 autoreload 18560 15572 Watching for file changes with StatReloader
+INFO 2025-10-14 12:16:40,826 autoreload 18560 15572 C:\Users\Dell\Desktop\Tobacco\tobacco_trading_system\merchant_app\admin.py changed, reloading.
+INFO 2025-10-14 12:16:44,420 autoreload 20300 10556 Watching for file changes with StatReloader
+INFO 2025-10-14 12:16:53,795 autoreload 20300 10556 C:\Users\Dell\Desktop\Tobacco\tobacco_trading_system\merchant_app\admin.py changed, reloading.
+INFO 2025-10-14 12:16:58,278 autoreload 10956 16812 Watching for file changes with StatReloader
+INFO 2025-10-14 12:17:03,938 autoreload 10956 16812 C:\Users\Dell\Desktop\Tobacco\tobacco_trading_system\utils\encryption.py changed, reloading.
+INFO 2025-10-14 12:17:06,812 autoreload 18836 12492 Watching for file changes with StatReloader
+INFO 2025-10-14 12:17:21,937 autoreload 18836 12492 C:\Users\Dell\Desktop\Tobacco\tobacco_trading_system\utils\encryption.py changed, reloading.
+INFO 2025-10-14 12:17:29,876 autoreload 20840 19352 Watching for file changes with StatReloader
+ERROR 2025-10-14 12:19:11,795 log 20840 11724 Internal Server Error: /merchant/aggregation/
+Traceback (most recent call last):
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\views\decorators\http.py", line 43, in inner
+    return func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco\tobacco_trading_system\merchant_app\views.py", line 469, in aggregation_dashboard
+    merchant = request.user.merchant_profile
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\utils\functional.py", line 268, in inner
+    return func(_wrapped, *args)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\db\models\fields\related_descriptors.py", line 492, in __get__
+    raise self.RelatedObjectDoesNotExist(
+authentication.models.User.merchant_profile.RelatedObjectDoesNotExist: User has no merchant_profile.
+ERROR 2025-10-14 12:19:11,951 basehttp 20840 11724 "GET /merchant/aggregation/ HTTP/1.1" 500 101945
+INFO 2025-10-14 12:19:20,537 basehttp 20840 11724 "POST /auth/profile/ HTTP/1.1" 200 45873
+INFO 2025-10-14 12:19:20,743 basehttp 20840 11724 "GET /static/images/timb-logo.png HTTP/1.1" 304 0
+INFO 2025-10-14 12:19:26,564 basehttp 20840 11724 "GET /merchant/inventory/ HTTP/1.1" 302 0
+INFO 2025-10-14 12:19:26,646 basehttp 20840 11724 "GET /auth/profile/ HTTP/1.1" 200 45895
+INFO 2025-10-14 12:19:29,657 basehttp 20840 11724 "GET /merchant/orders/ HTTP/1.1" 302 0
+INFO 2025-10-14 12:19:29,705 basehttp 20840 11724 "GET /auth/profile/ HTTP/1.1" 200 45895
+ERROR 2025-10-14 12:19:31,417 log 20840 11724 Internal Server Error: /merchant/aggregation/
+Traceback (most recent call last):
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\views\decorators\http.py", line 43, in inner
+    return func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco\tobacco_trading_system\merchant_app\views.py", line 469, in aggregation_dashboard
+    merchant = request.user.merchant_profile
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\utils\functional.py", line 268, in inner
+    return func(_wrapped, *args)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\db\models\fields\related_descriptors.py", line 492, in __get__
+    raise self.RelatedObjectDoesNotExist(
+authentication.models.User.merchant_profile.RelatedObjectDoesNotExist: User has no merchant_profile.
+ERROR 2025-10-14 12:19:31,439 basehttp 20840 11724 "GET /merchant/aggregation/ HTTP/1.1" 500 101945
+INFO 2025-10-14 12:20:15,040 autoreload 20840 19352 C:\Users\Dell\Desktop\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-14 12:20:17,674 autoreload 20952 3420 Watching for file changes with StatReloader
+INFO 2025-10-14 12:20:24,766 autoreload 20952 3420 C:\Users\Dell\Desktop\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-14 12:20:27,051 autoreload 4040 1500 Watching for file changes with StatReloader
+INFO 2025-10-14 12:20:34,504 basehttp 4040 15628 "GET /merchant/aggregation/ HTTP/1.1" 302 0
+INFO 2025-10-14 12:20:34,526 basehttp 4040 15628 "GET /merchant/ HTTP/1.1" 302 0
+INFO 2025-10-14 12:20:34,719 basehttp 4040 15628 "GET /auth/profile/ HTTP/1.1" 200 46742
+INFO 2025-10-14 12:20:42,473 basehttp 4040 15628 "GET /merchant/inventory/ HTTP/1.1" 302 0
+INFO 2025-10-14 12:20:42,510 basehttp 4040 15628 "GET /auth/profile/ HTTP/1.1" 200 45895
+INFO 2025-10-14 12:20:44,409 basehttp 4040 15628 "GET /merchant/orders/ HTTP/1.1" 302 0
+INFO 2025-10-14 12:20:44,443 basehttp 4040 15628 "GET /auth/profile/ HTTP/1.1" 200 45895
+INFO 2025-10-14 12:20:51,722 basehttp 4040 15628 "GET /merchant/ai/recommendations/ HTTP/1.1" 302 0
+INFO 2025-10-14 12:20:51,791 basehttp 4040 15628 "GET /auth/profile/ HTTP/1.1" 200 45895
+INFO 2025-10-14 12:22:54,137 autoreload 4040 1500 C:\Users\Dell\Desktop\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-14 12:22:56,751 autoreload 13372 10464 Watching for file changes with StatReloader
+INFO 2025-10-14 12:23:12,478 autoreload 13372 10464 C:\Users\Dell\Desktop\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-14 12:23:15,323 autoreload 21232 380 Watching for file changes with StatReloader
+INFO 2025-10-14 12:23:23,410 autoreload 21232 380 C:\Users\Dell\Desktop\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-14 12:23:25,263 autoreload 10540 19244 Watching for file changes with StatReloader
+INFO 2025-10-14 12:23:33,945 basehttp 10540 13800 "POST /auth/profile/ HTTP/1.1" 200 45873
+INFO 2025-10-14 12:23:34,141 basehttp 10540 13800 "GET /static/images/timb-logo.png HTTP/1.1" 304 0
+INFO 2025-10-14 12:23:37,146 basehttp 10540 13800 "GET /merchant/ HTTP/1.1" 302 0
+INFO 2025-10-14 12:23:37,222 basehttp 10540 13800 "GET /auth/profile/ HTTP/1.1" 200 45895
+INFO 2025-10-14 12:23:39,734 basehttp 10540 13800 "GET /merchant/orders/ HTTP/1.1" 302 0
+INFO 2025-10-14 12:23:39,778 basehttp 10540 13800 "GET /auth/profile/ HTTP/1.1" 200 45895
+INFO 2025-10-14 12:23:41,703 basehttp 10540 13800 "GET /merchant/aggregation/ HTTP/1.1" 200 25999
+WARNING 2025-10-14 12:24:29,401 log 10540 13800 Forbidden: /merchant/aggregation/rule/save/
+WARNING 2025-10-14 12:24:29,402 basehttp 10540 13800 "POST /merchant/aggregation/rule/save/ HTTP/1.1" 403 50
+INFO 2025-10-14 12:24:40,591 basehttp 10540 13800 "GET /merchant/inventory/ HTTP/1.1" 302 0
+INFO 2025-10-14 12:24:40,642 basehttp 10540 13800 "GET /auth/profile/ HTTP/1.1" 200 45895
+INFO 2025-10-14 12:24:43,909 basehttp 10540 13800 "GET /merchant/orders/ HTTP/1.1" 302 0
+INFO 2025-10-14 12:24:43,961 basehttp 10540 13800 "GET /auth/profile/ HTTP/1.1" 200 45895
+INFO 2025-10-14 12:24:48,705 basehttp 10540 13800 "GET /merchant/ai/recommendations/ HTTP/1.1" 302 0
+INFO 2025-10-14 12:24:48,753 basehttp 10540 13800 "GET /auth/profile/ HTTP/1.1" 200 45895
+INFO 2025-10-14 12:24:50,650 basehttp 10540 13800 - Broken pipe from ('127.0.0.1', 65263)
+INFO 2025-10-14 12:24:50,668 basehttp 10540 3092 "GET /merchant/ai/recommendations/ HTTP/1.1" 302 0
+INFO 2025-10-14 12:24:50,727 basehttp 10540 3092 "GET /auth/profile/ HTTP/1.1" 200 45895
+INFO 2025-10-14 12:24:52,388 basehttp 10540 3092 "GET /realtime/ HTTP/1.1" 200 46382
+INFO 2025-10-14 12:26:57,799 basehttp 10540 1164 "GET /merchant/aggregation/ HTTP/1.1" 200 25999
+INFO 2025-10-14 13:11:21,085 basehttp 10540 20572 "GET /merchant/inventory/ HTTP/1.1" 302 0
+INFO 2025-10-14 13:11:21,132 basehttp 10540 20572 "GET /auth/profile/ HTTP/1.1" 200 45904
+INFO 2025-10-14 13:11:21,423 basehttp 10540 20572 "GET /static/images/timb-logo.png HTTP/1.1" 304 0
+INFO 2025-10-14 13:13:54,707 basehttp 10540 19500 "GET /merchant/inventory/ HTTP/1.1" 302 0
+INFO 2025-10-14 13:13:54,737 basehttp 10540 19500 "GET /auth/profile/ HTTP/1.1" 200 45904
+INFO 2025-10-14 13:13:57,446 basehttp 10540 19500 "GET /merchant/ HTTP/1.1" 302 0
+INFO 2025-10-14 13:13:57,503 basehttp 10540 19500 "GET /auth/profile/ HTTP/1.1" 200 45904
+INFO 2025-10-14 13:14:48,783 basehttp 10540 19500 "GET /merchant/ai/recommendations/ HTTP/1.1" 302 0
+INFO 2025-10-14 13:14:48,883 basehttp 10540 19500 "GET /auth/profile/ HTTP/1.1" 200 45904
+INFO 2025-10-14 13:15:54,027 autoreload 10540 19244 C:\Users\Dell\Desktop\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-14 13:16:06,430 autoreload 10844 18808 Watching for file changes with StatReloader
+INFO 2025-10-14 13:16:28,153 autoreload 10844 18808 C:\Users\Dell\Desktop\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-14 13:16:32,655 autoreload 14172 8632 Watching for file changes with StatReloader
+INFO 2025-10-14 13:16:39,724 autoreload 14172 8632 C:\Users\Dell\Desktop\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-14 13:16:42,549 autoreload 12012 2672 Watching for file changes with StatReloader
+INFO 2025-10-14 13:16:48,623 autoreload 12012 2672 C:\Users\Dell\Desktop\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-14 13:16:51,259 autoreload 14884 12336 Watching for file changes with StatReloader
+INFO 2025-10-14 13:16:59,302 autoreload 14884 12336 C:\Users\Dell\Desktop\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-14 13:17:02,462 autoreload 4036 5036 Watching for file changes with StatReloader
+INFO 2025-10-14 13:17:05,313 basehttp 4036 6596 "GET /merchant/ai/recommendations/ HTTP/1.1" 302 0
+INFO 2025-10-14 13:17:05,596 basehttp 4036 6596 "GET /auth/profile/ HTTP/1.1" 200 45904
+INFO 2025-10-14 13:17:16,815 autoreload 4036 5036 C:\Users\Dell\Desktop\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-14 13:17:19,832 autoreload 7340 16344 Watching for file changes with StatReloader
+INFO 2025-10-14 13:17:53,611 autoreload 7340 16344 C:\Users\Dell\Desktop\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-14 13:17:56,392 autoreload 19224 4500 Watching for file changes with StatReloader
+INFO 2025-10-14 13:21:03,183 basehttp 19224 11616 "GET /merchant/inventory/ HTTP/1.1" 200 42020
+INFO 2025-10-14 13:21:03,383 basehttp 19224 11616 "GET /static/images/timb-logo.png HTTP/1.1" 304 0
+INFO 2025-10-14 13:21:03,732 basehttp 19224 11616 "GET /merchant/api/grades/ HTTP/1.1" 200 35183
+WARNING 2025-10-14 13:21:03,753 log 19224 7260 Not Found: /ws/inventory/
+WARNING 2025-10-14 13:21:03,758 basehttp 19224 7260 "GET /ws/inventory/ HTTP/1.1" 404 3139
+ERROR 2025-10-14 13:21:37,539 log 19224 11616 Internal Server Error: /merchant/orders/
+Traceback (most recent call last):
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco\tobacco_trading_system\merchant_app\views.py", line 442, in orders_management
+    return render(request, 'merchant_app/orders.html', context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\template\loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\template\backends\django.py", line 33, in get_template
+    return Template(self.engine.get_template(template_name), self)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\template\engine.py", line 175, in get_template
+    template, origin = self.find_template(template_name)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\template\engine.py", line 157, in find_template
+    template = loader.get_template(name, skip=skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\template\loaders\cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\template\loaders\base.py", line 28, in get_template
+    return Template(
+           ^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\template\base.py", line 154, in __init__
+    self.nodelist = self.compile_nodelist()
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\template\base.py", line 200, in compile_nodelist
+    return parser.parse()
+           ^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\template\base.py", line 513, in parse
+    raise self.error(token, e)
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\template\base.py", line 511, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\template\loader_tags.py", line 293, in do_extends
+    nodelist = parser.parse()
+               ^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\template\base.py", line 513, in parse
+    raise self.error(token, e)
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\template\base.py", line 511, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\template\loader_tags.py", line 232, in do_block
+    nodelist = parser.parse(("endblock",))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\template\base.py", line 513, in parse
+    raise self.error(token, e)
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\template\base.py", line 511, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\template\defaulttags.py", line 853, in do_for
+    nodelist_loop = parser.parse(
+                    ^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\template\base.py", line 484, in parse
+    raise self.error(token, e)
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\template\base.py", line 482, in parse
+    filter_expression = self.compile_filter(token.contents)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\template\base.py", line 600, in compile_filter
+    return FilterExpression(token, self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\template\base.py", line 698, in __init__
+    filter_func = parser.find_filter(filter_name)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\template\base.py", line 606, in find_filter
+    raise TemplateSyntaxError("Invalid filter: '%s'" % filter_name)
+django.template.exceptions.TemplateSyntaxError: Invalid filter: 'sub'
+ERROR 2025-10-14 13:21:37,662 basehttp 19224 11616 "GET /merchant/orders/ HTTP/1.1" 500 289467
+INFO 2025-10-14 13:22:01,330 basehttp 19224 11616 "GET /merchant/ HTTP/1.1" 200 39894
+WARNING 2025-10-14 13:22:02,017 log 19224 19828 Not Found: /ws/realtime/dashboard/merchant/
+WARNING 2025-10-14 13:22:02,020 basehttp 19224 19828 "GET /ws/realtime/dashboard/merchant/ HTTP/1.1" 404 3193
+INFO 2025-10-14 13:22:10,255 basehttp 19224 11616 "GET /merchant/grades/create/ HTTP/1.1" 302 0
+INFO 2025-10-14 13:22:10,338 basehttp 19224 11616 "GET /merchant/grades/ HTTP/1.1" 200 32020
+INFO 2025-10-14 13:22:20,745 basehttp 19224 11616 "GET /merchant/grades/create/ HTTP/1.1" 302 0
+INFO 2025-10-14 13:22:20,810 basehttp 19224 11616 "GET /merchant/grades/ HTTP/1.1" 200 32020
+INFO 2025-10-14 13:22:24,305 basehttp 19224 11616 "GET /merchant/grades/create/ HTTP/1.1" 302 0
+INFO 2025-10-14 13:22:24,354 basehttp 19224 11616 "GET /merchant/grades/ HTTP/1.1" 200 32020
+ERROR 2025-10-14 13:22:31,502 log 19224 11616 Internal Server Error: /merchant/farmer-risk/
+Traceback (most recent call last):
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco\tobacco_trading_system\merchant_app\views.py", line 652, in farmer_risk_assessment
+    merchant = request.user.merchant_profile
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\utils\functional.py", line 268, in inner
+    return func(_wrapped, *args)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\db\models\fields\related_descriptors.py", line 492, in __get__
+    raise self.RelatedObjectDoesNotExist(
+authentication.models.User.merchant_profile.RelatedObjectDoesNotExist: User has no merchant_profile.
+ERROR 2025-10-14 13:22:31,591 basehttp 19224 11616 "GET /merchant/farmer-risk/ HTTP/1.1" 500 97330
+ERROR 2025-10-14 13:22:37,371 log 19224 11616 Internal Server Error: /merchant/communications/
+Traceback (most recent call last):
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco\tobacco_trading_system\merchant_app\views.py", line 759, in inter_merchant_communications
+    Merchant.objects.exclude(id=merchant.id).filter(status='ACTIVE').order_by('company_name') if merchant else Merchant.objects.filter(status='ACTIVE').order_by('company_name')
+                                                                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\db\models\query.py", line 1436, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\db\models\query.py", line 1454, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\db\models\query.py", line 1461, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\db\models\sql\query.py", line 1545, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\db\models\sql\query.py", line 1576, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\db\models\sql\query.py", line 1426, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\db\models\sql\query.py", line 1236, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\db\models\sql\query.py", line 1724, in names_to_path
+    raise FieldError(
+django.core.exceptions.FieldError: Cannot resolve keyword 'status' into field. Choices are: aggregated_grades, aggregation_rule_sets, ai_recommendations, annual_trading_volume, bank_account_number, bank_branch, bank_name, business_address, business_email, business_phone, business_registration_number, client_orders, company_name, created_at, custom_grades, dashboard_widgets, extended_profile, farmer_assessments, id, inventory, is_active, is_verified, license_expiry_date, license_issue_date, license_number, marketalert, preferred_grades, price_alerts, purchase_recommendations, purchases, received_messages, sales, sent_messages, trading_regions, trading_sessions, updated_at, user, user_id, verification_date, verified_by, verified_by_id, website
+ERROR 2025-10-14 13:22:37,407 basehttp 19224 11616 "GET /merchant/communications/ HTTP/1.1" 500 138199
+INFO 2025-10-14 13:22:49,319 autoreload 19224 4500 C:\Users\Dell\Desktop\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-14 13:23:00,937 autoreload 10528 16508 Watching for file changes with StatReloader
+INFO 2025-10-14 13:23:09,959 basehttp 10528 8600 "GET /merchant/orders/ HTTP/1.1" 200 35958
+INFO 2025-10-14 13:23:11,956 basehttp 10528 8600 - Broken pipe from ('127.0.0.1', 51522)
+INFO 2025-10-14 13:23:12,103 basehttp 10528 4760 "GET /merchant/orders/ HTTP/1.1" 200 35958
+INFO 2025-10-14 13:23:21,584 basehttp 10528 4760 "GET /merchant/orders/ HTTP/1.1" 200 35958
+INFO 2025-10-14 13:23:24,675 basehttp 10528 4760 "GET /merchant/inventory/ HTTP/1.1" 200 42020
+INFO 2025-10-14 13:23:27,338 basehttp 10528 4760 "GET /merchant/api/grades/ HTTP/1.1" 200 35183
+WARNING 2025-10-14 13:23:27,903 log 10528 6532 Not Found: /ws/inventory/
+WARNING 2025-10-14 13:23:28,038 basehttp 10528 6532 "GET /ws/inventory/ HTTP/1.1" 404 3139
+INFO 2025-10-14 13:23:31,371 autoreload 10528 16508 C:\Users\Dell\Desktop\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-14 13:23:39,452 autoreload 14856 11148 Watching for file changes with StatReloader
+ERROR 2025-10-14 13:23:50,101 log 14856 13584 Internal Server Error: /merchant/inventory/report/
+Traceback (most recent call last):
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\views\decorators\http.py", line 43, in inner
+    return func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco\tobacco_trading_system\merchant_app\views.py", line 588, in inventory_report
+    merchant = request.user.merchant_profile
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\utils\functional.py", line 268, in inner
+    return func(_wrapped, *args)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\Desktop\Tobacco Challenge\tobacco_env\Lib\site-packages\django\db\models\fields\related_descriptors.py", line 492, in __get__
+    raise self.RelatedObjectDoesNotExist(
+authentication.models.User.merchant_profile.RelatedObjectDoesNotExist: User has no merchant_profile.
+ERROR 2025-10-14 13:23:50,157 basehttp 14856 13584 "POST /merchant/inventory/report/ HTTP/1.1" 500 101824
+INFO 2025-10-14 13:23:56,430 basehttp 14856 13584 "GET /merchant/orders/ HTTP/1.1" 200 35958
+INFO 2025-10-14 13:24:06,945 autoreload 14856 11148 C:\Users\Dell\Desktop\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-14 13:24:11,526 autoreload 2444 11652 Watching for file changes with StatReloader
+INFO 2025-10-14 13:24:17,664 autoreload 2444 11652 C:\Users\Dell\Desktop\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-14 13:24:19,723 autoreload 13168 20128 Watching for file changes with StatReloader
+INFO 2025-10-14 13:43:27,796 basehttp 13168 17440 "GET /merchant/orders/ HTTP/1.1" 200 36304
+INFO 2025-10-14 13:43:27,951 basehttp 13168 17440 "GET /static/images/timb-logo.png HTTP/1.1" 304 0
+INFO 2025-10-14 13:43:33,476 basehttp 13168 17440 "GET /merchant/orders/ HTTP/1.1" 200 36304
+INFO 2025-10-14 13:48:18,460 basehttp 13168 20948 "GET /merchant/orders/ HTTP/1.1" 200 36932
+INFO 2025-10-14 13:48:22,277 basehttp 13168 20948 "GET /merchant/orders/ HTTP/1.1" 200 36932
+INFO 2025-10-14 13:48:24,699 basehttp 13168 20948 "GET /merchant/inventory/ HTTP/1.1" 200 42020
+INFO 2025-10-14 13:48:25,628 basehttp 13168 20948 "GET /merchant/api/grades/ HTTP/1.1" 200 35183
+WARNING 2025-10-14 13:48:25,713 log 13168 16460 Not Found: /ws/inventory/
+WARNING 2025-10-14 13:48:25,726 basehttp 13168 16460 "GET /ws/inventory/ HTTP/1.1" 404 3139
+INFO 2025-10-14 13:48:42,161 basehttp 13168 20948 "GET /merchant/ai/recommendations/ HTTP/1.1" 302 0
+INFO 2025-10-14 13:48:42,246 basehttp 13168 20948 "GET /auth/profile/ HTTP/1.1" 200 45904
+INFO 2025-10-14 13:48:44,386 basehttp 13168 20948 "GET /merchant/orders/ HTTP/1.1" 200 36932
+INFO 2025-10-14 13:48:46,474 basehttp 13168 20948 "GET /merchant/ai/recommendations/ HTTP/1.1" 302 0
+INFO 2025-10-14 13:48:46,511 basehttp 13168 20948 "GET /auth/profile/ HTTP/1.1" 200 45904
+INFO 2025-10-14 13:48:48,126 basehttp 13168 20948 "GET /merchant/inventory/ HTTP/1.1" 200 42020
+WARNING 2025-10-14 13:48:48,641 log 13168 812 Not Found: /ws/inventory/
+WARNING 2025-10-14 13:48:48,642 basehttp 13168 812 "GET /ws/inventory/ HTTP/1.1" 404 3139
+INFO 2025-10-14 13:48:48,666 basehttp 13168 20948 "GET /merchant/api/grades/ HTTP/1.1" 200 35183
+INFO 2025-10-14 13:52:06,388 basehttp 13168 3932 "GET /merchant/orders/ HTTP/1.1" 200 36932
+INFO 2025-10-14 14:06:52,571 basehttp 13168 16912 "GET /merchant/orders/ HTTP/1.1" 200 37349
+INFO 2025-10-14 14:06:52,749 basehttp 13168 16912 "GET /static/images/timb-logo.png HTTP/1.1" 304 0
+WARNING 2025-10-14 14:07:03,813 log 13168 16912 Not Found: /merchant/api/orders/export/
+WARNING 2025-10-14 14:07:03,814 basehttp 13168 16912 "GET /merchant/api/orders/export/ HTTP/1.1" 404 8996
+INFO 2025-10-14 14:07:26,238 basehttp 13168 16912 "GET /merchant/ai/recommendations/ HTTP/1.1" 302 0
+INFO 2025-10-14 14:07:26,315 basehttp 13168 16912 "GET /auth/profile/ HTTP/1.1" 200 45904
+INFO 2025-10-14 14:11:23,229 basehttp 13168 20884 "GET /auth/logout/ HTTP/1.1" 302 0
+INFO 2025-10-14 14:11:23,248 basehttp 13168 20884 "GET /auth/login/ HTTP/1.1" 200 19276
+INFO 2025-10-14 14:11:39,898 basehttp 13168 20884 "POST /auth/login/ HTTP/1.1" 302 0
+INFO 2025-10-14 14:11:40,110 basehttp 13168 20884 "GET /timb/ HTTP/1.1" 200 39433
+WARNING 2025-10-14 14:11:40,745 log 13168 17660 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-14 14:11:40,759 basehttp 13168 17660 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3181
+INFO 2025-10-14 14:11:46,992 basehttp 13168 20884 "GET /timb/ HTTP/1.1" 200 38509
+WARNING 2025-10-14 14:11:48,111 log 13168 9608 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-14 14:11:48,113 basehttp 13168 9608 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3181
+INFO 2025-10-14 14:11:53,364 basehttp 13168 20884 "GET /timb/record-transaction/ HTTP/1.1" 200 82971
+WARNING 2025-10-14 14:12:11,130 log 13168 20960 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-14 14:12:11,142 basehttp 13168 20960 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3181
+INFO 2025-10-14 14:12:16,391 basehttp 13168 20884 "GET /timb/ HTTP/1.1" 200 38509
+WARNING 2025-10-14 14:12:16,897 log 13168 20528 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-14 14:12:16,898 basehttp 13168 20528 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3181
+INFO 2025-10-14 14:12:22,100 basehttp 13168 20884 "GET /timb/ HTTP/1.1" 200 38509
+WARNING 2025-10-14 14:12:22,921 log 13168 11588 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-14 14:12:22,935 basehttp 13168 11588 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3181
+INFO 2025-10-14 14:12:28,245 basehttp 13168 20884 "GET /timb/ HTTP/1.1" 200 38509
+WARNING 2025-10-14 14:12:28,990 log 13168 15048 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-14 14:12:28,996 basehttp 13168 15048 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3181
+INFO 2025-10-14 14:12:34,314 basehttp 13168 20884 "GET /timb/ HTTP/1.1" 200 38509
+WARNING 2025-10-14 14:12:34,903 log 13168 19268 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-14 14:12:34,910 basehttp 13168 19268 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3181
+INFO 2025-10-14 14:12:40,095 basehttp 13168 20884 "GET /timb/ HTTP/1.1" 200 38509
+WARNING 2025-10-14 14:12:40,618 log 13168 17220 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-14 14:12:40,619 basehttp 13168 17220 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3181
+INFO 2025-10-14 14:12:45,796 basehttp 13168 20884 "GET /timb/ HTTP/1.1" 200 38509
+WARNING 2025-10-14 14:12:46,368 log 13168 856 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-14 14:12:46,370 basehttp 13168 856 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3181
+INFO 2025-10-14 14:12:51,563 basehttp 13168 20884 "GET /timb/ HTTP/1.1" 200 38509
+WARNING 2025-10-14 14:12:54,030 log 13168 19908 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-14 14:12:54,031 basehttp 13168 19908 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3181
+INFO 2025-10-14 14:12:59,183 basehttp 13168 20884 "GET /timb/ HTTP/1.1" 200 38509
+WARNING 2025-10-14 14:13:05,429 log 13168 7536 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-14 14:13:05,431 basehttp 13168 7536 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3181
+INFO 2025-10-14 14:20:35,030 autoreload 13168 20128 C:\Users\Dell\Desktop\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-14 14:20:38,060 autoreload 5136 16576 Watching for file changes with StatReloader
+INFO 2025-10-14 14:22:20,881 autoreload 5136 16576 C:\Users\Dell\Desktop\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-14 14:22:27,991 autoreload 1696 5352 Watching for file changes with StatReloader

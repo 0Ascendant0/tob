@@ -3,7 +3,9 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponse
 from django.contrib import messages
 from django.utils import timezone
-from django.db.models import Q, Sum, Count, Avg
+from django.db.models import Q, Sum, Count, Avg, F, ExpressionWrapper, DecimalField
+from django.db import transaction
+from django.utils.dateparse import parse_date
 from django.core.paginator import Paginator
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
@@ -32,84 +34,101 @@ except ImportError:
 @login_required
 def dashboard(request):
     """Enhanced merchant dashboard with customization"""
-    if not request.user.is_merchant:
-        return redirect('home')
-    
-    try:
-        merchant = request.user.merchant_profile
-    except:
-        messages.error(request, 'Merchant profile not found. Please contact support.')
-        return redirect('profile')
+    merchant = getattr(request.user, 'merchant_profile', None)
     
     # Get or create extended profile
-    profile, created = MerchantProfile.objects.get_or_create(merchant=merchant)
+    profile = None
+    if merchant:
+        profile, _ = MerchantProfile.objects.get_or_create(merchant=merchant)
     
     # Dashboard statistics
     today = timezone.now().date()
     this_month = timezone.now().replace(day=1).date()
     
-    stats = {
-        'total_inventory_value': MerchantInventory.objects.filter(
-            merchant=merchant
-        ).aggregate(
-            total=Sum('quantity') * Sum('average_cost')
-        )['total'] or 0,
-        
-        'active_orders': ClientOrder.objects.filter(
-            merchant=merchant,
-            status__in=['PENDING', 'CONFIRMED', 'IN_PROGRESS']
-        ).count(),
-        
-        'todays_transactions': Transaction.objects.filter(
-            Q(buyer=request.user) | Q(seller=request.user),
-            timestamp__date=today
-        ).count(),
-        
-        'monthly_volume': Transaction.objects.filter(
-            Q(buyer=request.user) | Q(seller=request.user),
-            timestamp__date__gte=this_month
-        ).aggregate(total=Sum('quantity'))['total'] or 0,
-        
-        'low_stock_items': MerchantInventory.objects.filter(
-            merchant=merchant
-        ).filter(quantity__lte=models.F('minimum_threshold')).count(),
-        
-        'pending_assessments': FarmerRiskAssessment.objects.filter(
-            merchant=merchant,
-            is_approved=False
-        ).count()
-    }
+    if merchant:
+        stats = {
+            'total_inventory_value': (
+                MerchantInventory.objects
+                .filter(merchant=merchant)
+                .aggregate(
+                    total=Sum(
+                        ExpressionWrapper(F('quantity') * F('average_cost'),
+                                          output_field=DecimalField(max_digits=20, decimal_places=2))
+                    )
+                )['total'] or 0
+            ),
+            'active_orders': ClientOrder.objects.filter(
+                merchant=merchant,
+                status__in=['PENDING', 'CONFIRMED', 'IN_PROGRESS']
+            ).count(),
+            'todays_transactions': Transaction.objects.filter(
+                Q(buyer=request.user) | Q(seller=request.user),
+                timestamp__date=today
+            ).count(),
+            'monthly_volume': Transaction.objects.filter(
+                Q(buyer=request.user) | Q(seller=request.user),
+                timestamp__date__gte=this_month
+            ).aggregate(total=Sum('quantity'))['total'] or 0,
+            'low_stock_items': MerchantInventory.objects.filter(
+                merchant=merchant
+            ).filter(quantity__lte=F('minimum_threshold')).count(),
+            'pending_assessments': FarmerRiskAssessment.objects.filter(
+                merchant=merchant,
+                is_approved=False
+            ).count()
+        }
+    else:
+        stats = {
+            'total_inventory_value': 0,
+            'active_orders': 0,
+            'todays_transactions': 0,
+            'monthly_volume': 0,
+            'low_stock_items': 0,
+            'pending_assessments': 0,
+        }
     
     # Recent inventory
-    inventory = MerchantInventory.objects.filter(
-        merchant=merchant
-    ).select_related('grade').order_by('-last_updated')[:5]
+    inventory = (
+        MerchantInventory.objects.filter(merchant=merchant).select_related('grade').order_by('-last_updated')[:5]
+        if merchant else MerchantInventory.objects.none()
+    )
     
     # Active orders
-    active_orders = ClientOrder.objects.filter(
-        merchant=merchant,
-        status__in=['PENDING', 'CONFIRMED', 'IN_PROGRESS']
-    ).order_by('-created_at')[:5]
+    active_orders = (
+        ClientOrder.objects.filter(
+            merchant=merchant,
+            status__in=['PENDING', 'CONFIRMED', 'IN_PROGRESS']
+        ).order_by('-created_at')[:5]
+        if merchant else ClientOrder.objects.none()
+    )
     
     # AI recommendations
-    recommendations = PurchaseRecommendation.objects.filter(
-        merchant=merchant,
-        is_active=True,
-        expires_at__gt=timezone.now()
-    ).order_by('-priority', '-confidence_score')[:5]
+    recommendations = (
+        PurchaseRecommendation.objects.filter(
+            merchant=merchant,
+            is_active=True,
+            expires_at__gt=timezone.now()
+        ).order_by('-priority', '-confidence_score')[:5]
+        if merchant else PurchaseRecommendation.objects.none()
+    )
     
     # Risk alerts
-    risks = FarmerRiskAssessment.objects.filter(
-        merchant=merchant,
-        risk_level__in=['HIGH', 'CRITICAL']
-    ).order_by('-assessment_date')[:3]
+    risks = (
+        FarmerRiskAssessment.objects.filter(
+            merchant=merchant,
+            risk_level__in=['HIGH', 'CRITICAL']
+        ).order_by('-assessment_date')[:3]
+        if merchant else FarmerRiskAssessment.objects.none()
+    )
     
     # Get dashboard widgets
-    widgets = DashboardWidget.objects.filter(
-        merchant=merchant,
-        is_visible=True,
-        is_approved=True
-    ).order_by('position_y', 'position_x')
+    widgets = (
+        DashboardWidget.objects.filter(
+            merchant=merchant,
+            is_visible=True,
+            is_approved=True
+        ).order_by('position_y', 'position_x') if merchant else DashboardWidget.objects.none()
+    )
     
     context = {
         'merchant': merchant,
@@ -128,17 +147,12 @@ def dashboard(request):
 @login_required
 def profile_customization(request):
     """Enhanced profile customization and branding"""
-    if not request.user.is_merchant:
-        return redirect('home')
-
-    try:
-        merchant = request.user.merchant_profile
-    except:
-        messages.error(request, 'Merchant profile not found. Please contact support.')
-        return redirect('profile')
-    profile, created = MerchantProfile.objects.get_or_create(merchant=merchant)
+    merchant = getattr(request.user, 'merchant_profile', None)
+    profile = None
+    if merchant:
+        profile, _ = MerchantProfile.objects.get_or_create(merchant=merchant)
     
-    if request.method == 'POST':
+    if request.method == 'POST' and merchant and profile:
         section = request.POST.get('section')
         
         if section == 'branding':
@@ -204,19 +218,13 @@ def profile_customization(request):
 @login_required
 def inventory_management(request):
     """Enhanced inventory management with AI insights"""
-    if not request.user.is_merchant:
-        return redirect('home')
-
-    try:
-        merchant = request.user.merchant_profile
-    except:
-        messages.error(request, 'Merchant profile not found. Please contact support.')
-        return redirect('profile')
+    merchant = getattr(request.user, 'merchant_profile', None)
     
     # Get inventory with filtering
-    inventory = MerchantInventory.objects.filter(
-        merchant=merchant
-    ).select_related('grade').order_by('-last_updated')
+    inventory = (
+        MerchantInventory.objects.filter(merchant=merchant).select_related('grade').order_by('-last_updated')
+        if merchant else MerchantInventory.objects.none()
+    )
     
     # Filter by grade category
     category_filter = request.GET.get('category')
@@ -237,7 +245,7 @@ def inventory_management(request):
     total_quantity = sum(item.quantity for item in inventory)
     
     # Low stock items
-    low_stock_items = inventory.filter(quantity__lte=models.F('minimum_threshold'))
+    low_stock_items = inventory.filter(quantity__lte=F('minimum_threshold'))
     
     # Pagination
     paginator = Paginator(inventory, 20)
@@ -299,24 +307,16 @@ def add_inventory_item(request):
 @login_required
 def custom_grades_management(request):
     """Enhanced custom grades creation and management"""
-    if not request.user.is_merchant:
-        return redirect('home')
-
-    try:
-        merchant = request.user.merchant_profile
-    except:
-        messages.error(request, 'Merchant profile not found. Please contact support.')
-        return redirect('profile')
+    merchant = getattr(request.user, 'merchant_profile', None)
     
     # Get custom grades
-    custom_grades = CustomGrade.objects.filter(
-        merchant=merchant
-    ).prefetch_related('components__base_grade').order_by('-created_at')
+    custom_grades = (
+        CustomGrade.objects.filter(merchant=merchant).prefetch_related('components__base_grade').order_by('-created_at')
+        if merchant else CustomGrade.objects.none()
+    )
     
     # Get base grades for component selection
-    base_grades = TobaccoGrade.objects.filter(
-        is_active=True
-    ).order_by('category', 'grade_code')
+    base_grades = TobaccoGrade.objects.filter(is_active=True).order_by('category', 'grade_code')
     
     # Get aggregation rules (if needed)
     # aggregation_rules = AggregationRule.objects.filter(merchant=merchant)
@@ -334,14 +334,10 @@ def custom_grades_management(request):
 @login_required
 def create_custom_grade(request):
     """Create new custom tobacco grade"""
-    if not request.user.is_merchant:
-        return redirect('home')
-
-    try:
-        merchant = request.user.merchant_profile
-    except:
-        messages.error(request, 'Merchant profile not found. Please contact support.')
-        return redirect('profile')
+    merchant = getattr(request.user, 'merchant_profile', None)
+    if not merchant:
+        messages.warning(request, 'Create a merchant profile to save custom grades.')
+        return redirect('merchant_custom_grades')
     base_grades = TobaccoGrade.objects.filter(is_active=True).order_by('category', 'grade_code')
     
     if request.method == 'POST':
@@ -399,19 +395,13 @@ def create_custom_grade(request):
 @login_required
 def orders_management(request):
     """Enhanced order management with tracking"""
-    if not request.user.is_merchant:
-        return redirect('home')
-
-    try:
-        merchant = request.user.merchant_profile
-    except:
-        messages.error(request, 'Merchant profile not found. Please contact support.')
-        return redirect('profile')
+    merchant = getattr(request.user, 'merchant_profile', None)
     
     # Get orders with filtering
-    orders = ClientOrder.objects.filter(
-        merchant=merchant
-    ).select_related('grade', 'custom_grade').order_by('-created_at')
+    orders = (
+        ClientOrder.objects.filter(merchant=merchant).select_related('grade', 'custom_grade').order_by('-created_at')
+        if merchant else ClientOrder.objects.none()
+    )
     
     # Filter by status
     status_filter = request.GET.get('status')
@@ -447,6 +437,7 @@ def orders_management(request):
         'order_statuses': ClientOrder.ORDER_STATUS,
         'status_filter': status_filter,
         'search_query': search_query,
+        'today': timezone.now().date(),
     }
     
     return render(request, 'merchant_app/orders.html', context)
@@ -459,9 +450,14 @@ def orders_management(request):
 def aggregation_dashboard(request):
     if not request.user.is_merchant:
         return redirect('home')
-    merchant = request.user.merchant_profile
-    rules = AggregationRuleSet.objects.filter(merchant=merchant).order_by('-created_at')
-    outputs = AggregatedGrade.objects.filter(merchant=merchant).select_related('rule_set').order_by('-computed_at')[:20]
+    try:
+        merchant = request.user.merchant_profile
+        rules = AggregationRuleSet.objects.filter(merchant=merchant).order_by('-created_at')
+        outputs = AggregatedGrade.objects.filter(merchant=merchant).select_related('rule_set').order_by('-computed_at')[:20]
+    except Exception:
+        merchant = None
+        rules = AggregationRuleSet.objects.none()
+        outputs = AggregatedGrade.objects.none()
     return render(request, 'merchant_app/aggregation.html', {
         'merchant': merchant,
         'rules': rules,
@@ -474,7 +470,9 @@ def aggregation_dashboard(request):
 def save_aggregation_rule(request):
     if not request.user.is_merchant:
         return JsonResponse({'success': False, 'error': 'Unauthorized'}, status=403)
-    merchant = request.user.merchant_profile
+    merchant = getattr(request.user, 'merchant_profile', None)
+    if merchant is None:
+        return JsonResponse({'success': False, 'error': 'No merchant context'}, status=403)
     try:
         data = json.loads(request.body)
         rule_id = data.get('id')
@@ -506,7 +504,9 @@ def run_aggregation_rule(request, rule_id):
     if not request.user.is_merchant:
         return JsonResponse({'success': False, 'error': 'Unauthorized'}, status=403)
     from .aggregation_engine import run_rule_set
-    merchant = request.user.merchant_profile
+    merchant = getattr(request.user, 'merchant_profile', None)
+    if merchant is None:
+        return JsonResponse({'success': False, 'error': 'No merchant context'}, status=403)
     try:
         rule = AggregationRuleSet.objects.get(id=rule_id, merchant=merchant, is_active=True)
         outputs = run_rule_set(rule)
@@ -526,7 +526,9 @@ def run_aggregation_rule(request, rule_id):
 def aggregated_grade_detail(request, aggregated_id):
     if not request.user.is_merchant:
         return JsonResponse({'success': False, 'error': 'Unauthorized'}, status=403)
-    merchant = request.user.merchant_profile
+    merchant = getattr(request.user, 'merchant_profile', None)
+    if merchant is None:
+        return JsonResponse({'success': False, 'error': 'No merchant context'}, status=403)
     try:
         agg = AggregatedGrade.objects.select_related('rule_set').prefetch_related('components__base_grade').get(
             id=aggregated_id, merchant=merchant
@@ -610,6 +612,7 @@ def create_order(request):
         merchant = request.user.merchant_profile
         data = json.loads(request.body)
         
+        expected_delivery = parse_date(data.get('expected_delivery_date')) if data.get('expected_delivery_date') else None
         order = ClientOrder.objects.create(
             merchant=merchant,
             client_name=data['client_name'],
@@ -621,7 +624,7 @@ def create_order(request):
             custom_grade_id=data.get('custom_grade_id'),
             requested_quantity=Decimal(data['requested_quantity']),
             target_price=Decimal(data['target_price']),
-            expected_delivery_date=data.get('expected_delivery_date'),
+            expected_delivery_date=expected_delivery,
             priority=data.get('priority', 'NORMAL'),
             order_notes=data.get('order_notes', ''),
             special_requirements=data.get('special_requirements', ''),
@@ -721,15 +724,14 @@ def farmer_risk_assessment(request):
 @login_required
 def inter_merchant_communications(request):
     """Private communications between merchants"""
-    if not request.user.is_merchant:
-        return redirect('home')
-    
-    merchant = request.user.merchant_profile
+    merchant = getattr(request.user, 'merchant_profile', None)
     
     # Get conversations
-    conversations = InterMerchantCommunication.objects.filter(
-        Q(from_merchant=merchant) | Q(to_merchant=merchant)
-    ).select_related('from_merchant', 'to_merchant').order_by('-sent_at')
+    conversations = (
+        InterMerchantCommunication.objects.filter(
+            Q(from_merchant=merchant) | Q(to_merchant=merchant)
+        ).select_related('from_merchant', 'to_merchant').order_by('-sent_at') if merchant else InterMerchantCommunication.objects.none()
+    )
     
     # Filter options
     filter_type = request.GET.get('filter', 'all')
@@ -754,9 +756,9 @@ def inter_merchant_communications(request):
     conversations_page = paginator.get_page(page_number)
     
     # Get other merchants for new messages
-    other_merchants = Merchant.objects.exclude(id=merchant.id).filter(
-        status='ACTIVE'
-    ).order_by('company_name')
+    other_merchants = (
+        Merchant.objects.exclude(id=merchant.id).filter(is_active=True).order_by('company_name') if merchant else Merchant.objects.filter(is_active=True).order_by('company_name')
+    )
     
     context = {
         'merchant': merchant,
@@ -826,14 +828,17 @@ def inter_merchant_trading(request):
         trades = trades.filter(status=status_filter)
     
     # Get available inventory for selling
-    available_inventory = MerchantInventory.objects.filter(
-        merchant=merchant,
-        available_quantity__gt=0
-    ).select_related('grade')
+    available_inventory = (
+        MerchantInventory.objects
+        .filter(merchant=merchant)
+        .annotate(available=F('quantity') - F('reserved_quantity'))
+        .filter(available__gt=0)
+        .select_related('grade')
+    )
     
     # Get other merchants
     other_merchants = Merchant.objects.exclude(id=merchant.id).filter(
-        status='ACTIVE'
+        is_active=True
     ).order_by('company_name')
     
     context = {
@@ -860,6 +865,8 @@ def propose_trade(request):
         merchant = request.user.merchant_profile
         data = json.loads(request.body)
         
+        from django.utils.dateparse import parse_date
+        delivery_dt = parse_date(data.get('delivery_date')) if data.get('delivery_date') else None
         trade = InterMerchantTrade.objects.create(
             seller_merchant=merchant,
             buyer_merchant_id=data['buyer_merchant_id'],
@@ -870,12 +877,12 @@ def propose_trade(request):
             payment_terms=data.get('payment_terms', 'NET_30'),
             delivery_terms=data.get('delivery_terms', ''),
             delivery_location=data.get('delivery_location', ''),
-            delivery_date=data.get('delivery_date'),
+            delivery_date=delivery_dt,
             quality_requirements=data.get('quality_requirements', {})
         )
         
         # Check if trade needs TIMB review (high value, unusual pricing, etc.)
-        if trade.total_value > 100000 or trade.agreed_price_per_kg > trade.grade.base_price * 1.3:
+        if trade.total_value > 100000 or (trade.grade and trade.agreed_price_per_kg > trade.grade.base_price * 1.3):
             trade.is_flagged_for_review = True
             trade.save()
         
@@ -990,22 +997,21 @@ def api_order_process(request, order_id):
         return JsonResponse({'success': False, 'error': 'Unauthorized'}, status=403)
     merchant = request.user.merchant_profile
     try:
-        order = ClientOrder.objects.select_for_update().get(id=order_id, merchant=merchant)
-        data = json.loads(request.body)
-        fill_qty = Decimal(str(data.get('fill_quantity', 0)))
-        source_inventory_id = data.get('source_inventory')
-        inv = MerchantInventory.objects.select_for_update().get(id=source_inventory_id, merchant=merchant)
-        if fill_qty <= 0 or fill_qty > inv.available_quantity:
-            return JsonResponse({'success': False, 'error': 'Invalid quantity'}, status=400)
-        inv.reserved_quantity += fill_qty
-        inv.quantity -= fill_qty
-        inv.save()
-        order.filled_quantity += fill_qty
-        if order.filled_quantity >= order.requested_quantity:
-            order.status = 'READY'
-        else:
-            order.status = 'IN_PROGRESS'
-        order.save()
+        with transaction.atomic():
+            order = ClientOrder.objects.select_for_update().get(id=order_id, merchant=merchant)
+            data = json.loads(request.body)
+            fill_qty = Decimal(str(data.get('fill_quantity', 0)))
+            source_inventory_id = data.get('source_inventory')
+            inv = MerchantInventory.objects.select_for_update().get(id=source_inventory_id, merchant=merchant)
+            available = inv.quantity - inv.reserved_quantity
+            if fill_qty <= 0 or fill_qty > available:
+                return JsonResponse({'success': False, 'error': 'Invalid quantity'}, status=400)
+            # Fulfillment reduces on-hand quantity only
+            inv.quantity -= fill_qty
+            inv.save()
+            order.filled_quantity += fill_qty
+            order.status = 'READY' if order.filled_quantity >= order.requested_quantity else 'IN_PROGRESS'
+            order.save()
         return JsonResponse({'success': True})
     except (ClientOrder.DoesNotExist, MerchantInventory.DoesNotExist):
         return JsonResponse({'success': False, 'error': 'Not found'}, status=404)
@@ -1176,7 +1182,7 @@ def api_dashboard_data(request):
         'inventory_count': MerchantInventory.objects.filter(merchant=merchant).count(),
         'low_stock_count': MerchantInventory.objects.filter(
             merchant=merchant,
-            quantity__lte=models.F('minimum_threshold')
+            quantity__lte=F('minimum_threshold')
         ).count(),
         'active_orders': ClientOrder.objects.filter(
             merchant=merchant,
@@ -1225,4 +1231,4 @@ def api_price_alerts(request):
         }
     ]
     
-    return JsonResponse({'alerts': alerts})
+    return JsonResponse({'success': True, 'alerts': alerts})

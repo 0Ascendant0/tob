@@ -1,3 +1,35 @@
+import base64
+import json
+from typing import Any, Dict
+
+
+def _to_bytes(data: Any) -> bytes:
+    if isinstance(data, (dict, list)):
+        return json.dumps(data, separators=(",", ":")).encode("utf-8")
+    if isinstance(data, str):
+        return data.encode("utf-8")
+    return str(data).encode("utf-8")
+
+
+def encrypt_data(data: Any) -> str:
+    """Lightweight reversible encoding placeholder.
+
+    NOTE: Replace with a proper crypto solution (e.g., Fernet) in production.
+    """
+    raw = _to_bytes(data)
+    return base64.urlsafe_b64encode(raw).decode("ascii")
+
+
+def decrypt_data(token: str) -> Dict[str, Any] | Any:
+    try:
+        raw = base64.urlsafe_b64decode(token.encode("ascii"))
+        try:
+            return json.loads(raw.decode("utf-8"))
+        except json.JSONDecodeError:
+            return raw.decode("utf-8")
+    except Exception:
+        return {}
+
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
