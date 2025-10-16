@@ -12,11 +12,13 @@ from decimal import Decimal
 import json
 
 from .models import (
-    Transaction, TobaccoGrade, TobaccoFloor, DailyPrice, 
-    DashboardMetric, SystemAlert, UserSession
+    Transaction, TobaccoGrade, TobaccoFloor, DailyPrice,
+    DashboardMetric, SystemAlert, UserSession, Merchant
 )
 from authentication.models import User
+from .forms import MerchantCreationForm
 from django.db import models
+from django.contrib.auth.models import Group
 
 
 def is_timb_staff(user):
@@ -518,16 +520,92 @@ class TransactionDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView)
     context_object_name = 'transaction'
     slug_field = 'transaction_id'
     slug_url_kwarg = 'transaction_id'
-    
+
     def test_func(self):
         return is_timb_staff(self.request.user)
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        
+
         # Get related alerts
         context['alerts'] = SystemAlert.objects.filter(
             transaction=self.object
         ).order_by('-created_at')
-        
+
         return context
+
+
+@login_required
+@user_passes_test(is_timb_staff)
+def create_merchant_view(request):
+    """Create new merchant from TIMB dashboard"""
+    if request.method == 'POST':
+        form = MerchantCreationForm(request.POST)
+        if form.is_valid():
+            try:
+                # Create the User first
+                user = User.objects.create_user(
+                    username=form.cleaned_data['username'],
+                    email=form.cleaned_data['email'],
+                    password='merchant',  # Default password as requested
+                    first_name=form.cleaned_data.get('first_name', ''),
+                    last_name=form.cleaned_data.get('last_name', ''),
+                    phone=form.cleaned_data.get('phone', ''),
+                    is_merchant=True
+                )
+
+                # Create the Merchant profile
+                merchant = Merchant.objects.create(
+                    user=user,
+                    company_name=form.cleaned_data['company_name'],
+                    license_number=form.cleaned_data['license_number'],
+                    business_address=form.cleaned_data.get('business_address', ''),
+                    business_phone=form.cleaned_data.get('business_phone', ''),
+                    business_email=form.cleaned_data.get('business_email', ''),
+                    bank_name=form.cleaned_data.get('bank_name', ''),
+                    bank_account_number=form.cleaned_data.get('bank_account_number', ''),
+                    is_verified=True,  # Auto-verify since created by TIMB
+                    verified_by=request.user
+                )
+
+                # Add to Merchants group if it exists
+                try:
+                    merchants_group = Group.objects.get(name='Merchants')
+                    user.groups.add(merchants_group)
+                except Group.DoesNotExist:
+                    pass  # Group doesn't exist, skip
+
+                messages.success(
+                    request,
+                    f'Merchant "{merchant.company_name}" created successfully. '
+                    f'Username: {user.username}, Default password: merchant'
+                )
+
+                return redirect('timb_dashboard:merchants')
+
+            except Exception as e:
+                messages.error(request, f'Error creating merchant: {str(e)}')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = MerchantCreationForm()
+
+    context = {
+        'form': form,
+        'title': 'Create New Merchant'
+    }
+
+    return render(request, 'timb_dashboard/create_merchant.html', context)
+
+
+@login_required
+@user_passes_test(is_timb_staff)
+def merchants_view(request):
+    """Merchants management view"""
+    merchants = Merchant.objects.select_related('user').order_by('company_name')
+
+    context = {
+        'merchants': merchants,
+    }
+
+    return render(request, 'timb_dashboard/merchants.html', context)

@@ -7,6 +7,7 @@ urlpatterns = [
     
     # Profile Management
     path('profile/customize/', views.profile_customization, name='merchant_profile_customization'),
+    path('profile/change-password/', views.change_password, name='merchant_change_password'),
     path('dashboard/customize/', views.dashboard_customization, name='merchant_dashboard_customization'),
     
     # Inventory Management

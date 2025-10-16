@@ -24,7 +24,11 @@ urlpatterns = [
     
     # Grade management
     path('grades/', views.grade_management_view, name='grade_management'),
-    
+
+    # Merchant management
+    path('merchants/', views.merchants_view, name='merchants'),
+    path('merchants/create/', views.create_merchant_view, name='create_merchant'),
+
     # API endpoints
     path('api/realtime-data/', views.api_realtime_data, name='api_realtime_data'),
 ]

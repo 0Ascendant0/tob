@@ -23,7 +23,7 @@
         background: #f8d7da;
     }
     .grade-preview {
-        border: 2px solid var(--merchant-secondary, #007bff);
+        border: 2px solid #5D5CDE;
         border-radius: 12px;
         padding: 1.5rem;
         background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
@@ -42,7 +42,7 @@
     }
     .percentage-fill {
         height: 100%;
-        background: linear-gradient(90deg, var(--merchant-secondary, #007bff), var(--merchant-accent, #0056b3));
+        background: linear-gradient(90deg, #5D5CDE, #4338ca);
         transition: width 0.5s ease;
         display: flex;
         align-items: center;
@@ -82,7 +82,7 @@
     .component-fill {
         height: 100%;
         transition: width 0.3s ease;
-        background: linear-gradient(90deg, #007bff, #0056b3);
+        background: linear-gradient(90deg, #5D5CDE, #4338ca);
     }
     .custom-card {
         background: white;
@@ -91,7 +91,7 @@
         overflow: hidden;
     }
     .card-header-custom {
-        background: linear-gradient(135deg, var(--merchant-primary, #007bff), var(--merchant-secondary, #0056b3));
+        background: linear-gradient(135deg, #5D5CDE, #4338ca);
         color: white;
         padding: 1rem 1.5rem;
         font-weight: 600;
@@ -111,7 +111,7 @@
         color: #f57f17;
     }
     .btn-primary-custom {
-        background: linear-gradient(135deg, var(--merchant-primary, #007bff), var(--merchant-secondary, #0056b3));
+        background: linear-gradient(135deg, #5D5CDE, #4338ca);
         border: none;
         color: white;
         padding: 0.5rem 1.5rem;
@@ -121,7 +121,7 @@
     }
     .btn-primary-custom:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+        box-shadow: 0 4px 12px rgba(93, 92, 222, 0.3);
         color: white;
     }
     .grade-demand-badge {
@@ -132,7 +132,7 @@
     .demand-high { background: #d4edda; color: #155724; }
     .demand-medium { background: #fff3cd; color: #856404; }
     .demand-low { background: #f8d7da; color: #721c24; }
-    
+
     @media (max-width: 768px) {
         .grade-preview {
             position: static;
@@ -156,7 +156,7 @@
                     <li class="breadcrumb-item active">Create New Grade</li>
                 </ol>
             </nav>
-            <h1 class="h3 mb-0">Create Custom Grade</h1>
+            <h1 class="h3 mb-0" style="color: #5D5CDE;">Create Custom Grade</h1>
             <p class="text-muted">Design a custom tobacco grade by blending different TIMB base grades</p>
         </div>
     </div>
@@ -173,30 +173,42 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Custom Grade Name *</label>
-                            <input type="text" class="form-control" name="custom_grade_name" required 
-                                   placeholder="e.g., Premium Blend A1" onchange="updatePreview()">
+                            <input type="text" class="form-control" name="custom_grade_name" required
+                                   placeholder="e.g., Premium Blend A1" onchange="updatePreview()" style="border-color: #5D5CDE;">
                             <div class="form-text">Choose a descriptive name for your custom blend</div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Target Price ($/kg) *</label>
                             <input type="number" class="form-control" name="target_price" step="0.01" min="0" required
-                                   placeholder="5.50" onchange="updatePreview()">
+                                   placeholder="5.50" onchange="updatePreview()" style="border-color: #5D5CDE;">
                             <div class="form-text">Expected selling price per kilogram</div>
                         </div>
                         <div class="col-12 mb-3">
                             <label class="form-label">Description</label>
                             <textarea class="form-control" name="description" rows="3" onchange="updatePreview()"
-                                      placeholder="Describe the characteristics and intended use of this custom grade..."></textarea>
+                                      placeholder="Describe the characteristics and intended use of this custom grade..." style="border-color: #5D5CDE;"></textarea>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Minimum Order Quantity (kg)</label>
                             <input type="number" class="form-control" name="minimum_order_quantity" step="0.01" min="0"
-                                   placeholder="100" onchange="updatePreview()">
+                                   placeholder="100" onchange="updatePreview()" style="border-color: #5D5CDE;">
                             <div class="form-text">Minimum quantity for orders of this grade</div>
                         </div>
                         <div class="col-md-6 mb-3">
+                            <label class="form-label">Required Weight per Grade (kg) *</label>
+                            <input type="number" class="form-control" name="required_weight_per_grade" step="0.01" min="0" required
+                                   placeholder="500" onchange="updatePreview()" style="border-color: #5D5CDE;">
+                            <div class="form-text">Total weight required to complete this grade</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Acquired Weight per Grade (kg)</label>
+                            <input type="number" class="form-control" name="acquired_weight_per_grade" step="0.01" min="0"
+                                   placeholder="0" value="0" onchange="updatePreview()" style="border-color: #5D5CDE;">
+                            <div class="form-text">Current weight acquired for this grade</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
                             <label class="form-label">Quality Standard</label>
-                            <select class="form-select" name="quality_standard" onchange="updatePreview()">
+                            <select class="form-select" name="quality_standard" onchange="updatePreview()" style="border-color: #5D5CDE;">
                                 <option value="PREMIUM">Premium</option>
                                 <option value="STANDARD" selected>Standard</option>
                                 <option value="BASIC">Basic</option>
@@ -868,6 +880,8 @@ function saveDraft() {
         burn_rate: formData.get('burn_rate'),
         moisture_content: parseFloat(formData.get('moisture_content')) || null,
         nicotine_level: formData.get('nicotine_level'),
+        required_weight_per_grade: parseFloat(formData.get('required_weight_per_grade')) || 0,
+        acquired_weight_per_grade: parseFloat(formData.get('acquired_weight_per_grade')) || 0,
         components: components,
         is_draft: true
     };
@@ -947,6 +961,8 @@ document.getElementById('customGradeForm').addEventListener('submit', function(e
         burn_rate: formData.get('burn_rate'),
         moisture_content: parseFloat(formData.get('moisture_content')) || null,
         nicotine_level: formData.get('nicotine_level'),
+        required_weight_per_grade: parseFloat(formData.get('required_weight_per_grade')) || 0,
+        acquired_weight_per_grade: parseFloat(formData.get('acquired_weight_per_grade')) || 0,
         components: components,
         is_draft: false
     };

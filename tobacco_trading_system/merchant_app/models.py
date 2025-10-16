@@ -205,22 +205,22 @@ class MerchantInventory(models.Model):
 
 class CustomGrade(models.Model):
     """Enhanced custom tobacco grades created by merchants"""
-    
+
     QUALITY_STANDARDS = [
         ('PREMIUM', 'Premium'),
         ('STANDARD', 'Standard'),
         ('BASIC', 'Basic'),
     ]
-    
+
     merchant = models.ForeignKey(Merchant, on_delete=models.CASCADE, related_name='custom_grades')
     custom_grade_name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
-    
+
     # Pricing
     target_price = models.DecimalField(max_digits=8, decimal_places=2)
     minimum_order_quantity = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     price_markup_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=15.00)
-    
+
     # Quality specifications
     quality_standard = models.CharField(max_length=20, choices=QUALITY_STANDARDS, default='STANDARD')
     flavor_profile = models.CharField(max_length=50, blank=True)
@@ -228,22 +228,26 @@ class CustomGrade(models.Model):
     moisture_content = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     nicotine_level = models.CharField(max_length=20, blank=True)
     ash_content = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
-    
+
     # Market positioning
     target_market = models.CharField(max_length=100, blank=True)
     competitive_advantages = models.JSONField(default=list, blank=True)
     marketing_description = models.TextField(blank=True)
-    
+
     # Production tracking
     total_produced = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     total_sold = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     production_cost_per_kg = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
-    
+
+    # Weight tracking for grades
+    required_weight_per_grade = models.DecimalField(max_digits=10, decimal_places=2, default=0, help_text="Required weight per grade in kg")
+    acquired_weight_per_grade = models.DecimalField(max_digits=10, decimal_places=2, default=0, help_text="Acquired weight per grade in kg")
+
     # Status
     is_active = models.BooleanField(default=True)
     is_draft = models.BooleanField(default=False)
     is_public = models.BooleanField(default=False)
-    
+
     # Metadata
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -284,6 +288,18 @@ class CustomGrade(models.Model):
         # This would require complex calculation based on component availability
         # For now, return a simplified version
         return self.total_produced - self.total_sold
+
+    @property
+    def weight_completion_percentage(self):
+        """Calculate percentage of required weight acquired"""
+        if self.required_weight_per_grade > 0:
+            return min(100, (self.acquired_weight_per_grade / self.required_weight_per_grade) * 100)
+        return 0
+
+    @property
+    def remaining_weight_needed(self):
+        """Calculate remaining weight needed to meet requirement"""
+        return max(0, self.required_weight_per_grade - self.acquired_weight_per_grade)
 
 
 class GradeComponent(models.Model):

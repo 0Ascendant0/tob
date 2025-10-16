@@ -145,6 +145,57 @@ def dashboard(request):
 
 
 @login_required
+def change_password(request):
+    """Allow merchants to change their password"""
+    if not request.user.is_merchant:
+        messages.error(request, 'Access denied. Merchant account required.')
+        return redirect('home')
+
+    if request.method == 'POST':
+        current_password = request.POST.get('current_password')
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+
+        # Validate current password
+        if not request.user.check_password(current_password):
+            messages.error(request, 'Current password is incorrect.')
+            return redirect('merchant_change_password')
+
+        # Validate new password
+        if new_password != confirm_password:
+            messages.error(request, 'New passwords do not match.')
+            return redirect('merchant_change_password')
+
+        if len(new_password) < 8:
+            messages.error(request, 'New password must be at least 8 characters long.')
+            return redirect('merchant_change_password')
+
+        # Update password
+        request.user.set_password(new_password)
+        request.user.password_changed_at = timezone.now()
+        request.user.save()
+
+        # Log security event (if available)
+        try:
+            from authentication.models import SecurityLog
+            SecurityLog.objects.create(
+                user=request.user,
+                event_type='PASSWORD_CHANGE',
+                severity='MEDIUM',
+                description='Password changed via merchant dashboard',
+                ip_address=request.META.get('REMOTE_ADDR'),
+                user_agent=request.META.get('HTTP_USER_AGENT', ''),
+            )
+        except ImportError:
+            pass
+
+        messages.success(request, 'Password changed successfully! Please log in with your new password.')
+        return redirect('merchant_profile_customization')
+
+    return render(request, 'merchant_app/change_password.html')
+
+
+@login_required
 def profile_customization(request):
     """Enhanced profile customization and branding"""
     merchant = getattr(request.user, 'merchant_profile', None)
@@ -325,6 +376,8 @@ def create_custom_grade(request):
                 nicotine_level=request.POST.get('nicotine_level', ''),
                 target_market=request.POST.get('target_market', ''),
                 marketing_description=request.POST.get('marketing_description', ''),
+                required_weight_per_grade=Decimal(request.POST.get('required_weight_per_grade', 0)),
+                acquired_weight_per_grade=Decimal(request.POST.get('acquired_weight_per_grade', 0)),
                 is_draft=bool(request.POST.get('is_draft', False))
             )
             

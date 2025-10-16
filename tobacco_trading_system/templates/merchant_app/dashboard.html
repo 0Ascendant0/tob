@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load custom_filters %}
 
 {% block title %}Merchant Dashboard - {{ merchant.company_name }}{% endblock %}
 
@@ -72,7 +73,31 @@
     </div>
 
     <!-- Key Metrics -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+        <!-- Weight Tracking Metric -->
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-indigo-100 rounded-md flex items-center justify-center">
+                            <i class="fas fa-balance-scale text-indigo-600"></i>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Avg Weight Completion</dt>
+                            <dd class="text-lg font-medium text-gray-900 dark:text-white">
+                                {% if merchant and merchant.custom_grades.exists %}
+                                        {{ merchant.custom_grades.all|average:"weight_completion_percentage"|floatformat:1 }}%
+                                    {% else %}
+                                    N/A
+                                {% endif %}
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg">
             <div class="p-5">
                 <div class="flex items-center">
@@ -130,22 +155,85 @@
         </div>
 
         <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg">
-            <div class="p-5">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <div class="w-8 h-8 bg-yellow-100 rounded-md flex items-center justify-center">
-                            <i class="fas fa-weight text-yellow-600"></i>
-                        </div>
-                    </div>
-                    <div class="ml-5 w-0 flex-1">
-                        <dl>
-                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Monthly Volume</dt>
-                            <dd class="text-lg font-medium text-gray-900 dark:text-white">{{ stats.monthly_volume|floatformat:0 }}kg</dd>
-                        </dl>
-                    </div>
-                </div>
-            </div>
-        </div>
+             <div class="p-5">
+                 <div class="flex items-center">
+                     <div class="flex-shrink-0">
+                         <div class="w-8 h-8 bg-yellow-100 rounded-md flex items-center justify-center">
+                             <i class="fas fa-weight text-yellow-600"></i>
+                         </div>
+                     </div>
+                     <div class="ml-5 w-0 flex-1">
+                         <dl>
+                             <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Monthly Volume</dt>
+                             <dd class="text-lg font-medium text-gray-900 dark:text-white">{{ stats.monthly_volume|floatformat:0 }}kg</dd>
+                         </dl>
+                     </div>
+                 </div>
+             </div>
+         </div>
+     </div>
+
+     <!-- Weight Tracking Section -->
+     <div class="mt-8">
+         <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                 <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                     <i class="fas fa-balance-scale mr-2 text-blue-600"></i>Grade Weight Tracking
+                 </h3>
+                 <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Monitor acquired weight vs required weight for each grade</p>
+             </div>
+             <div class="p-6">
+                 {% if merchant %}
+                     {% for grade in merchant.custom_grades.all %}
+                         <div class="mb-4 p-4 border border-gray-200 dark:border-gray-600 rounded-lg">
+                             <div class="flex justify-between items-center mb-2">
+                                 <h5 class="font-medium text-gray-900 dark:text-white">{{ grade.custom_grade_name }}</h5>
+                                 <span class="text-sm px-2 py-1 rounded-full
+                                     {% if grade.weight_completion_percentage >= 100 %}bg-green-100 text-green-800
+                                     {% elif grade.weight_completion_percentage >= 75 %}bg-yellow-100 text-yellow-800
+                                     {% else %}bg-red-100 text-red-800{% endif %}">
+                                     {{ grade.weight_completion_percentage|floatformat:1 }}% Complete
+                                 </span>
+                             </div>
+                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
+                                 <div class="text-center">
+                                     <div class="text-2xl font-bold text-blue-600">{{ grade.required_weight_per_grade|floatformat:0 }}</div>
+                                     <div class="text-sm text-gray-600 dark:text-gray-400">Required (kg)</div>
+                                 </div>
+                                 <div class="text-center">
+                                     <div class="text-2xl font-bold text-green-600">{{ grade.acquired_weight_per_grade|floatformat:0 }}</div>
+                                     <div class="text-sm text-gray-600 dark:text-gray-400">Acquired (kg)</div>
+                                 </div>
+                                 <div class="text-center">
+                                     <div class="text-2xl font-bold text-orange-600">{{ grade.remaining_weight_needed|floatformat:0 }}</div>
+                                     <div class="text-sm text-gray-600 dark:text-gray-400">Remaining (kg)</div>
+                                 </div>
+                             </div>
+                             <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 mb-2">
+                                 <div class="bg-gradient-to-r from-blue-500 to-green-500 h-3 rounded-full transition-all duration-300"
+                                      style="width: {{ grade.weight_completion_percentage }}%"></div>
+                             </div>
+                             <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                                 <span>Progress</span>
+                                 <span>{{ grade.acquired_weight_per_grade|floatformat:0 }} / {{ grade.required_weight_per_grade|floatformat:0 }} kg</span>
+                             </div>
+                         </div>
+                     {% empty %}
+                         <div class="text-center text-gray-500 py-8">
+                             <i class="fas fa-balance-scale text-3xl mb-2 opacity-50"></i>
+                             <p>No custom grades with weight tracking</p>
+                             <a href="{% url 'merchant_create_custom_grade' %}" class="text-blue-600 hover:text-blue-500 text-sm">Create a custom grade →</a>
+                         </div>
+                     {% endfor %}
+                 {% else %}
+                     <div class="text-center text-gray-500 py-8">
+                         <i class="fas fa-balance-scale text-3xl mb-2 opacity-50"></i>
+                         <p>Merchant profile required for weight tracking</p>
+                     </div>
+                 {% endif %}
+             </div>
+         </div>
+     </div>
     </div>
 
     <!-- Customizable Widget Area -->
@@ -184,7 +272,7 @@
                 <div class="text-center text-gray-500 py-8">
                     <i class="fas fa-inbox text-3xl mb-2"></i>
                     <p>No inventory items</p>
-                    <a href="{% url 'merchant_add_inventory' %}" class="text-blue-600 hover:text-blue-500 text-sm">Add inventory →</a>
+                    <a href="#" class="text-blue-600 hover:text-blue-500 text-sm">Add inventory →</a>
                 </div>
                 {% endfor %}
             </div>
@@ -328,7 +416,7 @@
         </div>
         <div class="p-6">
             <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                <a href="{% url 'merchant_add_inventory' %}" 
+                <a href="#" 
                    class="flex flex-col items-center p-4 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-200">
                     <i class="fas fa-plus-circle text-2xl text-blue-600 mb-2"></i>
                     <span class="text-sm font-medium text-gray-900 dark:text-white">Add Inventory</span>

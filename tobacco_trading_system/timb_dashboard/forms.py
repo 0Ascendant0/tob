@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import Transaction, TobaccoGrade, TobaccoFloor, DailyPrice, SystemAlert
+from .models import Transaction, TobaccoGrade, TobaccoFloor, DailyPrice, SystemAlert, Merchant
 
 
 class TransactionForm(forms.ModelForm):
@@ -131,9 +131,119 @@ class FloorManagementForm(forms.ModelForm):
         ).order_by('username')
 
 
+class MerchantCreationForm(forms.ModelForm):
+    """Form for creating new merchants from TIMB dashboard"""
+
+    username = forms.CharField(
+        max_length=150,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Username for login'
+        }),
+        help_text='Username for merchant login'
+    )
+
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Email address'
+        })
+    )
+
+    first_name = forms.CharField(
+        max_length=30,
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'First name'
+        })
+    )
+
+    last_name = forms.CharField(
+        max_length=150,
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Last name'
+        })
+    )
+
+    phone = forms.CharField(
+        max_length=20,
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Phone number'
+        })
+    )
+
+    class Meta:
+        model = Merchant
+        fields = [
+            'company_name', 'license_number', 'business_address',
+            'business_phone', 'business_email', 'bank_name',
+            'bank_account_number'
+        ]
+        widgets = {
+            'company_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Company name'
+            }),
+            'license_number': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'License number'
+            }),
+            'business_address': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Business address'
+            }),
+            'business_phone': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Business phone'
+            }),
+            'business_email': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Business email'
+            }),
+            'bank_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Bank name'
+            }),
+            'bank_account_number': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Bank account number'
+            }),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Make license_number required
+        self.fields['license_number'].required = True
+        self.fields['company_name'].required = True
+
+    def clean_license_number(self):
+        license_number = self.cleaned_data.get('license_number')
+        if Merchant.objects.filter(license_number=license_number).exists():
+            raise forms.ValidationError('A merchant with this license number already exists.')
+        return license_number
+
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if User.objects.filter(username=username).exists():
+            raise forms.ValidationError('This username is already taken.')
+        return username
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError('A user with this email already exists.')
+        return email
+
+
 class AlertResolutionForm(forms.ModelForm):
     """Form for resolving system alerts"""
-    
+
     resolution_notes = forms.CharField(
         widget=forms.Textarea(attrs={
             'class': 'form-control',
@@ -142,7 +252,7 @@ class AlertResolutionForm(forms.ModelForm):
         }),
         required=False
     )
-    
+
     class Meta:
         model = SystemAlert
         fields = ['resolution_notes']
