@@ -7,8 +7,7 @@ urlpatterns = [
     # Main dashboard
     path('', views.dashboard_view, name='dashboard'),
     
-    # Transaction management
-    path('record-transaction/', views.record_transaction_view, name='record_transaction'),
+    # Transaction management (record transaction removed)
     path('transactions/', views.TransactionListView.as_view(), name='transaction_list'),
     path('transactions/<str:transaction_id>/', views.TransactionDetailView.as_view(), name='transaction_detail'),
     path('analytics/', views.transaction_analytics_view, name='transaction_analytics'),

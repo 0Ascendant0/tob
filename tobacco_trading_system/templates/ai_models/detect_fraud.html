@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+
+{% block title %}Fraud Detection - AI Models{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="mb-8">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Fraud Detection</h1>
+                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                    AI-powered fraud detection for tobacco transactions
+                </p>
+            </div>
+            <a href="{% url 'ai_models:dashboard' %}" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition duration-200">
+                <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+    
+    <!-- Fraud Detection Form -->
+    <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                <i class="fas fa-shield-alt mr-2 text-red-600"></i>Transaction Fraud Analysis
+            </h3>
+        </div>
+        <div class="p-6">
+            <form id="fraud-detection-form" class="space-y-6">
+                {% csrf_token %}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Transaction ID</label>
+                        <input type="text" name="transaction_id" id="transaction_id" class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" placeholder="Enter transaction ID" required>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Grade</label>
+                        <input type="text" name="grade" class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" placeholder="e.g., A1, B1, C1" required>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Purchase Price per kg ($)</label>
+                        <input type="number" step="0.01" name="purchase_price_per_kg" class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" placeholder="2.50" required>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Sale Price per kg ($)</label>
+                        <input type="number" step="0.01" name="sale_price_per_kg" class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" placeholder="3.00" required>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Quantity (kg)</label>
+                        <input type="number" step="0.01" name="quantity_kg" class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" placeholder="1000" required>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Time Difference (days)</label>
+                        <input type="number" step="0.1" name="time_difference_days" class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" placeholder="1.0" required>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Merchant Experience (years)</label>
+                        <input type="number" name="merchant_experience_years" class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" placeholder="5" required>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Market Volatility</label>
+                        <input type="number" step="0.01" name="market_volatility" class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" placeholder="0.15" required>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Season</label>
+                        <select name="season" class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" required>
+                            <option value="">Select Season</option>
+                            <option value="peak">Peak</option>
+                            <option value="off-peak">Off-Peak</option>
+                            <option value="transition">Transition</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Floor Location</label>
+                        <select name="floor_location" class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" required>
+                            <option value="">Select Floor</option>
+                            <option value="harare">Harare</option>
+                            <option value="bulawayo">Bulawayo</option>
+                            <option value="mutare">Mutare</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end">
+                    <button type="submit" class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition duration-200">
+                        <i class="fas fa-shield-alt mr-2"></i>Run Fraud Detection
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Results Section -->
+    <div id="results-section" class="mt-8 hidden">
+        <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                    <i class="fas fa-chart-line mr-2 text-blue-600"></i>Analysis Results
+                </h3>
+            </div>
+            <div class="p-6">
+                <div id="results-content">
+                    <!-- Results will be displayed here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('fraud-detection-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData);
+    
+    // Show loading state
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Analyzing...';
+    submitBtn.disabled = true;
+    
+    try {
+        const response = await fetch('{% url "ai_models:detect_fraud_api" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': data.csrfmiddlewaretoken
+            },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            displayResults(result);
+        } else {
+            alert(`Error: ${result.error}`);
+        }
+    } catch (error) {
+        console.error('Error running fraud detection:', error);
+        alert('Error running fraud detection');
+    } finally {
+        // Reset button
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }
+});
+
+function displayResults(result) {
+    const resultsSection = document.getElementById('results-section');
+    const resultsContent = document.getElementById('results-content');
+    
+    const fraudStatus = result.fraud_detected ? 'DETECTED' : 'NOT DETECTED';
+    const statusColor = result.fraud_detected ? 'text-red-600' : 'text-green-600';
+    const statusBg = result.fraud_detected ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200';
+    
+    resultsContent.innerHTML = `
+        <div class="border rounded-lg p-6 ${statusBg}">
+            <div class="flex items-center justify-between mb-4">
+                <h4 class="text-xl font-semibold ${statusColor}">
+                    <i class="fas fa-${result.fraud_detected ? 'exclamation-triangle' : 'check-circle'} mr-2"></i>
+                    Fraud ${fraudStatus}
+                </h4>
+                <div class="text-right">
+                    <div class="text-2xl font-bold ${statusColor}">${(result.confidence * 100).toFixed(1)}%</div>
+                    <div class="text-sm text-gray-500">Confidence</div>
+                </div>
+            </div>
+            
+            ${result.risk_factors && result.risk_factors.length > 0 ? `
+                <div class="mb-4">
+                    <h5 class="font-medium text-gray-900 dark:text-white mb-2">Risk Factors:</h5>
+                    <ul class="list-disc list-inside space-y-1">
+                        ${result.risk_factors.map(factor => `<li class="text-sm text-gray-600 dark:text-gray-400">${factor}</li>`).join('')}
+                    </ul>
+                </div>
+            ` : ''}
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                <div class="text-center p-3 bg-white dark:bg-gray-700 rounded-lg">
+                    <div class="text-sm text-gray-500">Price Deviation</div>
+                    <div class="font-semibold">${(result.price_deviation * 100).toFixed(1)}%</div>
+                </div>
+                <div class="text-center p-3 bg-white dark:bg-gray-700 rounded-lg">
+                    <div class="text-sm text-gray-500">Volume Anomaly</div>
+                    <div class="font-semibold">${result.volume_anomaly ? 'Yes' : 'No'}</div>
+                </div>
+                <div class="text-center p-3 bg-white dark:bg-gray-700 rounded-lg">
+                    <div class="text-sm text-gray-500">Timing Anomaly</div>
+                    <div class="font-semibold">${result.timing_anomaly ? 'Yes' : 'No'}</div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    resultsSection.classList.remove('hidden');
+    resultsSection.scrollIntoView({ behavior: 'smooth' });
+}
+</script>
+{% endblock %}

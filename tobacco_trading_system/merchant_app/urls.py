@@ -2,9 +2,8 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    # Dashboard
-    path('', views.dashboard, name='merchant_dashboard'),
-    path('transactions/record/', views.record_transaction, name='merchant_record_transaction'),
+# Dashboard now points to Inventory page
+path('', views.inventory_management, name='merchant_dashboard'),
     
     # Profile Management
     path('profile/customize/', views.profile_customization, name='merchant_profile_customization'),
@@ -24,6 +23,9 @@ urlpatterns = [
     # Order Management
     path('orders/', views.orders_management, name='merchant_orders'),
     path('orders/create/', views.create_order, name='merchant_create_order'),
+
+    # Record Transaction page (merchant side, reusing TIMB template)
+    path('transactions/record/', views.record_transaction, name='merchant_record_transaction'),
     
     # AI Features
     path('ai/recommendations/', views.ai_recommendations, name='merchant_ai_recommendations'),

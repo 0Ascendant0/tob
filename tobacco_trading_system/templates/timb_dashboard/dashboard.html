@@ -29,14 +29,7 @@
                     Real-time tobacco trading oversight • <span id="current-time"></span>
                 </p>
             </div>
-            <div class="flex space-x-3">
-                <a href="{% url 'timb_dashboard:record_transaction' %}" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-200">
-                    <i class="fas fa-plus mr-2"></i>Record Transaction
-                </a>
-                <a href="{% url 'timb_dashboard:create_merchant' %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200">
-                    <i class="fas fa-user-plus mr-2"></i>Create Merchant
-                </a>
-            </div>
+            <div class="flex space-x-3"></div>
         </div>
     </div>
     
@@ -158,10 +151,17 @@
                                             {{ transaction.transaction_id }}
                                         </div>
                                         <div class="text-sm text-gray-500">
-                                            {{ transaction.seller.username }} → {{ transaction.buyer.username }}
+                                            {% if transaction.seller_id == transaction.buyer_id %}
+                                                {{ transaction.buyer.merchant_profile.company_name|default:transaction.buyer.username }} — {{ transaction.get_transaction_type_display|default:transaction.transaction_type }}
+                                            {% else %}
+                                                {{ transaction.seller.merchant_profile.company_name|default:transaction.seller.username }} → {{ transaction.buyer.merchant_profile.company_name|default:transaction.buyer.username }} — {{ transaction.get_transaction_type_display|default:transaction.transaction_type }}
+                                            {% endif %}
                                         </div>
                                         <div class="text-xs text-gray-400">
                                             {{ transaction.grade.grade_name }} • {{ transaction.quantity }}kg @ ${{ transaction.price_per_kg }}/kg
+                                            {% if transaction.metadata.barcode_number %}
+                                                • Barcode: {{ transaction.metadata.barcode_number }}
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>
@@ -239,33 +239,7 @@
         </div>
     </div>
     
-    <!-- Quick Actions as separate cards under Recent Transactions -->
-    <div class="mt-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-        <a href="{% url 'timb_dashboard:record_transaction' %}" class="bg-white dark:bg-gray-800 shadow-lg rounded-lg min-h-48 flex items-center justify-center border border-gray-200 dark:border-gray-700 hover:shadow-xl transition">
-            <div class="text-center">
-                <i class="fas fa-plus-circle text-green-600 text-3xl mb-2"></i>
-                <div class="text-base font-medium text-gray-900 dark:text-white">Record Transaction</div>
-            </div>
-        </a>
-        <a href="{% url 'timb_dashboard:create_merchant' %}" class="bg-white dark:bg-gray-800 shadow-lg rounded-lg min-h-48 flex items-center justify-center border border-gray-200 dark:border-gray-700 hover:shadow-xl transition">
-            <div class="text-center">
-                <i class="fas fa-user-plus text-indigo-600 text-3xl mb-2"></i>
-                <div class="text-base font-medium text-gray-900 dark:text-white">Create Merchant</div>
-            </div>
-        </a>
-        <a href="{% url 'timb_dashboard:price_monitoring' %}" class="bg-white dark:bg-gray-800 shadow-lg rounded-lg min-h-48 flex items-center justify-center border border-gray-200 dark:border-gray-700 hover:shadow-xl transition">
-            <div class="text-center">
-                <i class="fas fa-chart-line text-blue-600 text-3xl mb-2"></i>
-                <div class="text-base font-medium text-gray-900 dark:text-white">Price Monitoring</div>
-            </div>
-        </a>
-        <button onclick="updateDailyPrices()" class="bg-white dark:bg-gray-800 shadow-lg rounded-lg min-h-48 flex items-center justify-center border border-gray-200 dark:border-gray-700 hover:shadow-xl transition">
-            <div class="text-center">
-                <i class="fas fa-sync-alt text-purple-600 text-3xl mb-2"></i>
-                <div class="text-base font-medium text-gray-900 dark:text-white">Update Daily Prices</div>
-            </div>
-        </button>
-    </div>
+    
     <!-- Trading Volume Chart -->
     <div class="mt-8">
         <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg">
@@ -302,6 +276,24 @@ document.addEventListener('DOMContentLoaded', function() {
     startRealTimeUpdates();
     updateCurrentTime();
     setInterval(updateCurrentTime, 1000);
+    // Check if a new transaction payload was produced by merchant form
+    try {
+        const payloadRaw = localStorage.getItem('last_transaction_payload');
+        if (payloadRaw) {
+            const payload = JSON.parse(payloadRaw);
+            addNewTransactionToList({
+                transaction_id: payload.transaction_id,
+                seller: payload.seller,
+                buyer: payload.buyer,
+                grade: payload.grade,
+                quantity: payload.quantity,
+                price: payload.price,
+                total: payload.total,
+                is_flagged: payload.is_flagged
+            });
+            localStorage.removeItem('last_transaction_payload');
+        }
+    } catch (e) { /* no-op */ }
 });
 
 // Current time display
@@ -491,10 +483,11 @@ function addNewTransactionToList(transaction) {
                         ${transaction.transaction_id}
                     </div>
                     <div class="text-sm text-gray-500">
-                        ${transaction.seller} → ${transaction.buyer}
+                        ${transaction.seller === transaction.buyer ? transaction.buyer : `${transaction.seller} → ${transaction.buyer}`} ${transaction.type ? `— ${transaction.type}` : ''}
                     </div>
                     <div class="text-xs text-gray-400">
                         ${transaction.grade} • ${transaction.quantity}kg @ $${transaction.price}/kg
+                        ${transaction.barcode_number ? ` • Barcode: ${transaction.barcode_number}` : ''}
                     </div>
                 </div>
             </div>

@@ -10,6 +10,12 @@ from django.conf import settings
 from datetime import datetime, timedelta
 from django.utils import timezone
 
+def get_model_path(default_name, model_path=None):
+    """Get model file path"""
+    if model_path:
+        return model_path
+    return os.path.join(settings.BASE_DIR, 'models', default_name)
+
 class FraudDetectionModel:
     def __init__(self):
         self.model = RandomForestClassifier(n_estimators=100, random_state=42)
@@ -455,10 +461,391 @@ class SideBuyingDetectionModel:
         except Exception as e:
             print(f"Error loading side buying model: {e}")
 
+class FarmerRiskModel:
+    """Farmer Risk Assessment Model"""
+    
+    def __init__(self, model_path=None):
+        self.model = RandomForestClassifier(n_estimators=100, random_state=42)
+        self.scaler = StandardScaler()
+        self.label_encoders = {}
+        self.is_trained = False
+        self.model_path = model_path or get_model_path('farmer_risk_model.joblib')
+        
+        # Load pre-trained model if it exists
+        self.load_model()
+    
+    def train(self, data):
+        """Train the farmer risk assessment model"""
+        try:
+            # Prepare features
+            features = [
+                'loan_amount', 'hectarage', 'yields', 'yield_per_ha', 'loan_per_ha',
+                'side_marketer_effect', 'mass_usually_produced_kg', 'default_prob'
+            ]
+            
+            categorical_features = ['merchant_contractor', 'location', 'gender', 'grade_normally_produced']
+            
+            # Encode categorical variables
+            for feature in categorical_features:
+                if feature in data.columns:
+                    le = LabelEncoder()
+                    data[f'{feature}_encoded'] = le.fit_transform(data[feature].astype(str))
+                    self.label_encoders[feature] = le
+                    features.append(f'{feature}_encoded')
+            
+            X = data[features]
+            y = data['is_risky']
+            
+            # Split data
+            X_train, X_test, y_train, y_test = train_test_split(
+                X, y, test_size=0.2, random_state=42
+            )
+            
+            # Scale features
+            X_train_scaled = self.scaler.fit_transform(X_train)
+            X_test_scaled = self.scaler.transform(X_test)
+            
+            # Train model
+            self.model.fit(X_train_scaled, y_train)
+            
+            # Evaluate
+            y_pred = self.model.predict(X_test_scaled)
+            accuracy = accuracy_score(y_test, y_pred)
+            
+            self.is_trained = True
+            self.save_model()
+            
+            return {
+                'accuracy': accuracy,
+                'training_samples': len(X_train),
+                'test_samples': len(X_test)
+            }
+            
+        except Exception as e:
+            print(f"Error training farmer risk model: {e}")
+            return {'error': str(e)}
+    
+    def predict(self, farmer_data):
+        """Predict farmer risk using the new data structure"""
+        if not self.is_trained:
+            return self._rule_based_prediction(farmer_data)
+        
+        try:
+            # Prepare features from the new form structure
+            features = []
+            feature_names = []
+            
+            # Extract and process numerical features
+            numerical_mapping = {
+                'total_hectares': 'hectarage',
+                'annual_income': 'income',
+                'debt_level': 'debt',
+                'previous_defaults': 'defaults',
+                'proposed_contract_value': 'contract_value',
+                'proposed_quantity': 'quantity',
+                'price_per_kg': 'price_per_kg',
+                'contract_duration': 'duration',
+                'years_experience': 'experience'
+            }
+            
+            for new_field, model_field in numerical_mapping.items():
+                if new_field in farmer_data:
+                    features.append(float(farmer_data[new_field]))
+                    feature_names.append(model_field)
+            
+            # Calculate derived features
+            if 'annual_income' in farmer_data and 'debt_level' in farmer_data:
+                income = float(farmer_data['annual_income'])
+                debt = float(farmer_data['debt_level'])
+                if income > 0:
+                    debt_to_income = debt / income
+                    features.append(debt_to_income)
+                    feature_names.append('debt_to_income_ratio')
+            
+            if 'proposed_contract_value' in farmer_data and 'annual_income' in farmer_data:
+                contract_value = float(farmer_data['proposed_contract_value'])
+                income = float(farmer_data['annual_income'])
+                if income > 0:
+                    contract_to_income = contract_value / income
+                    features.append(contract_to_income)
+                    feature_names.append('contract_to_income_ratio')
+            
+            if 'proposed_quantity' in farmer_data and 'total_hectares' in farmer_data:
+                quantity = float(farmer_data['proposed_quantity'])
+                hectares = float(farmer_data['total_hectares'])
+                if hectares > 0:
+                    yield_per_ha = quantity / hectares
+                    features.append(yield_per_ha)
+                    feature_names.append('yield_per_hectare')
+            
+            # Categorical features
+            categorical_mapping = {
+                'location': 'location',
+                'primary_tobacco_type': 'tobacco_type'
+            }
+            
+            for new_field, model_field in categorical_mapping.items():
+                if new_field in farmer_data:
+                    value = str(farmer_data[new_field])
+                    if model_field in self.label_encoders:
+                        if value in self.label_encoders[model_field].classes_:
+                            encoded_value = self.label_encoders[model_field].transform([value])[0]
+                        else:
+                            encoded_value = 0
+                        features.append(encoded_value)
+                        feature_names.append(model_field)
+            
+            if not features:
+                return self._rule_based_prediction(farmer_data)
+            
+            # Scale features
+            X = self.scaler.transform([features])
+            
+            # Make prediction
+            risk_probability = self.model.predict_proba(X)[0][1]  # Probability of being risky
+            is_risky = risk_probability > 0.5
+            
+            # Determine risk level
+            if risk_probability < 0.3:
+                risk_level = 'LOW'
+            elif risk_probability < 0.6:
+                risk_level = 'MEDIUM'
+            elif risk_probability < 0.8:
+                risk_level = 'HIGH'
+            else:
+                risk_level = 'CRITICAL'
+            
+            # Calculate confidence
+            confidence = abs(risk_probability - 0.5) * 2
+            
+            # Get feature importance
+            final_features = feature_names[:len(self.model.feature_importances_)]
+            feature_importance = dict(zip(final_features, self.model.feature_importances_))
+            
+            # Generate recommendation
+            recommendation = self._generate_recommendation(risk_level, farmer_data)
+            
+            # Generate risk factors
+            risk_factors = self._generate_risk_factors(farmer_data, risk_probability)
+            
+            # Calculate financial metrics
+            financial_metrics = self._calculate_financial_metrics(farmer_data)
+            
+            return {
+                'risk_score': float(risk_probability),
+                'is_risky': is_risky,
+                'confidence': float(confidence),
+                'risk_level': risk_level,
+                'recommendation': recommendation,
+                'risk_factors': risk_factors,
+                'financial_metrics': financial_metrics,
+                'feature_importance': feature_importance
+            }
+            
+        except Exception as e:
+            print(f"Error in farmer risk prediction: {e}")
+            return self._rule_based_prediction(farmer_data)
+    
+    def _rule_based_prediction(self, farmer_data):
+        """Fallback rule-based prediction"""
+        risk_score = 0.5
+        risk_factors = []
+        
+        # Analyze debt-to-income ratio
+        if 'annual_income' in farmer_data and 'debt_level' in farmer_data:
+            income = float(farmer_data['annual_income'])
+            debt = float(farmer_data['debt_level'])
+            if income > 0:
+                debt_ratio = debt / income
+                if debt_ratio > 0.5:
+                    risk_score += 0.2
+                    risk_factors.append("High debt-to-income ratio")
+                elif debt_ratio > 0.3:
+                    risk_score += 0.1
+                    risk_factors.append("Moderate debt-to-income ratio")
+        
+        # Analyze previous defaults
+        if 'previous_defaults' in farmer_data:
+            defaults = int(farmer_data['previous_defaults'])
+            if defaults > 2:
+                risk_score += 0.3
+                risk_factors.append("Multiple previous defaults")
+            elif defaults > 0:
+                risk_score += 0.15
+                risk_factors.append("Previous default history")
+        
+        # Analyze contract size relative to income
+        if 'proposed_contract_value' in farmer_data and 'annual_income' in farmer_data:
+            contract_value = float(farmer_data['proposed_contract_value'])
+            income = float(farmer_data['annual_income'])
+            if income > 0:
+                contract_ratio = contract_value / income
+                if contract_ratio > 1.0:
+                    risk_score += 0.2
+                    risk_factors.append("Contract value exceeds annual income")
+                elif contract_ratio > 0.7:
+                    risk_score += 0.1
+                    risk_factors.append("Large contract relative to income")
+        
+        # Analyze experience
+        if 'years_experience' in farmer_data:
+            experience = int(farmer_data['years_experience'])
+            if experience < 3:
+                risk_score += 0.1
+                risk_factors.append("Limited farming experience")
+        
+        # Normalize risk score
+        risk_score = min(1.0, max(0.0, risk_score))
+        
+        # Determine risk level
+        if risk_score < 0.3:
+            risk_level = 'LOW'
+        elif risk_score < 0.6:
+            risk_level = 'MEDIUM'
+        elif risk_score < 0.8:
+            risk_level = 'HIGH'
+        else:
+            risk_level = 'CRITICAL'
+        
+        is_risky = risk_score > 0.5
+        confidence = abs(risk_score - 0.5) * 2
+        
+        recommendation = self._generate_recommendation(risk_level, farmer_data)
+        financial_metrics = self._calculate_financial_metrics(farmer_data)
+        
+        return {
+            'risk_score': float(risk_score),
+            'is_risky': is_risky,
+            'confidence': float(confidence),
+            'risk_level': risk_level,
+            'recommendation': recommendation,
+            'risk_factors': risk_factors,
+            'financial_metrics': financial_metrics,
+            'feature_importance': {}
+        }
+    
+    def _generate_recommendation(self, risk_level, farmer_data):
+        """Generate recommendation based on risk level"""
+        if risk_level == 'LOW':
+            return "APPROVE: Low risk farmer with good financial standing and experience."
+        elif risk_level == 'MEDIUM':
+            return "APPROVE WITH CONDITIONS: Medium risk farmer. Consider additional monitoring and smaller initial contract."
+        elif risk_level == 'HIGH':
+            return "REJECT OR REDUCE: High risk farmer. Consider reducing contract size or requiring additional guarantees."
+        else:
+            return "REJECT: Critical risk farmer. Do not approve contract without significant risk mitigation measures."
+    
+    def _generate_risk_factors(self, farmer_data, risk_probability):
+        """Generate specific risk factors"""
+        risk_factors = []
+        
+        # Debt analysis
+        if 'annual_income' in farmer_data and 'debt_level' in farmer_data:
+            income = float(farmer_data['annual_income'])
+            debt = float(farmer_data['debt_level'])
+            if income > 0:
+                debt_ratio = debt / income
+                if debt_ratio > 0.5:
+                    risk_factors.append(f"High debt-to-income ratio ({debt_ratio:.1%})")
+        
+        # Default history
+        if 'previous_defaults' in farmer_data:
+            defaults = int(farmer_data['previous_defaults'])
+            if defaults > 0:
+                risk_factors.append(f"Previous default history ({defaults} defaults)")
+        
+        # Contract size
+        if 'proposed_contract_value' in farmer_data and 'annual_income' in farmer_data:
+            contract_value = float(farmer_data['proposed_contract_value'])
+            income = float(farmer_data['annual_income'])
+            if income > 0:
+                contract_ratio = contract_value / income
+                if contract_ratio > 1.0:
+                    risk_factors.append(f"Contract exceeds annual income ({contract_ratio:.1%})")
+        
+        # Experience
+        if 'years_experience' in farmer_data:
+            experience = int(farmer_data['years_experience'])
+            if experience < 5:
+                risk_factors.append(f"Limited experience ({experience} years)")
+        
+        return risk_factors
+    
+    def _calculate_financial_metrics(self, farmer_data):
+        """Calculate financial metrics for display"""
+        metrics = {}
+        
+        # Debt-to-income ratio
+        if 'annual_income' in farmer_data and 'debt_level' in farmer_data:
+            income = float(farmer_data['annual_income'])
+            debt = float(farmer_data['debt_level'])
+            if income > 0:
+                metrics['debt_to_income_ratio'] = debt / income
+            else:
+                metrics['debt_to_income_ratio'] = 0
+        else:
+            metrics['debt_to_income_ratio'] = 0
+        
+        # Contract-to-income ratio
+        if 'proposed_contract_value' in farmer_data and 'annual_income' in farmer_data:
+            contract_value = float(farmer_data['proposed_contract_value'])
+            income = float(farmer_data['annual_income'])
+            if income > 0:
+                metrics['contract_to_income_ratio'] = contract_value / income
+            else:
+                metrics['contract_to_income_ratio'] = 0
+        else:
+            metrics['contract_to_income_ratio'] = 0
+        
+        # Yield per hectare
+        if 'proposed_quantity' in farmer_data and 'total_hectares' in farmer_data:
+            quantity = float(farmer_data['proposed_quantity'])
+            hectares = float(farmer_data['total_hectares'])
+            if hectares > 0:
+                metrics['yield_per_hectare'] = quantity / hectares
+            else:
+                metrics['yield_per_hectare'] = 0
+        else:
+            metrics['yield_per_hectare'] = 0
+        
+        # Previous defaults
+        if 'previous_defaults' in farmer_data:
+            metrics['previous_defaults'] = int(farmer_data['previous_defaults'])
+        else:
+            metrics['previous_defaults'] = 0
+        
+        return metrics
+    
+    def save_model(self):
+        """Save the trained model"""
+        try:
+            os.makedirs(os.path.dirname(self.model_path), exist_ok=True)
+            joblib.dump({
+                'model': self.model,
+                'scaler': self.scaler,
+                'label_encoders': self.label_encoders,
+                'is_trained': self.is_trained
+            }, self.model_path)
+        except Exception as e:
+            print(f"Error saving farmer risk model: {e}")
+    
+    def load_model(self):
+        """Load a pre-trained model"""
+        try:
+            if os.path.exists(self.model_path):
+                model_data = joblib.load(self.model_path)
+                self.model = model_data['model']
+                self.scaler = model_data['scaler']
+                self.label_encoders = model_data.get('label_encoders', {})
+                self.is_trained = model_data['is_trained']
+        except Exception as e:
+            print(f"Error loading farmer risk model: {e}")
+
 # Global model instances
 fraud_model = FraudDetectionModel()
 yield_model = YieldPredictionModel()
 side_buying_model = SideBuyingDetectionModel()
+farmer_risk_model = FarmerRiskModel()
 
 # API functions
 def detect_fraud(transaction):

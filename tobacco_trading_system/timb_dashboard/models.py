@@ -460,3 +460,98 @@ class FarmerProfile(models.Model):
     
     def __str__(self):
         return f"{self.farm_name or self.user.username} ({self.farmer_id})"
+
+
+class FraudAlert(models.Model):
+    """Fraud detection alerts"""
+    ALERT_TYPES = [
+        ('AI_DETECTION', 'AI Detection'),
+        ('MANUAL_REVIEW', 'Manual Review'),
+        ('PATTERN_ANALYSIS', 'Pattern Analysis'),
+        ('THRESHOLD_BREACH', 'Threshold Breach'),
+    ]
+    
+    SEVERITY_CHOICES = [
+        ('LOW', 'Low'),
+        ('MEDIUM', 'Medium'),
+        ('HIGH', 'High'),
+        ('CRITICAL', 'Critical'),
+    ]
+    
+    alert_type = models.CharField(max_length=20, choices=ALERT_TYPES)
+    severity = models.CharField(max_length=10, choices=SEVERITY_CHOICES)
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    
+    # Related objects
+    transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE, null=True, blank=True)
+    merchant = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True, related_name='fraud_alerts')
+    
+    # AI Analysis
+    confidence_score = models.DecimalField(max_digits=5, decimal_places=3, null=True, blank=True)
+    risk_factors = models.JSONField(default=list, blank=True)
+    
+    # Status
+    is_resolved = models.BooleanField(default=False)
+    resolved_at = models.DateTimeField(null=True, blank=True)
+    resolved_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='resolved_alerts')
+    
+    # Timestamps
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'timb_fraud_alerts'
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['alert_type', '-created_at']),
+            models.Index(fields=['severity', 'is_resolved']),
+            models.Index(fields=['transaction', '-created_at']),
+        ]
+    
+    def __str__(self):
+        return f"{self.title} - {self.get_severity_display()}"
+
+
+class YieldPrediction(models.Model):
+    """Tobacco yield predictions"""
+    PREDICTION_TYPES = [
+        ('ANNUAL', 'Annual'),
+        ('SEASONAL', 'Seasonal'),
+        ('REGIONAL', 'Regional'),
+        ('FARM_LEVEL', 'Farm Level'),
+    ]
+    
+    prediction_type = models.CharField(max_length=20, choices=PREDICTION_TYPES)
+    year = models.IntegerField()
+    region = models.CharField(max_length=100, blank=True)
+    
+    # Input parameters
+    rainfall_mm = models.DecimalField(max_digits=8, decimal_places=2)
+    temperature_avg = models.DecimalField(max_digits=5, decimal_places=2)
+    number_of_farmers = models.IntegerField()
+    total_hectarage = models.DecimalField(max_digits=12, decimal_places=2)
+    inflation_rate = models.DecimalField(max_digits=5, decimal_places=2)
+    interest_rate = models.DecimalField(max_digits=5, decimal_places=2)
+    
+    # Predictions
+    predicted_yield_kg = models.DecimalField(max_digits=15, decimal_places=2)
+    confidence_level = models.DecimalField(max_digits=5, decimal_places=3)
+    lower_bound = models.DecimalField(max_digits=15, decimal_places=2)
+    upper_bound = models.DecimalField(max_digits=15, decimal_places=2)
+    
+    # Metadata
+    model_version = models.CharField(max_length=20, blank=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(default=timezone.now)
+    
+    class Meta:
+        db_table = 'timb_yield_predictions'
+        ordering = ['-year', '-created_at']
+        indexes = [
+            models.Index(fields=['year', 'region']),
+            models.Index(fields=['prediction_type', '-created_at']),
+        ]
+    
+    def __str__(self):
+        return f"Yield Prediction {self.year} - {self.region or 'National'}"

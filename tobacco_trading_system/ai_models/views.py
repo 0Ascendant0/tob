@@ -106,6 +106,14 @@ def model_status(request):
     })
 
 @login_required
+def detect_fraud_form(request):
+    """Fraud detection form page"""
+    if not request.user.is_timb_staff:
+        return redirect('merchant_dashboard')
+    
+    return render(request, 'ai_models/detect_fraud.html')
+
+@login_required
 @require_http_methods(["POST"])
 def detect_fraud(request):
     """Run fraud detection on transaction"""
@@ -198,6 +206,14 @@ def detect_fraud(request):
         }, status=500)
 
 @login_required
+def assess_farmer_risk_form(request):
+    """Farmer risk assessment form page"""
+    if not request.user.is_timb_staff:
+        return redirect('merchant_dashboard')
+    
+    return render(request, 'ai_models/assess_farmer_risk.html')
+
+@login_required
 @require_http_methods(["POST"])
 def assess_farmer_risk(request):
     """Assess farmer risk for contract approval"""
@@ -216,7 +232,7 @@ def assess_farmer_risk(request):
                 'error': 'Risk assessment model not available'
             }, status=500)
         
-        # Run risk assessment
+        # Run risk assessment using rule-based approach
         risk_result = run_farmer_risk_assessment(data)
         
         # Log prediction
@@ -240,6 +256,14 @@ def assess_farmer_risk(request):
             'success': False,
             'error': str(e)
         }, status=500)
+
+@login_required
+def predict_yield_form(request):
+    """Yield prediction form page"""
+    if not request.user.is_timb_staff:
+        return redirect('merchant_dashboard')
+    
+    return render(request, 'ai_models/predict_yield.html')
 
 @login_required
 @require_http_methods(["POST"])
@@ -305,6 +329,14 @@ def predict_yield(request):
         }, status=500)
 
 @login_required
+def detect_side_buying_form(request):
+    """Side buying detection form page"""
+    if not request.user.is_timb_staff:
+        return redirect('merchant_dashboard')
+    
+    return render(request, 'ai_models/detect_side_buying.html')
+
+@login_required
 @require_http_methods(["POST"])
 def detect_side_buying(request):
     """Detect side buying patterns"""
@@ -366,6 +398,15 @@ def detect_side_buying(request):
             'success': False,
             'error': str(e)
         }, status=500)
+
+@login_required
+@require_http_methods(["GET"])
+def side_buying_monitor(request):
+    """Side buying monitoring page"""
+    if not request.user.is_timb_staff:
+        return redirect('merchant_dashboard')
+    
+    return render(request, 'ai_models/side_buying_monitor.html')
 
 @login_required
 @require_http_methods(["GET"])
@@ -557,7 +598,7 @@ def run_fraud_detection(transaction):
         }
 
 def run_farmer_risk_assessment(data):
-    """Enhanced farmer risk assessment algorithm"""
+    """Enhanced farmer risk assessment algorithm using new form fields"""
     risk_factors = []
     risk_score = 0.0
     
@@ -566,23 +607,35 @@ def run_farmer_risk_assessment(data):
         annual_income = float(data.get('annual_income', 0))
         debt_level = float(data.get('debt_level', 0))
         proposed_contract_value = float(data.get('proposed_contract_value', 0))
+        previous_defaults = int(data.get('previous_defaults', 0))
         
         # Debt-to-income ratio
         if annual_income > 0:
             debt_ratio = debt_level / annual_income
-            if debt_ratio > 0.8:
-                risk_score += 0.3
+            if debt_ratio > 0.5:
+                risk_score += 0.2
                 risk_factors.append(f"High debt-to-income ratio: {debt_ratio*100:.1f}%")
-            elif debt_ratio > 0.5:
-                risk_score += 0.15
+            elif debt_ratio > 0.3:
+                risk_score += 0.1
                 risk_factors.append(f"Moderate debt-to-income ratio: {debt_ratio*100:.1f}%")
         
         # Contract size vs income
         if annual_income > 0:
             contract_ratio = proposed_contract_value / annual_income
-            if contract_ratio > 2.0:
-                risk_score += 0.25
-                risk_factors.append(f"Contract value exceeds 2x annual income")
+            if contract_ratio > 1.0:
+                risk_score += 0.2
+                risk_factors.append(f"Contract value exceeds annual income: {contract_ratio*100:.1f}%")
+            elif contract_ratio > 0.7:
+                risk_score += 0.1
+                risk_factors.append(f"Large contract relative to income: {contract_ratio*100:.1f}%")
+        
+        # Previous defaults
+        if previous_defaults > 2:
+            risk_score += 0.3
+            risk_factors.append(f"Multiple previous defaults: {previous_defaults}")
+        elif previous_defaults > 0:
+            risk_score += 0.15
+            risk_factors.append(f"Previous default history: {previous_defaults}")
         
         # Experience factor
         years_experience = int(data.get('years_experience', 0))
@@ -606,65 +659,62 @@ def run_farmer_risk_assessment(data):
                 risk_score += 0.1
                 risk_factors.append(f"Low projected yield: {yield_per_hectare:.0f}kg/ha")
         
-        # Credit history
-        credit_score = int(data.get('credit_score', 70))
-        previous_defaults = int(data.get('previous_defaults', 0))
-        
-        if credit_score < 50:
-            risk_score += 0.25
-            risk_factors.append(f"Poor credit score: {credit_score}")
-        elif credit_score < 70:
-            risk_score += 0.1
-            risk_factors.append(f"Fair credit score: {credit_score}")
-        
-        if previous_defaults > 0:
-            risk_score += min(previous_defaults * 0.1, 0.3)
-            risk_factors.append(f"Previous defaults: {previous_defaults}")
-        
         # Location risk (some areas have higher risk)
         location = data.get('location', '').lower()
-        high_risk_areas = ['matabeleland south', 'masvingo']
+        high_risk_areas = ['matabeleland', 'masvingo']
         if any(area in location for area in high_risk_areas):
             risk_score += 0.1
-            risk_factors.append(f"High-risk geographical area: {location}")
+            risk_factors.append(f"Higher-risk geographical area: {location}")
         
+        # Normalize risk score
         risk_score = min(risk_score, 1.0)
         
-        # Generate recommendation
+        # Determine risk level and recommendation
         if risk_score < 0.3:
-            recommendation = "LOW RISK - Approve contract with standard terms"
             risk_level = "LOW"
+            recommendation = "APPROVE: Low risk farmer with good financial standing and experience."
         elif risk_score < 0.6:
-            recommendation = "MEDIUM RISK - Approve with enhanced monitoring or reduced contract value"
             risk_level = "MEDIUM"
+            recommendation = "APPROVE WITH CONDITIONS: Medium risk farmer. Consider additional monitoring and smaller initial contract."
         elif risk_score < 0.8:
-            recommendation = "HIGH RISK - Requires additional collateral or guarantees"
             risk_level = "HIGH"
+            recommendation = "REJECT OR REDUCE: High risk farmer. Consider reducing contract size or requiring additional guarantees."
         else:
-            recommendation = "CRITICAL RISK - Reject contract or require significant risk mitigation"
             risk_level = "CRITICAL"
+            recommendation = "REJECT: Critical risk farmer. Do not approve contract without significant risk mitigation measures."
+        
+        # Calculate confidence
+        confidence = abs(risk_score - 0.5) * 2
+        
+        # Calculate financial metrics
+        financial_metrics = {
+            'debt_to_income_ratio': debt_level / annual_income if annual_income > 0 else 0,
+            'contract_to_income_ratio': proposed_contract_value / annual_income if annual_income > 0 else 0,
+            'yield_per_hectare': proposed_quantity / total_hectares if total_hectares > 0 else 0,
+            'previous_defaults': previous_defaults
+        }
         
         return {
-            'risk_score': risk_score,
+            'risk_score': float(risk_score),
+            'is_risky': risk_score > 0.5,
+            'confidence': float(confidence),
             'risk_level': risk_level,
-            'confidence': random.uniform(0.8, 0.95),
             'recommendation': recommendation,
             'risk_factors': risk_factors,
-            'financial_metrics': {
-                'debt_to_income_ratio': debt_level / annual_income if annual_income > 0 else 0,
-                'contract_to_income_ratio': proposed_contract_value / annual_income if annual_income > 0 else 0,
-                'projected_yield_per_hectare': proposed_quantity / total_hectares if total_hectares > 0 else 0
-            }
+            'financial_metrics': financial_metrics,
+            'feature_importance': {}
         }
         
     except Exception as e:
         return {
             'risk_score': 0.5,
-            'risk_level': 'UNKNOWN',
-            'confidence': 0.0,
-            'recommendation': f"Error in assessment: {str(e)}",
-            'risk_factors': [f"Assessment error: {str(e)}"],
-            'financial_metrics': {}
+            'is_risky': True,
+            'confidence': 0.3,
+            'risk_level': 'MEDIUM',
+            'recommendation': 'Unable to assess risk due to data error',
+            'risk_factors': [f'Assessment error: {str(e)}'],
+            'financial_metrics': {},
+            'feature_importance': {}
         }
 
 def run_yield_prediction(data):

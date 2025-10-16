@@ -14,9 +14,7 @@
                 </p>
             </div>
             <div class="flex space-x-3">
-                <a href="{% url 'timb_dashboard:record_transaction' %}" class="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition duration-200">
-                    <i class="fas fa-plus mr-2"></i>New Transaction
-                </a>
+                
                 <button onclick="exportTransactions()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-200">
                     <i class="fas fa-download mr-2"></i>Export
                 </button>
@@ -191,6 +189,9 @@
                                 <a href="{% url 'timb_dashboard:transaction_detail' transaction.transaction_id %}" class="text-indigo-600 hover:text-indigo-900">
                                     <i class="fas fa-eye"></i>
                                 </a>
+                                <button onclick="runFraudDetection('{{ transaction.id }}')" class="text-red-600 hover:text-red-900" title="Run Fraud Detection">
+                                    <i class="fas fa-shield-alt"></i>
+                                </button>
                                 {% if transaction.status == 'PENDING' %}
                                 <button onclick="updateTransactionStatus('{{ transaction.transaction_id }}', 'COMPLETED')" class="text-green-600 hover:text-green-900">
                                     <i class="fas fa-check"></i>
@@ -209,9 +210,7 @@
                                 <i class="fas fa-exchange-alt text-4xl mb-4 text-gray-300"></i>
                                 <h3 class="text-lg font-medium mb-2">No transactions found</h3>
                                 <p class="text-sm mb-4">No transactions match your current filters.</p>
-                                <a href="{% url 'timb_dashboard:record_transaction' %}" class="bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700">
-                                    <i class="fas fa-plus mr-2"></i>Record First Transaction
-                                </a>
+                                
                             </div>
                         </td>
                     </tr>
@@ -265,6 +264,45 @@
 
 {% block extra_js %}
 <script>
+async function runFraudDetection(transactionId) {
+    try {
+        window.timbRealTime.showNotification('Running fraud detection...', 'info');
+        
+        const response = await fetch('/ai_models/detect-fraud/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ transaction_id: transactionId })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            if (result.fraud_detected) {
+                window.timbRealTime.showNotification(
+                    `Fraud detected! Confidence: ${(result.confidence * 100).toFixed(1)}%`, 
+                    'error'
+                );
+                if (result.risk_factors && result.risk_factors.length > 0) {
+                    alert('Risk Factors:\n' + result.risk_factors.join('\n'));
+                }
+            } else {
+                window.timbRealTime.showNotification(
+                    `No fraud detected. Confidence: ${(result.confidence * 100).toFixed(1)}%`, 
+                    'success'
+                );
+            }
+            setTimeout(() => window.location.reload(), 2000);
+        } else {
+            window.timbRealTime.showNotification(`Error: ${result.error}`, 'error');
+        }
+    } catch (error) {
+        window.timbRealTime.showNotification('Error running fraud detection', 'error');
+    }
+}
+
 async function updateTransactionStatus(transactionId, newStatus) {
     try {
         const response = await fetch(`/timb/transactions/${transactionId}/update-status/`, {

@@ -36,7 +36,8 @@ def dashboard_view(request):
     
     # Get basic statistics
     stats = {
-        'total_merchants': User.objects.filter(groups__name='Merchants').count(),
+        # Count registered merchants via Merchant profile for accuracy
+        'total_merchants': Merchant.objects.count(),
         'total_transactions_today': Transaction.objects.filter(timestamp__date=today).count(),
         'total_volume_today': Transaction.objects.filter(
             timestamp__date=today
@@ -49,7 +50,8 @@ def dashboard_view(request):
     
     # Recent transactions
     recent_transactions = Transaction.objects.select_related(
-        'seller', 'buyer', 'grade', 'floor'
+        'seller', 'buyer', 'grade', 'floor',
+        'seller__merchant_profile', 'buyer__merchant_profile'
     ).order_by('-timestamp')[:20]
     
     # Fraud alerts

@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponse
 from django.contrib import messages
 from django.utils import timezone
-from django.db.models import Q, Sum, Count, Avg, F, ExpressionWrapper, DecimalField
+from django.db.models import Q, Sum, Count, Avg, F, ExpressionWrapper, DecimalField, OuterRef, Subquery
 from django.db import transaction
 from django.utils.dateparse import parse_date
 from django.core.paginator import Paginator
@@ -13,7 +13,8 @@ from decimal import Decimal
 import json
 import uuid
 
-from timb_dashboard.models import Merchant, TobaccoGrade, Transaction
+from timb_dashboard.models import Merchant, TobaccoGrade, Transaction, TobaccoFloor
+from authentication.models import User
 from .models import (
     MerchantProfile, MerchantInventory, CustomGrade, GradeComponent,
     ClientOrder, FarmerRiskAssessment, PurchaseRecommendation,
@@ -146,81 +147,78 @@ def dashboard(request):
 
 @login_required
 def record_transaction(request):
-    """Merchant-side Record New Transaction. Buyer is the current merchant; seller can be optional.
-    Updates Grade Weight Tracking upon success.
+    """Merchant-accessible Record Transaction page using the existing TIMB template.
+    GET renders the form; POST creates the Transaction and returns JSON.
     """
     if not request.user.is_merchant:
         return redirect('home')
 
-    merchant = request.user.merchant_profile
-    grades = TobaccoGrade.objects.filter(is_active=True, is_tradeable=True).order_by('grade_code')
-
     if request.method == 'POST':
         try:
-            transaction_type = request.POST.get('transaction_type') or 'PURCHASE'
-            grade_id = request.POST.get('grade')
+            transaction_type = request.POST.get('transaction_type')
+            grade_text = request.POST.get('grade_text', '').strip()
+            barcode_number = request.POST.get('barcode_number', '').strip()
             quantity = Decimal(request.POST.get('quantity', '0'))
             price_per_kg = Decimal(request.POST.get('price_per_kg', '0'))
-            payment_method = request.POST.get('payment_method') or ''
-            moisture_content = request.POST.get('moisture_content') or None
-            quality_assessment = request.POST.get('quality_assessment', '')
+            floor_id = request.POST.get('floor')
 
-            if not grade_id or quantity <= 0 or price_per_kg <= 0:
-                return JsonResponse({'success': False, 'error': 'Please provide valid grade, quantity and price.'}, status=400)
+            buyer = request.user
+            # Resolve grade from free text: try code then name; if not found, create a placeholder grade
+            grade = TobaccoGrade.objects.filter(grade_code__iexact=grade_text).first()
+            if grade is None:
+                grade = TobaccoGrade.objects.filter(grade_name__iexact=grade_text).first()
+            if grade is None:
+                # Create a minimally valid grade to allow free-form entries
+                # Generate a safe grade code from the input; ensure uniqueness
+                safe_code = ''.join(ch for ch in grade_text.upper() if ch.isalnum())[:12] or 'CUSTOM'
+                if TobaccoGrade.objects.filter(grade_code=safe_code).exists():
+                    safe_code = f"{safe_code}-{str(uuid.uuid4())[:4].upper()}"
+                grade = TobaccoGrade.objects.create(
+                    grade_code=safe_code,
+                    grade_name=grade_text or safe_code,
+                    category='LOOSE_LEAF'
+                )
+            floor = get_object_or_404(TobaccoFloor, id=floor_id) if floor_id else None
 
-            grade = TobaccoGrade.objects.get(id=grade_id)
-
-            # Create the transaction: current user is buyer; seller left null
             tx = Transaction.objects.create(
                 transaction_type=transaction_type,
-                buyer=request.user,
+                seller=request.user,
+                buyer=buyer,
                 grade=grade,
                 quantity=quantity,
                 price_per_kg=price_per_kg,
                 total_amount=quantity * price_per_kg,
-                payment_method=payment_method,
-                moisture_content=Decimal(moisture_content) if moisture_content else None,
-                quality_assessment=quality_assessment,
+                floor=floor,
+                # optional fields omitted on merchant form
                 created_by=request.user,
+                metadata={**({} if not barcode_number else {'barcode_number': barcode_number})}
             )
 
-            # Update Grade Weight Tracking (custom grade progress)
-            try:
-                tracking_name = f"{grade.grade_code}"
-                custom, _ = CustomGrade.objects.get_or_create(
-                    merchant=merchant,
-                    custom_grade_name=tracking_name,
-                    defaults={
-                        'description': f"Auto-tracking for base grade {grade.grade_name}",
-                        'target_price': grade.base_price or Decimal('0'),
-                        'quality_standard': 'STANDARD',
-                        'required_weight_per_grade': Decimal('0'),
-                        'acquired_weight_per_grade': Decimal('0'),
-                        'is_active': True,
-                        'is_draft': False,
-                    }
-                )
-                custom.acquired_weight_per_grade = (custom.acquired_weight_per_grade or 0) + quantity
-                if not custom.required_weight_per_grade or custom.required_weight_per_grade == 0:
-                    custom.required_weight_per_grade = custom.acquired_weight_per_grade
-                if not custom.target_price or custom.target_price == 0:
-                    custom.target_price = grade.base_price or Decimal('0')
-                custom.save()
-            except Exception:
-                pass
-
-            messages.success(request, 'Transaction recorded successfully!')
-            return JsonResponse({'success': True, 'transaction_id': tx.id})
-
-        except TobaccoGrade.DoesNotExist:
-            return JsonResponse({'success': False, 'error': 'Selected grade not found.'}, status=404)
+            # Also return a compact payload for TIMB dashboard append
+            return JsonResponse({
+                'success': True,
+                'transaction_id': tx.transaction_id,
+                'payload': {
+                    'transaction_id': tx.transaction_id,
+                    'seller': request.user.username,
+                    'buyer': buyer.username,
+                    'grade': grade_text or grade.grade_name,
+                    'quantity': float(quantity),
+                    'price': float(price_per_kg),
+                    'total': float(quantity * price_per_kg),
+                    'is_flagged': False,
+                    'barcode_number': barcode_number
+                }
+            })
         except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)}, status=400)
+            return JsonResponse({'success': False, 'error': str(e)})
 
     context = {
-        'transaction_types': getattr(Transaction, 'TRANSACTION_TYPES', [('PURCHASE', 'Purchase')]),
-        'grades': grades,
+        'transaction_types': getattr(Transaction, 'TRANSACTION_TYPES', []),
+        'merchants': User.objects.filter(groups__name='Merchants').order_by('username'),
+        'floors': TobaccoFloor.objects.filter(is_active=True).order_by('name'),
     }
+    # Use merchant-specific template (simplified fields)
     return render(request, 'merchant_app/record_transaction.html', context)
 
 
@@ -351,16 +349,32 @@ def inventory_management(request):
     """Enhanced inventory management with AI insights"""
     merchant = getattr(request.user, 'merchant_profile', None)
     
-    # Get inventory with filtering
-    inventory = (
-        MerchantInventory.objects.filter(merchant=merchant).select_related('grade').order_by('-last_updated')
-        if merchant else MerchantInventory.objects.none()
-    )
+    # Get inventory with filtering and annotate Tobacco Floor from latest transaction
+    if merchant:
+        last_floor_subquery = (
+            Transaction.objects
+            .filter(buyer=request.user, grade=OuterRef('grade'))
+            .order_by('-timestamp')
+            .values('floor__name')[:1]
+        )
+        last_price_subquery = (
+            Transaction.objects
+            .filter(buyer=request.user, grade=OuterRef('grade'), status='COMPLETED')
+            .order_by('-timestamp')
+            .values('price_per_kg')[:1]
+        )
+        inventory = (
+            MerchantInventory.objects
+            .filter(merchant=merchant)
+            .select_related('grade')
+            .annotate(tobacco_floor=Subquery(last_floor_subquery), last_price_per_kg=Subquery(last_price_subquery))
+            .order_by('-last_updated')
+        )
+    else:
+        inventory = MerchantInventory.objects.none()
     
-    # Filter by grade category
-    category_filter = request.GET.get('category')
-    if category_filter:
-        inventory = inventory.filter(grade__category=category_filter)
+    # Category filter removed per request
+    category_filter = None
     
     # Search functionality
     search_query = request.GET.get('search')
@@ -374,6 +388,22 @@ def inventory_management(request):
     # Calculate totals
     total_value = sum(item.total_value for item in inventory)
     total_quantity = sum(item.quantity for item in inventory)
+    # Latest completed purchase price per kg for this merchant
+    last_purchase_price_per_kg = (
+        Transaction.objects
+        .filter(buyer=request.user, status='COMPLETED')
+        .order_by('-timestamp')
+        .values_list('price_per_kg', flat=True)
+        .first()
+    )
+    # Last average cost from latest updated inventory item
+    last_average_cost = (
+        MerchantInventory.objects
+        .filter(merchant=merchant)
+        .order_by('-last_updated')
+        .values_list('average_cost', flat=True)
+        .first()
+    )
     
     # Low stock items
     low_stock_items = inventory.filter(quantity__lte=F('minimum_threshold'))
@@ -392,6 +422,8 @@ def inventory_management(request):
         'grade_categories': TobaccoGrade.GRADE_CATEGORIES,
         'search_query': search_query,
         'category_filter': category_filter,
+        'last_purchase_price_per_kg': last_purchase_price_per_kg,
+        'last_average_cost': last_average_cost,
     }
     
     return render(request, 'merchant_app/inventory.html', context)

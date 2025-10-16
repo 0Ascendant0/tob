@@ -1,0 +1,427 @@
+{% extends 'base.html' %}
+
+{% block title %}Side Buying Monitor - AI Models{% endblock %}
+
+{% block extra_css %}
+<style>
+    .detection-card {
+        transition: all 0.3s ease;
+        border-left: 4px solid #e5e7eb;
+    }
+    
+    .detection-card.high-risk {
+        border-left-color: #ef4444;
+        background-color: #fef2f2;
+    }
+    
+    .detection-card.medium-risk {
+        border-left-color: #f59e0b;
+        background-color: #fffbeb;
+    }
+    
+    .detection-card.low-risk {
+        border-left-color: #10b981;
+        background-color: #f0fdf4;
+    }
+    
+    .risk-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 8px;
+    }
+    
+    .risk-high { background-color: #ef4444; }
+    .risk-medium { background-color: #f59e0b; }
+    .risk-low { background-color: #10b981; }
+    
+    .streaming-indicator {
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="mb-8">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Side Buying Monitor</h1>
+                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                    Real-time detection of side buying patterns • <span id="current-time"></span>
+                </p>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2">
+                    <div class="streaming-indicator w-3 h-3 bg-green-500 rounded-full"></div>
+                    <span class="text-sm text-gray-500" id="stream-status">Connected</span>
+                </div>
+                <button onclick="toggleStreaming()" id="stream-toggle" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-200">
+                    <i class="fas fa-stop mr-2"></i>Stop Monitoring
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Statistics -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-red-100 rounded-md flex items-center justify-center">
+                            <i class="fas fa-exclamation-triangle text-red-600"></i>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">High Risk Detections</dt>
+                            <dd class="text-lg font-medium text-gray-900 dark:text-white" id="high-risk-count">0</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-yellow-100 rounded-md flex items-center justify-center">
+                            <i class="fas fa-exclamation-circle text-yellow-600"></i>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Medium Risk</dt>
+                            <dd class="text-lg font-medium text-gray-900 dark:text-white" id="medium-risk-count">0</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-green-100 rounded-md flex items-center justify-center">
+                            <i class="fas fa-check-circle text-green-600"></i>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Low Risk</dt>
+                            <dd class="text-lg font-medium text-gray-900 dark:text-white" id="low-risk-count">0</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-blue-100 rounded-md flex items-center justify-center">
+                            <i class="fas fa-clock text-blue-600"></i>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Last Update</dt>
+                            <dd class="text-lg font-medium text-gray-900 dark:text-white" id="last-update">--:--</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Detection Feed -->
+    <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                <i class="fas fa-stream mr-2 text-purple-600"></i>Live Detection Feed
+            </h3>
+        </div>
+        <div class="p-6">
+            <div id="detection-feed" class="space-y-4 max-h-96 overflow-y-auto">
+                <div class="text-center py-8 text-gray-500">
+                    <i class="fas fa-stream text-4xl mb-4 text-gray-300"></i>
+                    <p>Waiting for detections...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Manual Detection -->
+    <div class="mt-8 bg-white dark:bg-gray-800 shadow-lg rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                <i class="fas fa-search mr-2 text-blue-600"></i>Manual Detection
+            </h3>
+        </div>
+        <div class="p-6">
+            <form id="manual-detection-form" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Farmer Name</label>
+                    <input type="text" name="farmer_name" class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" required>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Farmer ID</label>
+                    <input type="text" name="farmer_id" class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" required>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Merchant Name</label>
+                    <input type="text" name="merchant_name" class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" required>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Contracted Quantity (kg)</label>
+                    <input type="number" name="contracted_quantity" class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" required>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Delivered Quantity (kg)</label>
+                    <input type="number" name="delivered_quantity" class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" required>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Contractor Support Score</label>
+                    <input type="number" name="contractor_support_score" min="0" max="100" class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" required>
+                </div>
+                
+                <div class="md:col-span-2">
+                    <button type="submit" class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200">
+                        <i class="fas fa-search mr-2"></i>Run Detection
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+let isStreaming = true;
+let eventSource = null;
+let detectionCounts = { high: 0, medium: 0, low: 0 };
+
+// Update current time
+function updateTime() {
+    const now = new Date();
+    document.getElementById('current-time').textContent = now.toLocaleTimeString();
+}
+setInterval(updateTime, 1000);
+updateTime();
+
+// Start streaming
+function startStreaming() {
+    if (eventSource) {
+        eventSource.close();
+    }
+    
+    eventSource = new EventSource('/ai_models/realtime-side-buying-monitor/');
+    
+    eventSource.onmessage = function(event) {
+        try {
+            const data = JSON.parse(event.data);
+            updateDetectionFeed(data.detections);
+            updateLastUpdate();
+        } catch (error) {
+            console.error('Error parsing stream data:', error);
+        }
+    };
+    
+    eventSource.onerror = function(event) {
+        console.error('Stream error:', event);
+        document.getElementById('stream-status').textContent = 'Disconnected';
+        document.getElementById('stream-status').className = 'text-sm text-red-500';
+    };
+    
+    eventSource.onopen = function(event) {
+        document.getElementById('stream-status').textContent = 'Connected';
+        document.getElementById('stream-status').className = 'text-sm text-green-500';
+    };
+}
+
+// Stop streaming
+function stopStreaming() {
+    if (eventSource) {
+        eventSource.close();
+        eventSource = null;
+    }
+    document.getElementById('stream-status').textContent = 'Stopped';
+    document.getElementById('stream-status').className = 'text-sm text-gray-500';
+}
+
+// Toggle streaming
+function toggleStreaming() {
+    if (isStreaming) {
+        stopStreaming();
+        isStreaming = false;
+        document.getElementById('stream-toggle').innerHTML = '<i class="fas fa-play mr-2"></i>Start Monitoring';
+        document.getElementById('stream-toggle').className = 'bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-200';
+    } else {
+        startStreaming();
+        isStreaming = true;
+        document.getElementById('stream-toggle').innerHTML = '<i class="fas fa-stop mr-2"></i>Stop Monitoring';
+        document.getElementById('stream-toggle').className = 'bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-200';
+    }
+}
+
+// Update detection feed
+function updateDetectionFeed(detections) {
+    const feed = document.getElementById('detection-feed');
+    
+    if (detections.length === 0) {
+        return;
+    }
+    
+    // Clear existing content if this is the first update
+    if (feed.children.length === 1 && feed.children[0].textContent.includes('Waiting for detections')) {
+        feed.innerHTML = '';
+    }
+    
+    detections.forEach(detection => {
+        const detectionCard = createDetectionCard(detection);
+        feed.insertBefore(detectionCard, feed.firstChild);
+        
+        // Keep only last 20 detections
+        while (feed.children.length > 20) {
+            feed.removeChild(feed.lastChild);
+        }
+        
+        // Update counts
+        updateDetectionCounts(detection);
+    });
+}
+
+// Create detection card
+function createDetectionCard(detection) {
+    const card = document.createElement('div');
+    card.className = 'detection-card p-4 rounded-lg shadow-sm';
+    
+    const riskLevel = detection.confidence > 0.8 ? 'high-risk' : 
+                     detection.confidence > 0.5 ? 'medium-risk' : 'low-risk';
+    card.classList.add(riskLevel);
+    
+    const riskClass = detection.confidence > 0.8 ? 'risk-high' : 
+                     detection.confidence > 0.5 ? 'risk-medium' : 'risk-low';
+    
+    const riskText = detection.confidence > 0.8 ? 'HIGH RISK' : 
+                    detection.confidence > 0.5 ? 'MEDIUM RISK' : 'LOW RISK';
+    
+    card.innerHTML = `
+        <div class="flex items-center justify-between">
+            <div class="flex items-center">
+                <div class="risk-indicator ${riskClass}"></div>
+                <div>
+                    <h4 class="text-sm font-medium text-gray-900 dark:text-white">${detection.farmer_name}</h4>
+                    <p class="text-xs text-gray-500">${detection.merchant_name} • ${detection.farmer_id}</p>
+                </div>
+            </div>
+            <div class="text-right">
+                <div class="text-sm font-medium text-gray-900 dark:text-white">${riskText}</div>
+                <div class="text-xs text-gray-500">${(detection.confidence * 100).toFixed(1)}% confidence</div>
+            </div>
+        </div>
+        <div class="mt-2">
+            <div class="text-xs text-gray-600 dark:text-gray-400">
+                Detected: ${new Date(detection.detection_time).toLocaleString()}
+            </div>
+            ${detection.risk_factors && detection.risk_factors.length > 0 ? 
+                `<div class="mt-1 text-xs text-gray-500">
+                    Risk factors: ${detection.risk_factors.join(', ')}
+                </div>` : ''
+            }
+        </div>
+    `;
+    
+    return card;
+}
+
+// Update detection counts
+function updateDetectionCounts(detection) {
+    if (detection.confidence > 0.8) {
+        detectionCounts.high++;
+        document.getElementById('high-risk-count').textContent = detectionCounts.high;
+    } else if (detection.confidence > 0.5) {
+        detectionCounts.medium++;
+        document.getElementById('medium-risk-count').textContent = detectionCounts.medium;
+    } else {
+        detectionCounts.low++;
+        document.getElementById('low-risk-count').textContent = detectionCounts.low;
+    }
+}
+
+// Update last update time
+function updateLastUpdate() {
+    const now = new Date();
+    document.getElementById('last-update').textContent = now.toLocaleTimeString();
+}
+
+// Manual detection form
+document.getElementById('manual-detection-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData);
+    
+    try {
+        const response = await fetch('/ai_models/detect-side-buying/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            // Add to feed immediately
+            const detection = {
+                farmer_name: data.farmer_name,
+                farmer_id: data.farmer_id,
+                merchant_name: data.merchant_name,
+                confidence: result.confidence,
+                risk_factors: result.risk_factors,
+                detection_time: new Date().toISOString()
+            };
+            
+            updateDetectionFeed([detection]);
+            updateDetectionCounts(detection);
+            
+            // Show notification
+            alert(`Detection completed!\nRisk Level: ${result.side_buying_detected ? 'DETECTED' : 'NOT DETECTED'}\nConfidence: ${(result.confidence * 100).toFixed(1)}%`);
+        } else {
+            alert(`Error: ${result.error}`);
+        }
+    } catch (error) {
+        console.error('Error running detection:', error);
+        alert('Error running detection');
+    }
+});
+
+// Start streaming on page load
+startStreaming();
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', function() {
+    if (eventSource) {
+        eventSource.close();
+    }
+});
+</script>
+{% endblock %}

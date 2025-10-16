@@ -4,3 +4,7 @@ WARNING 2025-09-27 12:25:36,132 log 31748 40820 Forbidden (CSRF token from POST 
 WARNING 2025-09-27 12:31:59,684 log 31748 33432 Forbidden (CSRF token from POST incorrect.): /auth/login/
 WARNING 2025-10-16 16:42:45,525 log 10860 10964 Forbidden (CSRF token from POST incorrect.): /auth/login/
 WARNING 2025-10-16 16:45:31,241 log 10860 10964 Forbidden (CSRF token from POST incorrect.): /auth/login/
+WARNING 2025-10-16 18:56:21,978 log 32924 33768 Forbidden (CSRF token from POST incorrect.): /auth/login/
+WARNING 2025-10-16 18:56:42,693 log 32924 33768 Forbidden (CSRF token from POST incorrect.): /auth/login/
+WARNING 2025-10-16 18:59:01,500 log 16476 14788 Forbidden (CSRF token from POST incorrect.): /auth/login/
+WARNING 2025-10-16 18:59:06,681 log 16476 14788 Forbidden (CSRF token from POST incorrect.): /auth/login/

@@ -76,12 +76,17 @@
             <div class="p-5">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                        <i class="fas fa-exclamation-triangle {% if low_stock_items %}text-red-600{% else %}text-green-600{% endif %} text-2xl"></i>
+                        <i class="fas fa-tag text-purple-600 text-2xl"></i>
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
-                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Low Stock Items</dt>
-                            <dd class="text-lg font-medium {% if low_stock_items %}text-red-600{% else %}text-green-600{% endif %}">{{ low_stock_items.count }}</dd>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Last Purchase Price (kg)</dt>
+                            {% if last_purchase_price_per_kg %}
+                                <dd class="text-lg font-medium text-gray-900 dark:text-white">${{ last_purchase_price_per_kg|floatformat:2 }}</dd>
+                            {% endif %}
+                            {% if last_average_cost %}
+                                <dd class="text-lg font-medium text-gray-900 dark:text-white mt-1">${{ last_average_cost|floatformat:2 }}</dd>
+                            {% endif %}
                         </dl>
                     </div>
                 </div>
@@ -92,7 +97,7 @@
     <!-- Filters and Search -->
     <div class="bg-white dark:bg-gray-800 shadow rounded-lg mb-6">
         <div class="px-6 py-4">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div>
                     <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Search</label>
                     <input type="text" id="search" name="search" value="{{ search_query }}"
@@ -100,27 +105,9 @@
                            placeholder="Search by grade, code, or location...">
                 </div>
                 
-                <div>
-                    <label for="category_filter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Category</label>
-                    <select id="category_filter" name="category_filter"
-                            class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
-                        <option value="">All Categories</option>
-                        {% for value, label in grade_categories %}
-                            <option value="{{ value }}" {% if value == category_filter %}selected{% endif %}>{{ label }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
                 
-                <div>
-                    <label for="stock_filter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Stock Level</label>
-                    <select id="stock_filter" name="stock_filter"
-                            class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
-                        <option value="">All Stock Levels</option>
-                        <option value="low">Low Stock</option>
-                        <option value="normal">Normal Stock</option>
-                        <option value="high">High Stock</option>
-                    </select>
-                </div>
+                
+                
                 
                 <div class="flex items-end">
                     <button onclick="applyFilters()" class="w-full bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 transition duration-200">
@@ -154,14 +141,12 @@
                             Total Value
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            Location
+                            Tobacco Floor
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Status
                         </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            Actions
-                        </th>
+                        
                     </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700" id="inventory-tbody">
@@ -191,7 +176,7 @@
                             <div class="text-sm font-medium text-gray-900 dark:text-white">${{ item.total_value|floatformat:2 }}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900 dark:text-white">{{ item.storage_location|default:"Main Warehouse" }}</div>
+                            <div class="text-sm text-gray-900 dark:text-white">{{ item.tobacco_floor|default:item.storage_location|default:"Main Warehouse" }}</div>
                             {% if item.batch_number %}
                                 <div class="text-sm text-gray-500 dark:text-gray-400">Batch: {{ item.batch_number }}</div>
                             {% endif %}
@@ -211,23 +196,11 @@
                                 </span>
                             {% endif %}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <div class="flex space-x-2">
-                                <button onclick="editInventoryItem({{ item.id }})" class="text-indigo-600 hover:text-indigo-900">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button onclick="viewInventoryDetails({{ item.id }})" class="text-blue-600 hover:text-blue-900">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button onclick="adjustStock({{ item.id }})" class="text-green-600 hover:text-green-900">
-                                    <i class="fas fa-plus-minus"></i>
-                                </button>
-                            </div>
-                        </td>
+                        
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="7" class="px-6 py-12 text-center">
+                        <td colspan="6" class="px-6 py-12 text-center">
                             <div class="text-gray-500 dark:text-gray-400">
                                 <i class="fas fa-inbox text-4xl mb-4"></i>
                                 <h3 class="text-lg font-medium mb-2">No inventory items</h3>
@@ -422,14 +395,8 @@ function debounce(func, wait) {
 // Apply filters
 function applyFilters() {
     const search = document.getElementById('search').value;
-    const category = document.getElementById('category_filter').value;
-    const stockLevel = document.getElementById('stock_filter').value;
-    
     const params = new URLSearchParams();
     if (search) params.append('search', search);
-    if (category) params.append('category', category);
-    if (stockLevel) params.append('stock_level', stockLevel);
-    
     window.location.href = `${window.location.pathname}?${params.toString()}`;
 }
 

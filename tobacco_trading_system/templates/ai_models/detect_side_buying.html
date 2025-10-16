@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Side Buying Detection - AI Models{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="mb-8">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Side Buying Detection</h1>
+                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                    AI-powered side buying pattern detection
+                </p>
+            </div>
+            <a href="{% url 'ai_models:dashboard' %}" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition duration-200">
+                <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+    
+    <!-- Coming Soon -->
+    <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                <i class="fas fa-search mr-2 text-purple-600"></i>Side Buying Detection
+            </h3>
+        </div>
+        <div class="p-12 text-center">
+            <i class="fas fa-search text-6xl text-purple-600 mb-4"></i>
+            <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Coming Soon</h3>
+            <p class="text-gray-600 dark:text-gray-400">Side buying detection form is under development.</p>
+            <div class="mt-6">
+                <a href="{% url 'ai_models:side_buying_monitor' %}" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition duration-200">
+                    <i class="fas fa-stream mr-2"></i>View Live Monitor
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

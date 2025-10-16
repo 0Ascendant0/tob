@@ -1,41 +1,39 @@
 {% extends 'base.html' %}
 
-{% block title %}AI Models Dashboard - TIMB{% endblock %}
+{% block title %}AI Models Dashboard{% endblock %}
 
 {% block extra_css %}
 <style>
-    .model-card {
-        transition: all 0.3s ease;
+    .metric-card {
+        transition: transform 0.2s ease-in-out;
     }
-    
-    .model-card:hover {
+    .metric-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     }
     
-    .accuracy-ring {
-        position: relative;
+    .model-status-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
         display: inline-block;
+        margin-right: 8px;
     }
     
-    .accuracy-ring svg {
-        transform: rotate(-90deg);
+    .status-active { background-color: #10b981; }
+    .status-training { background-color: #f59e0b; }
+    .status-error { background-color: #ef4444; }
+    .status-deprecated { background-color: #6b7280; }
+    
+    .prediction-log-entry {
+        border-left: 4px solid #e5e7eb;
+        padding-left: 12px;
+        margin-bottom: 12px;
     }
     
-    .prediction-item {
-        animation: slideIn 0.5s ease-out;
-    }
-    
-    @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateX(-20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
+    .prediction-log-entry.fraud { border-left-color: #ef4444; }
+    .prediction-log-entry.risk { border-left-color: #f59e0b; }
+    .prediction-log-entry.yield { border-left-color: #10b981; }
+    .prediction-log-entry.side-buying { border-left-color: #8b5cf6; }
 </style>
 {% endblock %}
 
@@ -47,28 +45,46 @@
             <div>
                 <h1 class="text-3xl font-bold text-gray-900 dark:text-white">AI Models Dashboard</h1>
                 <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                    Monitor and manage AI models for tobacco trading • <span id="model-status-indicator" class="text-green-600">All Systems Operational</span>
+                    Machine Learning Models • Real-time Monitoring • <span id="current-time"></span>
                 </p>
             </div>
             <div class="flex space-x-3">
-                <button onclick="refreshModels()" class="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition duration-200">
-                    <i class="fas fa-sync-alt mr-2"></i>Refresh Models
+                <button onclick="refreshModelStatus()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200">
+                    <i class="fas fa-sync-alt mr-2"></i>Refresh Status
                 </button>
-                <button onclick="showTrainingModal()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-200">
-                    <i class="fas fa-cog mr-2"></i>Train Models
+                <button onclick="showRetrainModal()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-200">
+                    <i class="fas fa-brain mr-2"></i>Retrain Models
                 </button>
             </div>
         </div>
     </div>
-
+    
     <!-- Model Statistics -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="metric-card bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg">
             <div class="p-5">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
                         <div class="w-8 h-8 bg-blue-100 rounded-md flex items-center justify-center">
-                            <i class="fas fa-robot text-blue-600"></i>
+                            <i class="fas fa-brain text-blue-600"></i>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Total Models</dt>
+                            <dd class="text-lg font-medium text-gray-900 dark:text-white">{{ models_stats.total_models }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="metric-card bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-green-100 rounded-md flex items-center justify-center">
+                            <i class="fas fa-check-circle text-green-600"></i>
                         </div>
                     </div>
                     <div class="ml-5 w-0 flex-1">
@@ -80,26 +96,26 @@
                 </div>
             </div>
         </div>
-
-        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg">
+        
+        <div class="metric-card bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg">
             <div class="p-5">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                        <div class="w-8 h-8 bg-green-100 rounded-md flex items-center justify-center">
-                            <i class="fas fa-brain text-green-600"></i>
+                        <div class="w-8 h-8 bg-yellow-100 rounded-md flex items-center justify-center">
+                            <i class="fas fa-cog text-yellow-600"></i>
                         </div>
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
-                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Training Models</dt>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Training</dt>
                             <dd class="text-lg font-medium text-gray-900 dark:text-white">{{ models_stats.training_models }}</dd>
                         </dl>
                     </div>
                 </div>
             </div>
         </div>
-
-        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg">
+        
+        <div class="metric-card bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg">
             <div class="p-5">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
@@ -116,411 +132,165 @@
                 </div>
             </div>
         </div>
-
-        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg">
-            <div class="p-5">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <div class="w-8 h-8 bg-yellow-100 rounded-md flex items-center justify-center">
-                            <i class="fas fa-database text-yellow-600"></i>
-                        </div>
-                    </div>
-                    <div class="ml-5 w-0 flex-1">
-                        <dl>
-                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Total Models</dt>
-                            <dd class="text-lg font-medium text-gray-900 dark:text-white">{{ models_stats.total_models }}</dd>
-                        </dl>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
-
-    <!-- AI Models Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <!-- Fraud Detection Model -->
-        <div class="model-card bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
-            <div class="px-6 py-4 bg-gradient-to-r from-red-600 to-red-700">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                        <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                            <i class="fas fa-shield-alt text-white text-xl"></i>
-                        </div>
-                        <div class="ml-4">
-                            <h3 class="text-lg font-bold text-white">Fraud Detection</h3>
-                            <p class="text-red-100 text-sm">Real-time transaction analysis</p>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <div class="accuracy-ring">
-                            <svg width="60" height="60">
-                                <circle cx="30" cy="30" r="25" stroke="#ffffff40" stroke-width="4" fill="none"/>
-                                <circle cx="30" cy="30" r="25" stroke="#ffffff" stroke-width="4" fill="none"
-                                        stroke-dasharray="157" stroke-dashoffset="15.7" stroke-linecap="round"/>
-                            </svg>
-                            <div class="absolute inset-0 flex items-center justify-center">
-                                <span class="text-white text-sm font-bold">95.2%</span>
+    
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Model Performance -->
+        <div class="lg:col-span-2">
+            <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                        <i class="fas fa-chart-bar mr-2 text-blue-600"></i>Model Performance
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-6">
+                        {% for performance in performance_data %}
+                        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                            <div class="flex items-center">
+                                <div class="model-status-indicator status-active"></div>
+                                <div>
+                                    <h4 class="text-sm font-medium text-gray-900 dark:text-white">{{ performance.model.name }}</h4>
+                                    <p class="text-xs text-gray-500">{{ performance.model.get_model_type_display }}</p>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="p-6">
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <div class="text-sm text-gray-500 dark:text-gray-400">Status</div>
-                        <div class="text-sm font-medium text-green-600">Active</div>
-                    </div>
-                    <div>
-                        <div class="text-sm text-gray-500 dark:text-gray-400">Detections Today</div>
-                        <div class="text-sm font-medium text-gray-900 dark:text-white" id="fraud-detections">3</div>
-                    </div>
-                    <div>
-                        <div class="text-sm text-gray-500 dark:text-gray-400">Last Updated</div>
-                        <div class="text-sm font-medium text-gray-900 dark:text-white">2 hours ago</div>
-                    </div>
-                    <div>
-                        <div class="text-sm text-gray-500 dark:text-gray-400">Model Version</div>
-                        <div class="text-sm font-medium text-gray-900 dark:text-white">v2.1.3</div>
-                    </div>
-                </div>
-                <div class="flex space-x-2">
-                    <button onclick="runFraudDetection()" class="flex-1 bg-red-600 text-white px-3 py-2 rounded text-sm hover:bg-red-700">
-                        <i class="fas fa-play mr-2"></i>Run Analysis
-                    </button>
-                    <button onclick="viewFraudReports()" class="flex-1 border border-gray-300 text-gray-700 dark:text-gray-300 px-3 py-2 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-700">
-                        <i class="fas fa-chart-bar mr-2"></i>View Reports
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Price Prediction Model -->
-        <div class="model-card bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
-            <div class="px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-700">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                        <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                            <i class="fas fa-chart-line text-white text-xl"></i>
-                        </div>
-                        <div class="ml-4">
-                            <h3 class="text-lg font-bold text-white">Price Prediction</h3>
-                            <p class="text-blue-100 text-sm">Market price forecasting</p>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <div class="accuracy-ring">
-                            <svg width="60" height="60">
-                                <circle cx="30" cy="30" r="25" stroke="#ffffff40" stroke-width="4" fill="none"/>
-                                <circle cx="30" cy="30" r="25" stroke="#ffffff" stroke-width="4" fill="none"
-                                        stroke-dasharray="157" stroke-dashoffset="19.6" stroke-linecap="round"/>
-                            </svg>
-                            <div class="absolute inset-0 flex items-center justify-center">
-                                <span class="text-white text-sm font-bold">87.5%</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="p-6">
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <div class="text-sm text-gray-500 dark:text-gray-400">Status</div>
-                        <div class="text-sm font-medium text-green-600">Active</div>
-                    </div>
-                    <div>
-                        <div class="text-sm text-gray-500 dark:text-gray-400">Predictions Today</div>
-                        <div class="text-sm font-medium text-gray-900 dark:text-white" id="price-predictions">24</div>
-                    </div>
-                    <div>
-                        <div class="text-sm text-gray-500 dark:text-gray-400">Last Updated</div>
-                        <div class="text-sm font-medium text-gray-900 dark:text-white">30 minutes ago</div>
-                    </div>
-                    <div>
-                        <div class="text-sm text-gray-500 dark:text-gray-400">Model Version</div>
-                        <div class="text-sm font-medium text-gray-900 dark:text-white">v1.8.2</div>
-                    </div>
-                </div>
-                <div class="flex space-x-2">
-                    <button onclick="generatePriceForecast()" class="flex-1 bg-blue-600 text-white px-3 py-2 rounded text-sm hover:bg-blue-700">
-                        <i class="fas fa-crystal-ball mr-2"></i>Generate Forecast
-                    </button>
-                    <button onclick="viewPriceTrends()" class="flex-1 border border-gray-300 text-gray-700 dark:text-gray-300 px-3 py-2 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-700">
-                        <i class="fas fa-trending-up mr-2"></i>View Trends
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Yield Prediction Model -->
-        <div class="model-card bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
-            <div class="px-6 py-4 bg-gradient-to-r from-green-600 to-green-700">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                        <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                            <i class="fas fa-seedling text-white text-xl"></i>
-                        </div>
-                        <div class="ml-4">
-                            <h3 class="text-lg font-bold text-white">Yield Prediction</h3>
-                            <p class="text-green-100 text-sm">Crop yield forecasting</p>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <div class="accuracy-ring">
-                            <svg width="60" height="60">
-                                <circle cx="30" cy="30" r="25" stroke="#ffffff40" stroke-width="4" fill="none"/>
-                                <circle cx="30" cy="30" r="25" stroke="#ffffff" stroke-width="4" fill="none"
-                                        stroke-dasharray="157" stroke-dashoffset="33.1" stroke-linecap="round"/>
-                            </svg>
-                            <div class="absolute inset-0 flex items-center justify-center">
-                                <span class="text-white text-sm font-bold">78.9%</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="p-6">
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <div class="text-sm text-gray-500 dark:text-gray-400">Status</div>
-                        <div class="text-sm font-medium text-green-600">Active</div>
-                    </div>
-                    <div>
-                        <div class="text-sm text-gray-500 dark:text-gray-400">Forecasts Active</div>
-                        <div class="text-sm font-medium text-gray-900 dark:text-white" id="yield-forecasts">5</div>
-                    </div>
-                    <div>
-                        <div class="text-sm text-gray-500 dark:text-gray-400">Last Updated</div>
-                        <div class="text-sm font-medium text-gray-900 dark:text-white">1 day ago</div>
-                    </div>
-                    <div>
-                        <div class="text-sm text-gray-500 dark:text-gray-400">Model Version</div>
-                        <div class="text-sm font-medium text-gray-900 dark:text-white">v1.5.1</div>
-                    </div>
-                </div>
-                <div class="flex space-x-2">
-                    <button onclick="generateYieldForecast()" class="flex-1 bg-green-600 text-white px-3 py-2 rounded text-sm hover:bg-green-700">
-                        <i class="fas fa-leaf mr-2"></i>Create Forecast
-                    </button>
-                    <button onclick="viewYieldAnalysis()" class="flex-1 border border-gray-300 text-gray-700 dark:text-gray-300 px-3 py-2 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-700">
-                        <i class="fas fa-analytics mr-2"></i>View Analysis
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Side Buying Detection Model -->
-        <div class="model-card bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
-            <div class="px-6 py-4 bg-gradient-to-r from-purple-600 to-purple-700">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                        <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                            <i class="fas fa-search text-white text-xl"></i>
-                        </div>
-                        <div class="ml-4">
-                            <h3 class="text-lg font-bold text-white">Side Buying Detection</h3>
-                            <p class="text-purple-100 text-sm">Contract violation detection</p>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <div class="accuracy-ring">
-                            <svg width="60" height="60">
-                                <circle cx="30" cy="30" r="25" stroke="#ffffff40" stroke-width="4" fill="none"/>
-                                <circle cx="30" cy="30" r="25" stroke="#ffffff" stroke-width="4" fill="none"
-                                        stroke-dasharray="157" stroke-dashoffset="12.4" stroke-linecap="round"/>
-                            </svg>
-                            <div class="absolute inset-0 flex items-center justify-center">
-                                <span class="text-white text-sm font-bold">92.1%</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="p-6">
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <div class="text-sm text-gray-500 dark:text-gray-400">Status</div>
-                        <div class="text-sm font-medium text-green-600">Active</div>
-                    </div>
-                    <div>
-                        <div class="text-sm text-gray-500 dark:text-gray-400">Detections Today</div>
-                        <div class="text-sm font-medium text-gray-900 dark:text-white" id="side-buying-detections">3</div>
-                    </div>
-                    <div>
-                        <div class="text-sm text-gray-500 dark:text-gray-400">Last Updated</div>
-                        <div class="text-sm font-medium text-gray-900 dark:text-white">15 minutes ago</div>
-                    </div>
-                    <div>
-                        <div class="text-sm text-gray-500 dark:text-gray-400">Model Version</div>
-                        <div class="text-sm font-medium text-gray-900 dark:text-white">v1.3.0</div>
-                    </div>
-                </div>
-                <div class="flex space-x-2">
-                    <button onclick="runSideBuyingAnalysis()" class="flex-1 bg-purple-600 text-white px-3 py-2 rounded text-sm hover:bg-purple-700">
-                        <i class="fas fa-eye mr-2"></i>Monitor Contracts
-                    </button>
-                    <button onclick="viewSideBuyingReports()" class="flex-1 border border-gray-300 text-gray-700 dark:text-gray-300 px-3 py-2 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-700">
-                        <i class="fas fa-file-alt mr-2"></i>View Reports
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Recent Predictions -->
-    <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg mb-8">
-        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <div class="flex justify-between items-center">
-                <h3 class="text-lg font-medium text-gray-900 dark:text-white">
-                    <i class="fas fa-history mr-2 text-primary-600"></i>Recent Predictions
-                </h3>
-                <div class="flex items-center space-x-2">
-                    <div class="w-3 h-3 bg-green-500 rounded-full live-indicator"></div>
-                    <span class="text-sm text-gray-500">Real-time</span>
-                </div>
-            </div>
-        </div>
-        <div class="overflow-hidden">
-            <div id="predictions-list" class="divide-y divide-gray-200 dark:divide-gray-700 max-h-96 overflow-y-auto">
-                {% for prediction in recent_predictions %}
-                <div class="prediction-item p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-200">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-4">
-                            <div class="flex-shrink-0">
-                                {% if prediction.prediction_type == 'FRAUD' %}
-                                    <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-                                        <i class="fas fa-shield-alt text-red-600"></i>
-                                    </div>
-                                {% elif prediction.prediction_type == 'PRICE' %}
-                                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                                        <i class="fas fa-chart-line text-blue-600"></i>
-                                    </div>
-                                {% elif prediction.prediction_type == 'YIELD' %}
-                                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                                        <i class="fas fa-seedling text-green-600"></i>
-                                    </div>
-                                {% else %}
-                                    <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                                        <i class="fas fa-search text-purple-600"></i>
-                                    </div>
-                                {% endif %}
-                            </div>
-                            <div>
+                            <div class="text-right">
                                 <div class="text-sm font-medium text-gray-900 dark:text-white">
-                                    {{ prediction.get_prediction_type_display }}
+                                    {{ performance.accuracy|floatformat:1 }}% Accuracy
                                 </div>
-                                <div class="text-sm text-gray-500">
-                                    Model: {{ prediction.model_used.name }} v{{ prediction.model_used.version }}
-                                </div>
-                                <div class="text-xs text-gray-400">
-                                    {{ prediction.created_at|timesince }} ago
+                                <div class="text-xs text-gray-500">
+                                    {{ performance.predictions_count }} predictions
                                 </div>
                             </div>
                         </div>
-                        <div class="text-right">
-                            <div class="text-sm font-medium text-gray-900 dark:text-white">
-                                {{ prediction.confidence_score|floatformat:1 }}% confidence
-                            </div>
-                            <div class="text-xs text-gray-500">
-                                {% if prediction.user %}by {{ prediction.user.username }}{% endif %}
-                            </div>
+                        {% empty %}
+                        <div class="text-center py-8 text-gray-500">
+                            <i class="fas fa-chart-bar text-4xl mb-4 text-gray-300"></i>
+                            <p>No performance data available</p>
                         </div>
+                        {% endfor %}
                     </div>
                 </div>
-                {% empty %}
-                <div class="p-8 text-center text-gray-500">
-                    <i class="fas fa-brain text-4xl mb-4 text-gray-300"></i>
-                    <p>No recent predictions</p>
-                    <p class="text-sm">AI models will appear here as they make predictions</p>
+            </div>
+        </div>
+        
+        <!-- Recent Predictions -->
+        <div class="lg:col-span-1">
+            <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                        <i class="fas fa-history mr-2 text-green-600"></i>Recent Predictions
+                    </h3>
                 </div>
-                {% endfor %}
+                <div class="p-6">
+                    <div class="space-y-4">
+                        {% for prediction in recent_predictions %}
+                        <div class="prediction-log-entry {{ prediction.prediction_type|lower }}">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                        {{ prediction.get_prediction_type_display }}
+                                    </div>
+                                    <div class="text-xs text-gray-500">
+                                        {{ prediction.created_at|timesince }} ago
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                        {{ prediction.confidence_score|floatformat:1 }}%
+                                    </div>
+                                    <div class="text-xs text-gray-500">
+                                        {{ prediction.model_used.name }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="text-center py-8 text-gray-500">
+                            <i class="fas fa-history text-4xl mb-4 text-gray-300"></i>
+                            <p>No recent predictions</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-
-    <!-- Model Performance Chart -->
-    <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg">
-        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h3 class="text-lg font-medium text-gray-900 dark:text-white">
-                <i class="fas fa-chart-bar mr-2 text-primary-600"></i>Model Performance Overview
-            </h3>
-        </div>
-        <div class="p-6">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Performance Chart -->
-                <div>
-                    <canvas id="performanceChart" width="400" height="200"></canvas>
-                </div>
-                
-                <!-- Performance Summary -->
-                <div class="space-y-4">
-                    {% for data in performance_data %}
-                    <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                        <div>
-                            <div class="text-sm font-medium text-gray-900 dark:text-white">{{ data.model.name }}</div>
-                            <div class="text-xs text-gray-500">{{ data.predictions_count }} predictions</div>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-lg font-bold text-gray-900 dark:text-white">{{ data.accuracy|floatformat:1 }}%</div>
-                            <div class="text-xs {% if data.accuracy > 80 %}text-green-600{% elif data.accuracy > 60 %}text-yellow-600{% else %}text-red-600{% endif %}">
-                                {% if data.accuracy > 80 %}Excellent{% elif data.accuracy > 60 %}Good{% else %}Needs Improvement{% endif %}
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
+    
+    <!-- Quick Actions -->
+    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <a href="{% url 'ai_models:detect_fraud' %}" class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 hover:shadow-xl transition duration-200 border border-gray-200 dark:border-gray-700">
+            <div class="text-center">
+                <i class="fas fa-shield-alt text-red-600 text-3xl mb-3"></i>
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Fraud Detection</h3>
+                <p class="text-sm text-gray-500">Run fraud analysis on transactions</p>
             </div>
-        </div>
+        </a>
+        
+        <a href="{% url 'ai_models:assess_farmer_risk' %}" class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 hover:shadow-xl transition duration-200 border border-gray-200 dark:border-gray-700">
+            <div class="text-center">
+                <i class="fas fa-user-shield text-yellow-600 text-3xl mb-3"></i>
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Farmer Risk Assessment</h3>
+                <p class="text-sm text-gray-500">Evaluate farmer contract risk</p>
+            </div>
+        </a>
+        
+        <a href="{% url 'ai_models:predict_yield' %}" class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 hover:shadow-xl transition duration-200 border border-gray-200 dark:border-gray-700">
+            <div class="text-center">
+                <i class="fas fa-seedling text-green-600 text-3xl mb-3"></i>
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Yield Prediction</h3>
+                <p class="text-sm text-gray-500">Predict tobacco yield</p>
+            </div>
+        </a>
+        
+        <a href="{% url 'ai_models:detect_side_buying' %}" class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 hover:shadow-xl transition duration-200 border border-gray-200 dark:border-gray-700">
+            <div class="text-center">
+                <i class="fas fa-search text-purple-600 text-3xl mb-3"></i>
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Side Buying Detection</h3>
+                <p class="text-sm text-gray-500">Detect side buying patterns</p>
+            </div>
+        </a>
+        
+        <a href="{% url 'ai_models:side_buying_monitor' %}" class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 hover:shadow-xl transition duration-200 border border-gray-200 dark:border-gray-700">
+            <div class="text-center">
+                <i class="fas fa-stream text-indigo-600 text-3xl mb-3"></i>
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Live Monitor</h3>
+                <p class="text-sm text-gray-500">Real-time side buying monitoring</p>
+            </div>
+        </a>
     </div>
 </div>
 
-<!-- Training Modal -->
-<div id="training-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
-    <div class="flex items-center justify-center min-h-screen p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full">
-            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                <h3 class="text-lg font-medium text-gray-900 dark:text-white">Retrain AI Model</h3>
+<!-- Retrain Modal -->
+<div id="retrainModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800">
+        <div class="mt-3">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">Retrain AI Models</h3>
+                <button onclick="hideRetrainModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
-            
-            <div class="p-6">
-                <div class="space-y-4">
-                    <div>
-                        <label for="model_select" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Select Model</label>
-                        <select id="model_select" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
-                            <option value="fraud_detection">Fraud Detection</option>
-                            <option value="price_prediction">Price Prediction</option>
-                            <option value="yield_prediction">Yield Prediction</option>
-                            <option value="side_buying_detection">Side Buying Detection</option>
-                        </select>
-                    </div>
-                    
-                    <div>
-                        <label for="epochs" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Training Epochs</label>
-                        <input type="number" id="epochs" value="100" min="10" max="1000" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
-                    </div>
-                    
-                    <div class="bg-yellow-50 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-700 rounded-md p-4">
-                        <div class="flex">
-                            <div class="flex-shrink-0">
-                                <i class="fas fa-exclamation-triangle text-yellow-400"></i>
-                            </div>
-                            <div class="ml-3">
-                                <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">
-                                    Training Notice
-                                </h3>
-                                <div class="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
-                                    <p>Model training may take 2-4 hours depending on the data size and model complexity.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Select Model</label>
+                    <select id="modelSelect" class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                        <option value="fraud">Fraud Detection Model</option>
+                        <option value="yield">Yield Prediction Model</option>
+                        <option value="side_buying">Side Buying Detection Model</option>
+                        <option value="farmer_risk">Farmer Risk Assessment Model</option>
+                    </select>
                 </div>
-                
-                <div class="mt-6 flex justify-end space-x-3">
-                    <button onclick="closeTrainingModal()" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Training Parameters</label>
+                    <textarea id="trainingParams" class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" rows="3" placeholder='{"epochs": 100, "test_size": 0.2}'></textarea>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button onclick="hideRetrainModal()" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-600 rounded-md hover:bg-gray-200 dark:hover:bg-gray-500">
                         Cancel
                     </button>
-                    <button onclick="startTraining()" class="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700">
+                    <button onclick="startRetraining()" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">
                         Start Training
                     </button>
                 </div>
@@ -528,301 +298,75 @@
         </div>
     </div>
 </div>
-{% endblock %}
 
-{% block extra_js %}
 <script>
-let performanceChart;
-
-// Initialize dashboard
-document.addEventListener('DOMContentLoaded', function() {
-    initializePerformanceChart();
-    startRealTimeUpdates();
-});
-
-// Initialize performance chart
-function initializePerformanceChart() {
-    const ctx = document.getElementById('performanceChart').getContext('2d');
-    
-    const performanceData = {{ performance_data|safe }};
-    
-    performanceChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: performanceData.map(item => item.model.name),
-            datasets: [{
-                label: 'Accuracy (%)',
-                data: performanceData.map(item => item.accuracy),
-                backgroundColor: [
-                    'rgba(239, 68, 68, 0.8)',
-                    'rgba(59, 130, 246, 0.8)',
-                    'rgba(16, 185, 129, 0.8)',
-                    'rgba(139, 92, 246, 0.8)'
-                ],
-                borderColor: [
-                    'rgb(239, 68, 68)',
-                    'rgb(59, 130, 246)',
-                    'rgb(16, 185, 129)',
-                    'rgb(139, 92, 246)'
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    max: 100,
-                    ticks: {
-                        callback: function(value) {
-                            return value + '%';
-                        }
-                    }
-                }
-            }
-        }
-    });
+// Update current time
+function updateTime() {
+    const now = new Date();
+    document.getElementById('current-time').textContent = now.toLocaleTimeString();
 }
+setInterval(updateTime, 1000);
+updateTime();
 
-// Real-time updates
-function startRealTimeUpdates() {
-    setInterval(async () => {
-        try {
-            const response = await fetch('/ai/status/');
-            const data = await response.json();
-            
+// Refresh model status
+function refreshModelStatus() {
+    fetch('{% url "ai_models:model_status" %}')
+        .then(response => response.json())
+        .then(data => {
             if (data.success) {
-                updateModelStats(data);
+                console.log('Model status refreshed:', data);
+                // Update UI with new status
+                location.reload();
             }
-        } catch (error) {
-            console.error('Error fetching model status:', error);
-        }
-    }, 30000); // Update every 30 seconds
+        })
+        .catch(error => {
+            console.error('Error refreshing model status:', error);
+        });
 }
 
-// Update model statistics
-function updateModelStats(data) {
-    // Update health indicator
-    const allModelsActive = data.models.every(model => model.status === 'active');
-    const indicator = document.getElementById('model-status-indicator');
+// Show/hide retrain modal
+function showRetrainModal() {
+    document.getElementById('retrainModal').classList.remove('hidden');
+}
+
+function hideRetrainModal() {
+    document.getElementById('retrainModal').classList.add('hidden');
+}
+
+// Start retraining
+function startRetraining() {
+    const modelSelect = document.getElementById('modelSelect');
+    const trainingParams = document.getElementById('trainingParams');
     
-    if (allModelsActive) {
-        indicator.textContent = 'All Systems Operational';
-        indicator.className = 'text-green-600';
-    } else {
-        indicator.textContent = 'Some Models Offline';
-        indicator.className = 'text-yellow-600';
-    }
+    const data = {
+        model_id: modelSelect.value,
+        parameters: JSON.parse(trainingParams.value || '{}')
+    };
     
-    // Update individual model stats
-    data.models.forEach(model => {
-        if (model.type === 'fraud_detection') {
-            document.getElementById('fraud-detections').textContent = model.predictions_today;
-        } else if (model.type === 'price_prediction') {
-            document.getElementById('price-predictions').textContent = model.predictions_today;
-        } else if (model.type === 'yield_prediction') {
-            document.getElementById('yield-forecasts').textContent = model.predictions_today;
-        } else if (model.type === 'side_buying_detection') {
-            document.getElementById('side-buying-detections').textContent = model.predictions_today;
+    fetch('{% url "ai_models:retrain_model" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(`Training job started: ${data.job_id}`);
+            hideRetrainModal();
+        } else {
+            alert(`Error: ${data.error}`);
         }
+    })
+    .catch(error => {
+        console.error('Error starting training:', error);
+        alert('Error starting training job');
     });
 }
 
-// Model action functions
-async function refreshModels() {
-    window.timbRealTime.showNotification('Refreshing model status...', 'info');
-    
-    try {
-        const response = await fetch('/ai/status/');
-        const data = await response.json();
-        
-        if (data.success) {
-            updateModelStats(data);
-            window.timbRealTime.showNotification('Models refreshed successfully', 'success');
-        } else {
-            window.timbRealTime.showNotification('Failed to refresh models', 'error');
-        }
-    } catch (error) {
-        window.timbRealTime.showNotification('Error refreshing models', 'error');
-    }
-}
-
-async function runFraudDetection() {
-    window.timbRealTime.showNotification('Running fraud detection analysis...', 'info');
-    // Implementation would depend on specific requirements
-}
-
-async function generatePriceForecast() {
-    window.timbRealTime.showNotification('Generating price forecast...', 'info');
-    // Implementation would depend on specific requirements
-}
-
-async function generateYieldForecast() {
-    window.timbRealTime.showNotification('Creating yield forecast...', 'info');
-    // Implementation would depend on specific requirements
-}
-
-async function runSideBuyingAnalysis() {
-    window.timbRealTime.showNotification('Monitoring contracts for side buying...', 'info');
-    // Implementation would depend on specific requirements
-}
-
-// Training modal functions
-function showTrainingModal() {
-    document.getElementById('training-modal').classList.remove('hidden');
-}
-
-function closeTrainingModal() {
-    document.getElementById('training-modal').classList.add('hidden');
-}
-
-async function startTraining() {
-    const modelType = document.getElementById('model_select').value;
-    const epochs = document.getElementById('epochs').value;
-    
-    try {
-        const response = await fetch('/ai/retrain/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
-            },
-            body: JSON.stringify({
-                model_name: modelType,
-                epochs: parseInt(epochs)
-            })
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            closeTrainingModal();
-            window.timbRealTime.showNotification(
-                `Training started for ${modelType}. Job ID: ${result.job_id}`, 
-                'success'
-            );
-        } else {
-            window.timbRealTime.showNotification(result.error || 'Failed to start training', 'error');
-        }
-    } catch (error) {
-        window.timbRealTime.showNotification('Error starting training', 'error');
-    }
-}
-
-// View functions
-function viewFraudReports() {
-    window.location.href = '/ai/fraud-reports/';
-}
-
-function viewPriceTrends() {
-    window.location.href = '/ai/price-trends/';
-}
-
-function viewYieldAnalysis() {
-    window.location.href = '/ai/yield-analysis/';
-}
-
-function viewSideBuyingReports() {
-    window.location.href = '/ai/side-buying-reports/';
-}
-
-// WebSocket connection for real-time updates
-if (window.WebSocket) {
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${protocol}//${window.location.host}/ws/ai/predictions/`;
-    
-    const ws = new WebSocket(wsUrl);
-    
-    ws.onmessage = function(event) {
-        const data = JSON.parse(event.data);
-        
-        if (data.type === 'new_prediction') {
-            addNewPrediction(data.data);
-        } else if (data.type === 'model_update') {
-            updateModelStatus(data.data);
-        }
-    };
-}
-
-function addNewPrediction(prediction) {
-    const predictionsList = document.getElementById('predictions-list');
-    
-    // Create new prediction element
-    const predictionElement = document.createElement('div');
-    predictionElement.className = 'prediction-item p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-200';
-    
-    let iconClass, iconColor;
-    switch (prediction.type) {
-        case 'FRAUD':
-            iconClass = 'fas fa-shield-alt';
-            iconColor = 'text-red-600';
-            break;
-        case 'PRICE':
-            iconClass = 'fas fa-chart-line';
-            iconColor = 'text-blue-600';
-            break;
-        case 'YIELD':
-            iconClass = 'fas fa-seedling';
-            iconColor = 'text-green-600';
-            break;
-        default:
-            iconClass = 'fas fa-search';
-            iconColor = 'text-purple-600';
-    }
-    
-    predictionElement.innerHTML = `
-        <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-4">
-                <div class="flex-shrink-0">
-                    <div class="w-10 h-10 bg-${iconColor.split('-')[1]}-100 rounded-full flex items-center justify-center">
-                        <i class="${iconClass} ${iconColor}"></i>
-                    </div>
-                </div>
-                <div>
-                    <div class="text-sm font-medium text-gray-900 dark:text-white">
-                        ${prediction.type_display}
-                    </div>
-                    <div class="text-sm text-gray-500">
-                        Model: ${prediction.model_name}
-                    </div>
-                    <div class="text-xs text-gray-400">
-                        Just now
-                    </div>
-                </div>
-            </div>
-            <div class="text-right">
-                <div class="text-sm font-medium text-gray-900 dark:text-white">
-                    ${prediction.confidence}% confidence
-                </div>
-                <div class="text-xs text-gray-500">
-                    by ${prediction.user}
-                </div>
-            </div>
-        </div>
-    `;
-    
-    // Add to top of list
-    predictionsList.insertBefore(predictionElement, predictionsList.firstChild);
-    
-    // Remove last item if list is too long
-    if (predictionsList.children.length > 10) {
-        predictionsList.removeChild(predictionsList.lastChild);
-    }
-    
-    // Show notification
-    window.timbRealTime.showNotification(`New ${prediction.type_display} prediction`, 'info');
-}
-
-function updateModelStatus(modelData) {
-    // Update model status indicators
-    // Implementation would depend on the specific model data structure
-}
+// Auto-refresh every 30 seconds
+setInterval(refreshModelStatus, 30000);
 </script>
 {% endblock %}

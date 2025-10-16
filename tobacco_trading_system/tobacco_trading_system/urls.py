@@ -13,6 +13,7 @@ urlpatterns = [
     path('timb/', include('timb_dashboard.urls')),
     path('merchant/', include('merchant_app.urls')),
     path('realtime/', include('realtime_data.urls')),
+    path('ai_models/', include('ai_models.urls')),
 ]
 
 if settings.DEBUG:

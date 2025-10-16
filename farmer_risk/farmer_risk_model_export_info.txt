@@ -1,0 +1,149 @@
+FARMER RISK ASSESSMENT MODEL EXPORT INFORMATION
+===============================================
+
+EXPORT STATUS: SUCCESSFUL
+Date: 2025-10-16
+Source: Tobacco Trading System (Django application)
+
+OVERVIEW
+--------
+The farmer risk assessment model has been successfully exported for use in other systems.
+The model is a machine learning classifier that evaluates tobacco farmer risk based on financial,
+agricultural, and behavioral factors.
+
+EXPORTED FILES
+--------------
+1. exported_farmer_risk_model.joblib - Serialized trained model
+2. export_farmer_risk_model.py - Standalone model class for external use
+3. exported_farmer_risk_model_metadata.json - Model metadata and instructions
+4. example_usage.py - Working example code
+5. README_export.md - Detailed documentation
+
+MODEL SPECIFICATIONS
+-------------------
+Algorithm: Random Forest Classifier
+Features: 12 input variables (8 numerical, 4 categorical)
+Output: Risk score (0.0-1.0), risk level (LOW/MEDIUM/HIGH), confidence score
+
+REQUIRED INPUT FEATURES
+----------------------
+Numerical:
+- loan_amount (float)
+- hectarage (float)
+- yields (float)
+- yield_per_ha (float)
+- loan_per_ha (float)
+- side_marketer_effect (float)
+- mass_usually_produced_kg (float)
+- default_prob (float)
+
+Categorical:
+- merchant_contractor (string)
+- location (string)
+- gender (string)
+- grade_normally_produced (string)
+
+OUTPUT FORMAT
+-------------
+{
+    "risk_score": 0.560,
+    "risk_level": "MEDIUM",
+    "is_risky": true,
+    "confidence": 0.560,
+    "feature_importance": {
+        "side_marketer_effect": 0.137,
+        "default_prob": 0.114,
+        "yield_per_ha": 0.095,
+        ...
+    }
+}
+
+USAGE INSTRUCTIONS
+------------------
+1. Install dependencies:
+   pip install scikit-learn pandas numpy joblib
+
+2. Copy files to your project:
+   - exported_farmer_risk_model.joblib
+   - export_farmer_risk_model.py
+
+3. Basic usage code:
+   from export_farmer_risk_model import ExportedFarmerRiskModel
+
+   model = ExportedFarmerRiskModel('exported_farmer_risk_model.joblib')
+
+   farmer_data = {
+       'loan_amount': 5000.0,
+       'hectarage': 2.5,
+       'yields': 1500.0,
+       'yield_per_ha': 600.0,
+       'loan_per_ha': 2000.0,
+       'side_marketer_effect': 0.1,
+       'merchant_contractor': 'ABC Tobacco Co',
+       'mass_usually_produced_kg': 1200.0,
+       'default_prob': 0.15,
+       'location': 'Mashonaland',
+       'gender': 'Male',
+       'grade_normally_produced': 'Flue Cured'
+   }
+
+   result = model.predict(farmer_data)
+   print(f"Risk Level: {result['risk_level']}")
+
+RISK LEVEL THRESHOLDS
+---------------------
+- LOW: risk_score <= 0.3
+- MEDIUM: 0.3 < risk_score <= 0.7
+- HIGH: risk_score > 0.7
+
+TEST RESULTS
+------------
+Model successfully loaded and tested with sample data:
+- Risk Score: 0.560
+- Risk Level: MEDIUM
+- Is Risky: True
+- Confidence: 0.560
+
+Top 5 Important Features:
+1. side_marketer_effect: 0.137
+2. default_prob: 0.114
+3. yield_per_ha: 0.095
+4. loan_amount: 0.093
+5. loan_per_ha: 0.091
+
+INTEGRATION EXAMPLES
+-------------------
+Web API:
+from flask import Flask, request, jsonify
+app = Flask(__name__)
+model = ExportedFarmerRiskModel('exported_farmer_risk_model.joblib')
+
+@app.route('/assess_risk', methods=['POST'])
+def assess_risk():
+    data = request.get_json()
+    result = model.predict(data)
+    return jsonify(result)
+
+Batch Processing:
+import pandas as pd
+df = pd.read_csv('farmers.csv')
+results = [model.predict(row.to_dict()) for _, row in df.iterrows()]
+results_df = pd.DataFrame(results)
+results_df.to_csv('risk_assessments.csv', index=False)
+
+TROUBLESHOOTING
+---------------
+- Model not loading: Check file path and permissions
+- Prediction errors: Verify all required features are provided
+- Performance issues: Model is optimized for inference speed
+
+SECURITY NOTES
+-------------
+- Model file contains trained parameters only (no sensitive training data)
+- Implement proper access controls in production
+- Validate input data to prevent malicious inputs
+
+CONTACT
+-------
+For support or issues with the exported model, refer to the README_export.md file
+or contact the development team.

@@ -1,0 +1,8 @@
+{
+  "exported_at": "2025-10-16T09:10:44.368714",
+  "source": "/home/leon/StudioProjects/Tobacco-master/tobacco_trading_system/models/farmer_risk_model.joblib",
+  "destination": "exported_farmer_risk_model.joblib",
+  "model_type": "FarmerRiskModel",
+  "algorithm": "RandomForestClassifier",
+  "usage_instructions": "\nTo use this model in another system:\n\n1. Install required packages: pip install scikit-learn pandas numpy joblib\n2. Copy the ExportedFarmerRiskModel class and the model file\n3. Initialize: model = ExportedFarmerRiskModel('path/to/model.joblib')\n4. Predict: result = model.predict(farmer_data_dict)\n                "
+}

@@ -115,22 +115,22 @@
                             <a href="{% url 'timb_dashboard:dashboard' %}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                                 <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
                             </a>
-                            <a href="{% url 'timb_dashboard:record_transaction' %}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                                <i class="fas fa-plus-circle mr-2"></i>Record Transaction
-                            </a>
+                            
                             <a href="{% url 'timb_dashboard:users' %}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                                 <i class="fas fa-users mr-2"></i>Users
+                            </a>
+                            
+                            <a href="{% url 'ai_models:dashboard' %}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                                <i class="fas fa-brain mr-2"></i>AI Models
                             </a>
                             
                         {% elif user.is_merchant %}
                             <a href="{% url 'merchant_dashboard' %}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                                 <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
                             </a>
-                            <a href="{% url 'merchant_inventory' %}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                                <i class="fas fa-boxes mr-2"></i>Inventory
-                            </a>
-                            <a href="{% url 'merchant_orders' %}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                                <i class="fas fa-shopping-cart mr-2"></i>Orders
+                            
+                            <a href="{% url 'merchant_record_transaction' %}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                                <i class="fas fa-plus-circle mr-2"></i>Record Transaction
                             </a>
                             <a href="{% url 'merchant_aggregation_dashboard' %}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                                 <i class="fas fa-fill-drip mr-2"></i>Aggregation
@@ -219,13 +219,14 @@
                 {% if user.is_authenticated %}
                     {% if user.is_timb_staff %}
                         <a href="{% url 'timb_dashboard:dashboard' %}" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300">Dashboard</a>
-                        <a href="{% url 'timb_dashboard:record_transaction' %}" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300">Record Transaction</a>
+                        
                         <a href="{% url 'timb_dashboard:users' %}" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300">Users</a>
+                        
+                        <a href="{% url 'ai_models:dashboard' %}" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300">AI Models</a>
                         
                     {% elif user.is_merchant %}
                         <a href="{% url 'merchant_dashboard' %}" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300">Dashboard</a>
-                        <a href="{% url 'merchant_inventory' %}" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300">Inventory</a>
-                        <a href="{% url 'merchant_orders' %}" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300">Orders</a>
+                        <a href="{% url 'merchant_record_transaction' %}" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300">Record Transaction</a>
                     {% endif %}
                 {% endif %}
             </div>
@@ -339,24 +340,11 @@
             menu.classList.toggle('hidden');
         }
         
-        // Real-time connection status
+        // Real-time connection status (disabled popup)
         function updateConnectionStatus(connected) {
-            const status = document.getElementById('connection-status');
-            const indicator = document.getElementById('connection-indicator');
-            const text = document.getElementById('connection-text');
-            
-            if (connected) {
-                indicator.className = 'w-2 h-2 bg-green-500 rounded-full mr-2';
-                text.textContent = 'Connected';
-                status.className = 'fixed bottom-4 right-4 px-4 py-2 rounded-lg shadow-lg text-white text-sm bg-green-600';
-            } else {
-                indicator.className = 'w-2 h-2 bg-red-500 rounded-full mr-2';
-                text.textContent = 'Disconnected';
-                status.className = 'fixed bottom-4 right-4 px-4 py-2 rounded-lg shadow-lg text-white text-sm bg-red-600';
-            }
-            
-            status.classList.remove('hidden');
-            setTimeout(() => status.classList.add('hidden'), 3000);
+            // Intentionally left blank to prevent showing the floating status popup
+            // Calls from pages will no-op to avoid disruptive badges during auto-refresh
+            return;
         }
         
         // Initialize on page load
