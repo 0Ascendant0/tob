@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Users - TIMB{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Merchant Users</h1>
+        <p class="text-sm text-gray-600 dark:text-gray-400">Add, delete, and reset passwords for merchant accounts.</p>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex justify-between items-center">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">Users</h3>
+                <a href="{% url 'timb_dashboard:create_merchant' %}" class="px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700">
+                    <i class="fas fa-user-plus mr-2"></i>Create Merchant User
+                </a>
+            </div>
+        </div>
+        <div class="divide-y divide-gray-200 dark:divide-gray-700">
+            {% for u in users %}
+            <div class="px-6 py-4 flex items-center justify-between">
+                <div>
+                    <div class="text-sm font-medium text-gray-900 dark:text-white">{{ u.username }}{% if u.merchant_profile and u.merchant_profile.company_name %} — {{ u.merchant_profile.company_name }}{% endif %}</div>
+                    <div class="text-xs text-gray-500">{{ u.email|default:'no email' }}</div>
+                </div>
+                <div class="flex space-x-2">
+                    <a href="{% url 'timb_dashboard:edit_user' u.id %}" class="px-3 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700">Edit</a>
+                    <button type="button" class="px-3 py-1 text-xs bg-yellow-600 text-white rounded hover:bg-yellow-700" onclick="openResetModal({{ u.id }}, '{{ u.username }}')">Reset Password</button>
+                    <form action="{% url 'timb_dashboard:delete_user' u.id %}" method="post" onsubmit="return confirm('Delete this user?');">
+                        {% csrf_token %}
+                        <button type="submit" class="px-3 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700">Delete</button>
+                    </form>
+                </div>
+            </div>
+            {% empty %}
+            <div class="px-6 py-10 text-center text-gray-500">No merchant users found.</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

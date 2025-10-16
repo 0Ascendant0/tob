@@ -145,6 +145,86 @@ def dashboard(request):
 
 
 @login_required
+def record_transaction(request):
+    """Merchant-side Record New Transaction. Buyer is the current merchant; seller can be optional.
+    Updates Grade Weight Tracking upon success.
+    """
+    if not request.user.is_merchant:
+        return redirect('home')
+
+    merchant = request.user.merchant_profile
+    grades = TobaccoGrade.objects.filter(is_active=True, is_tradeable=True).order_by('grade_code')
+
+    if request.method == 'POST':
+        try:
+            transaction_type = request.POST.get('transaction_type') or 'PURCHASE'
+            grade_id = request.POST.get('grade')
+            quantity = Decimal(request.POST.get('quantity', '0'))
+            price_per_kg = Decimal(request.POST.get('price_per_kg', '0'))
+            payment_method = request.POST.get('payment_method') or ''
+            moisture_content = request.POST.get('moisture_content') or None
+            quality_assessment = request.POST.get('quality_assessment', '')
+
+            if not grade_id or quantity <= 0 or price_per_kg <= 0:
+                return JsonResponse({'success': False, 'error': 'Please provide valid grade, quantity and price.'}, status=400)
+
+            grade = TobaccoGrade.objects.get(id=grade_id)
+
+            # Create the transaction: current user is buyer; seller left null
+            tx = Transaction.objects.create(
+                transaction_type=transaction_type,
+                buyer=request.user,
+                grade=grade,
+                quantity=quantity,
+                price_per_kg=price_per_kg,
+                total_amount=quantity * price_per_kg,
+                payment_method=payment_method,
+                moisture_content=Decimal(moisture_content) if moisture_content else None,
+                quality_assessment=quality_assessment,
+                created_by=request.user,
+            )
+
+            # Update Grade Weight Tracking (custom grade progress)
+            try:
+                tracking_name = f"{grade.grade_code}"
+                custom, _ = CustomGrade.objects.get_or_create(
+                    merchant=merchant,
+                    custom_grade_name=tracking_name,
+                    defaults={
+                        'description': f"Auto-tracking for base grade {grade.grade_name}",
+                        'target_price': grade.base_price or Decimal('0'),
+                        'quality_standard': 'STANDARD',
+                        'required_weight_per_grade': Decimal('0'),
+                        'acquired_weight_per_grade': Decimal('0'),
+                        'is_active': True,
+                        'is_draft': False,
+                    }
+                )
+                custom.acquired_weight_per_grade = (custom.acquired_weight_per_grade or 0) + quantity
+                if not custom.required_weight_per_grade or custom.required_weight_per_grade == 0:
+                    custom.required_weight_per_grade = custom.acquired_weight_per_grade
+                if not custom.target_price or custom.target_price == 0:
+                    custom.target_price = grade.base_price or Decimal('0')
+                custom.save()
+            except Exception:
+                pass
+
+            messages.success(request, 'Transaction recorded successfully!')
+            return JsonResponse({'success': True, 'transaction_id': tx.id})
+
+        except TobaccoGrade.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Selected grade not found.'}, status=404)
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=400)
+
+    context = {
+        'transaction_types': getattr(Transaction, 'TRANSACTION_TYPES', [('PURCHASE', 'Purchase')]),
+        'grades': grades,
+    }
+    return render(request, 'merchant_app/record_transaction.html', context)
+
+
+@login_required
 def change_password(request):
     """Allow merchants to change their password"""
     if not request.user.is_merchant:

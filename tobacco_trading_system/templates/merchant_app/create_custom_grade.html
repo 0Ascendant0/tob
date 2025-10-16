@@ -20,6 +20,7 @@
     .card-header-custom {
         padding: 1rem 1.25rem;
         border-bottom: 1px solid #e6e6e6;
+        background: linear-gradient(180deg, rgba(93,92,222,0.06) 0%, rgba(93,92,222,0) 100%);
     }
 
     .card-body { padding: 1.25rem; }
@@ -62,6 +63,9 @@
         cursor: pointer;
     }
 
+    .btn:hover { filter: brightness(0.97); box-shadow: 0 4px 12px rgba(93,92,222,0.25); }
+    .btn:active { transform: translateY(1px); }
+
     .btn-secondary {
         background: #f3f4f6;
         color: #111827;
@@ -69,6 +73,24 @@
         border-radius: 0.5rem;
         border: 1px solid #e5e7eb;
     }
+
+    .btn-secondary:hover { background: #eef2f7; }
+
+    .btn-outline-primary {
+        background: transparent;
+        color: #5D5CDE;
+        border: 1px solid #c7c9ff;
+    }
+
+    .btn-outline-primary:hover { background: #eef2ff; }
+
+    .btn-outline-secondary {
+        background: transparent;
+        color: #111827;
+        border: 1px solid #e5e7eb;
+    }
+
+    .btn-outline-secondary:hover { background: #f9fafb; }
 
     .input-group {
         display: flex;
@@ -125,21 +147,31 @@
         top: 2rem;
         max-height: calc(100vh - 4rem);
         overflow-y: auto;
+        box-shadow: 0 8px 20px rgba(17, 24, 39, 0.06);
     }
 
-    .percentage-meter { height: 30px; background: #e9ecef; border-radius: 15px; overflow: hidden; position: relative; margin: 1rem 0; }
+    .percentage-meter { height: 30px; background: #eef2ff; border-radius: 15px; overflow: hidden; position: relative; margin: 1rem 0; }
     .percentage-fill { height: 100%; background: linear-gradient(90deg, #5D5CDE, #4338ca); transition: width 0.5s ease; display:flex; align-items:center; justify-content:center; color:white; font-weight:bold; min-width:30px; }
 
     .remove-component { position: absolute; top: 0.5rem; right: 0.5rem; background: #dc3545; color: white; border: none; border-radius: 50%; width: 25px; height: 25px; display:flex; align-items:center; justify-content:center; font-size:0.8rem; cursor:pointer; z-index:10; }
     .remove-component:hover { background: #c82333; }
 
-    .component-bar { height: 20px; border-radius: 10px; margin: 0.5rem 0; position: relative; overflow: hidden; background: #e9ecef; }
+    .component-bar { height: 20px; border-radius: 10px; margin: 0.5rem 0; position: relative; overflow: hidden; background: #eef2ff; }
     .component-fill { height: 100%; transition: width 0.3s ease; background: linear-gradient(90deg, #5D5CDE, #4338ca); }
 
     .custom-card { background: #fff; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
     .custom-card .card-body { padding: 1.25rem; }
 
     .alert-info-custom { background: linear-gradient(135deg, #e3f2fd, #bbdefb); border: none; border-left: 4px solid #2196f3; border-radius: 8px; color: #1565c0; }
+    .alert-warning-custom { background: linear-gradient(135deg, #fff4e5, #ffe8cc); border: none; border-left: 4px solid #f59e0b; border-radius: 8px; color: #8a5300; }
+
+    .grade-demand-badge { display:inline-block; padding: 2px 8px; border-radius: 9999px; font-weight: 600; font-size: 11px; }
+    .demand-high { background: #dcfce7; color: #166534; }
+    .demand-medium { background: #fef9c3; color: #854d0e; }
+    .demand-low { background: #fee2e2; color: #991b1b; }
+
+    .page-title { font-size: 2rem; font-weight: 700; color: #111827; }
+    .section-subtitle { color: #6b7280; font-size: 0.95rem; }
 
     .btn-primary-custom { background: linear-gradient(135deg, #5D5CDE, #4338ca); border: none; color: white; padding: 0.5rem 1.5rem; border-radius: 8px; font-weight: 500; transition: all 0.3s ease; }
     .btn-primary-custom:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(93, 92, 222, 0.3); color: white; }
@@ -152,6 +184,7 @@
 {% endblock %}
 
 {% block content %}
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
 <div class="create-merchant-container container-fluid py-4">
     <div class="row mb-4">
         <div class="col-12">
@@ -223,7 +256,7 @@
                 <div class="card-header-custom">
                     <div class="d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">Grade Components</h5>
-                        <button type="button" class="btn btn-outline-light btn-sm" onclick="addComponent()">
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="addComponent()">
                             <i class="bi bi-plus-circle"></i> Add Component
                         </button>
                     </div>
@@ -507,6 +540,7 @@
             </div>
         </div>
     </form>
+</div>
 </div>
 {% endblock %}
 

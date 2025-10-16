@@ -144,12 +144,8 @@ class MerchantCreationForm(forms.ModelForm):
         help_text='Username for merchant login'
     )
 
-    email = forms.EmailField(
-        widget=forms.EmailInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Email address'
-        })
-    )
+    # Email no longer required/used on the create merchant page
+    email = forms.EmailField(required=False, widget=forms.HiddenInput())
 
     first_name = forms.CharField(
         max_length=30,
@@ -169,21 +165,14 @@ class MerchantCreationForm(forms.ModelForm):
         })
     )
 
-    phone = forms.CharField(
-        max_length=20,
-        required=False,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Phone number'
-        })
-    )
+    # Phone removed from the create merchant page UI
+    phone = forms.CharField(max_length=20, required=False, widget=forms.HiddenInput())
 
     class Meta:
         model = Merchant
         fields = [
             'company_name', 'license_number', 'business_address',
-            'business_phone', 'business_email', 'bank_name',
-            'bank_account_number'
+            'business_phone', 'business_email'
         ]
         widgets = {
             'company_name': forms.TextInput(attrs={
@@ -207,14 +196,7 @@ class MerchantCreationForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Business email'
             }),
-            'bank_name': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Bank name'
-            }),
-            'bank_account_number': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Bank account number'
-            }),
+            # Banking fields removed
         }
 
     def __init__(self, *args, **kwargs):

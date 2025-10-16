@@ -29,6 +29,13 @@ urlpatterns = [
     path('merchants/', views.merchants_view, name='merchants'),
     path('merchants/create/', views.create_merchant_view, name='create_merchant'),
 
+    # Users management (TIMB admins manage merchant users)
+    path('users/', views.users_management_view, name='users'),
+    path('users/<int:user_id>/edit/', views.edit_user, name='edit_user'),
+    path('users/<int:user_id>/reset-password/', views.reset_user_password, name='reset_user_password'),
+    path('users/<int:user_id>/set-password/', views.set_user_password, name='set_user_password'),
+    path('users/<int:user_id>/delete/', views.delete_user, name='delete_user'),
+
     # API endpoints
     path('api/realtime-data/', views.api_realtime_data, name='api_realtime_data'),
 ]

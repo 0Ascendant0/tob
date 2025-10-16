@@ -30,9 +30,6 @@
                 </p>
             </div>
             <div class="flex space-x-3">
-                <button onclick="refreshDashboard()" class="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition duration-200">
-                    <i class="fas fa-sync-alt mr-2"></i>Refresh
-                </button>
                 <a href="{% url 'timb_dashboard:record_transaction' %}" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-200">
                     <i class="fas fa-plus mr-2"></i>Record Transaction
                 </a>
@@ -127,7 +124,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Recent Transactions -->
         <div class="lg:col-span-2">
-            <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg">
+            <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg min-h-96 flex flex-col">
                 <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                     <div class="flex justify-between items-center">
                         <h3 class="text-lg font-medium text-gray-900 dark:text-white">
@@ -139,8 +136,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="overflow-hidden">
-                    <div id="transactions-list" class="divide-y divide-gray-200 dark:divide-gray-700 max-h-96 overflow-y-auto">
+                <div class="overflow-hidden flex-1">
+                    <div id="transactions-list" class="divide-y divide-gray-200 dark:divide-gray-700 h-full overflow-y-auto">
                         {% for transaction in recent_transactions %}
                         <div class="p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-200 {% if transaction.is_flagged %}bg-red-50 dark:bg-red-900{% endif %}">
                             <div class="flex items-center justify-between">
@@ -192,16 +189,16 @@
             </div>
         </div>
         
-        <!-- Alerts and Quick Actions -->
+        <!-- Alerts -->
         <div class="space-y-6">
-            <!-- Fraud Alerts -->
-            <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg">
+            <!-- Fraud Alerts (match Recent Transactions height) -->
+            <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg min-h-96 flex flex-col">
                 <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                     <h3 class="text-lg font-medium text-gray-900 dark:text-white">
                         <i class="fas fa-shield-alt mr-2 text-red-600"></i>Fraud Alerts
                     </h3>
                 </div>
-                <div class="divide-y divide-gray-200 dark:divide-gray-700 max-h-64 overflow-y-auto">
+                <div class="divide-y divide-gray-200 dark:divide-gray-700 flex-1 overflow-y-auto">
                     {% for alert in fraud_alerts %}
                     <div class="p-4">
                         <div class="flex items-start space-x-3">
@@ -237,66 +234,38 @@
                 {% endif %}
             </div>
             
-            <!-- Quick Actions -->
-            <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg">
-                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">
-                        <i class="fas fa-bolt mr-2 text-yellow-600"></i>Quick Actions
-                    </h3>
-                </div>
-                <div class="p-4 space-y-3">
-                    <a href="{% url 'timb_dashboard:record_transaction' %}" class="block w-full text-left px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-200">
-                        <div class="flex items-center">
-                            <i class="fas fa-plus-circle text-green-600 mr-3"></i>
-                            <span class="text-sm font-medium text-gray-900 dark:text-white">Record Transaction</span>
-                        </div>
-                    </a>
-                    
-                    <a href="{% url 'timb_dashboard:create_merchant' %}" class="block w-full text-left px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-200">
-                        <div class="flex items-center">
-                            <i class="fas fa-user-plus text-indigo-600 mr-3"></i>
-                            <span class="text-sm font-medium text-gray-900 dark:text-white">Create Merchant</span>
-                        </div>
-                    </a>
-                    
-                    <a href="{% url 'timb_dashboard:price_monitoring' %}" class="block w-full text-left px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-200">
-                        <div class="flex items-center">
-                            <i class="fas fa-chart-line text-blue-600 mr-3"></i>
-                            <span class="text-sm font-medium text-gray-900 dark:text-white">Price Monitoring</span>
-                        </div>
-                    </a>
-                    
-                    <button onclick="updateDailyPrices()" class="block w-full text-left px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-200">
-                        <div class="flex items-center">
-                            <i class="fas fa-sync-alt text-purple-600 mr-3"></i>
-                            <span class="text-sm font-medium text-gray-900 dark:text-white">Update Daily Prices</span>
-                        </div>
-                    </button>
-                    
-                    <div class="grid grid-cols-2 gap-2">
-                        <a href="{% url 'timb_dashboard:open_market' %}" class="block w-full text-left px-4 py-3 rounded-lg border border-green-200 hover:bg-green-50 dark:border-green-700 dark:hover:bg-green-900 transition duration-200">
-                            <div class="flex items-center">
-                                <i class="fas fa-door-open text-green-600 mr-3"></i>
-                                <span class="text-sm font-medium text-gray-900 dark:text-white">Open Market</span>
-                            </div>
-                        </a>
-                        <a href="{% url 'timb_dashboard:close_market' %}" class="block w-full text-left px-4 py-3 rounded-lg border border-red-200 hover:bg-red-50 dark:border-red-700 dark:hover:bg-red-900 transition duration-200">
-                            <div class="flex items-center">
-                                <i class="fas fa-door-closed text-red-600 mr-3"></i>
-                                <span class="text-sm font-medium text-gray-900 dark:text-white">Close Market</span>
-                            </div>
-                        </a>
-                    </div>
-                    
-                    
-                </div>
-            </div>
-            
             <!-- Yield Prediction -->
             
         </div>
     </div>
     
+    <!-- Quick Actions as separate cards under Recent Transactions -->
+    <div class="mt-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+        <a href="{% url 'timb_dashboard:record_transaction' %}" class="bg-white dark:bg-gray-800 shadow-lg rounded-lg min-h-48 flex items-center justify-center border border-gray-200 dark:border-gray-700 hover:shadow-xl transition">
+            <div class="text-center">
+                <i class="fas fa-plus-circle text-green-600 text-3xl mb-2"></i>
+                <div class="text-base font-medium text-gray-900 dark:text-white">Record Transaction</div>
+            </div>
+        </a>
+        <a href="{% url 'timb_dashboard:create_merchant' %}" class="bg-white dark:bg-gray-800 shadow-lg rounded-lg min-h-48 flex items-center justify-center border border-gray-200 dark:border-gray-700 hover:shadow-xl transition">
+            <div class="text-center">
+                <i class="fas fa-user-plus text-indigo-600 text-3xl mb-2"></i>
+                <div class="text-base font-medium text-gray-900 dark:text-white">Create Merchant</div>
+            </div>
+        </a>
+        <a href="{% url 'timb_dashboard:price_monitoring' %}" class="bg-white dark:bg-gray-800 shadow-lg rounded-lg min-h-48 flex items-center justify-center border border-gray-200 dark:border-gray-700 hover:shadow-xl transition">
+            <div class="text-center">
+                <i class="fas fa-chart-line text-blue-600 text-3xl mb-2"></i>
+                <div class="text-base font-medium text-gray-900 dark:text-white">Price Monitoring</div>
+            </div>
+        </a>
+        <button onclick="updateDailyPrices()" class="bg-white dark:bg-gray-800 shadow-lg rounded-lg min-h-48 flex items-center justify-center border border-gray-200 dark:border-gray-700 hover:shadow-xl transition">
+            <div class="text-center">
+                <i class="fas fa-sync-alt text-purple-600 text-3xl mb-2"></i>
+                <div class="text-base font-medium text-gray-900 dark:text-white">Update Daily Prices</div>
+            </div>
+        </button>
+    </div>
     <!-- Trading Volume Chart -->
     <div class="mt-8">
         <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg">

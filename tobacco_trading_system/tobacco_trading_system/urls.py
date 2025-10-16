@@ -3,10 +3,12 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from . import views
+from authentication import views as auth_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.home, name='home'),
+    # Load login page first at root and keep name 'home' for templates
+    path('', auth_views.login_view, name='home'),
     path('auth/', include('authentication.urls')),
     path('timb/', include('timb_dashboard.urls')),
     path('merchant/', include('merchant_app.urls')),

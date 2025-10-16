@@ -101,8 +101,11 @@
                 <div class="flex">
                     <div class="flex-shrink-0 flex items-center">
                         <a href="{% url 'home' %}" class="flex items-center">
-                            <img class="h-8 w-auto" src="/static/images/timb-logo.png" alt="TIMB">
-                            <span class="ml-2 text-xl font-bold text-primary-600">TIMB</span>
+                            {% if user.is_authenticated and user.is_merchant and user.merchant_profile %}
+                                <span class="text-lg font-semibold text-gray-900 dark:text-gray-100">{{ user.merchant_profile.company_name }}</span>
+                            {% else %}
+                                <img class="h-8 w-auto" src="/static/images/timb-logo.png" alt="TIMB">
+                            {% endif %}
                         </a>
                     </div>
                     
@@ -114,6 +117,9 @@
                             </a>
                             <a href="{% url 'timb_dashboard:record_transaction' %}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                                 <i class="fas fa-plus-circle mr-2"></i>Record Transaction
+                            </a>
+                            <a href="{% url 'timb_dashboard:users' %}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                                <i class="fas fa-users mr-2"></i>Users
                             </a>
                             
                         {% elif user.is_merchant %}
@@ -129,14 +135,10 @@
                             <a href="{% url 'merchant_aggregation_dashboard' %}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                                 <i class="fas fa-fill-drip mr-2"></i>Aggregation
                             </a>
-                            <a href="{% url 'merchant_ai_recommendations' %}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                                <i class="fas fa-lightbulb mr-2"></i>AI Insights
-                            </a>
+                            
                         {% endif %}
                         
-                        <a href="{% url 'realtime:realtime_dashboard' %}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                            <i class="fas fa-broadcast-tower mr-2 live-indicator text-red-500"></i>Live Market
-                        </a>
+                        
                     </div>
                     {% endif %}
                 </div>
@@ -144,12 +146,7 @@
                 <!-- Right side navigation -->
                 <div class="hidden sm:ml-6 sm:flex sm:items-center">
                     <!-- Real-time indicators -->
-                    <div class="flex items-center space-x-4 mr-4">
-                        <div class="flex items-center text-sm text-gray-500">
-                            <div class="w-2 h-2 bg-green-500 rounded-full live-indicator mr-2"></div>
-                            Live Data
-                        </div>
-                    </div>
+                   
                     
                     <!-- Notifications -->
                     {% if user.is_authenticated %}
@@ -190,11 +187,7 @@
                                 <a href="{% url 'profile' %}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                                     <i class="fas fa-user mr-2"></i>Profile
                                 </a>
-                                {% if user.is_merchant %}
-                                <a href="{% url 'merchant_profile_customization' %}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                                    <i class="fas fa-cog mr-2"></i>Settings
-                                </a>
-                                {% endif %}
+                                
                                 <a href="{% url 'logout' %}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                                     <i class="fas fa-sign-out-alt mr-2"></i>Sign out
                                 </a>
@@ -227,6 +220,7 @@
                     {% if user.is_timb_staff %}
                         <a href="{% url 'timb_dashboard:dashboard' %}" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300">Dashboard</a>
                         <a href="{% url 'timb_dashboard:record_transaction' %}" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300">Record Transaction</a>
+                        <a href="{% url 'timb_dashboard:users' %}" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300">Users</a>
                         
                     {% elif user.is_merchant %}
                         <a href="{% url 'merchant_dashboard' %}" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300">Dashboard</a>

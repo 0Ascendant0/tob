@@ -8,8 +8,8 @@
     <div class="mb-8">
         <div class="flex justify-between items-center">
             <div>
-                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Custom Tobacco Grades</h1>
-                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                <h1 class="text-3xl font-bold text-gray-900">Custom Tobacco Grades</h1>
+                <p class="mt-1 text-sm text-gray-600">
                     Create and manage your custom tobacco grade blends
                 </p>
             </div>
@@ -24,7 +24,7 @@
     <!-- Custom Grades Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
         {% for grade in custom_grades %}
-        <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
+        <div class="bg-white shadow-lg rounded-lg overflow-hidden">
             <!-- Grade Header -->
             <div class="px-6 py-4 bg-gradient-to-r from-blue-600 to-purple-600">
                 <div class="flex justify-between items-start">
@@ -54,17 +54,17 @@
             <!-- Grade Details -->
             <div class="px-6 py-4">
                 <div class="mb-4">
-                    <p class="text-sm text-gray-600 dark:text-gray-400">{{ grade.description|truncatewords:20 }}</p>
+                    <p class="text-sm text-gray-600">{{ grade.description|truncatewords:20 }}</p>
                 </div>
                 
                 <!-- Pricing Information -->
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div>
-                        <div class="text-sm text-gray-500 dark:text-gray-400">Target Price</div>
-                        <div class="text-lg font-semibold text-gray-900 dark:text-white">${{ grade.target_price|floatformat:2 }}/kg</div>
+                        <div class="text-sm text-gray-500">Target Price</div>
+                        <div class="text-lg font-semibold text-gray-900">${{ grade.target_price|floatformat:2 }}/kg</div>
                     </div>
                     <div>
-                        <div class="text-sm text-gray-500 dark:text-gray-400">Profit Margin</div>
+                        <div class="text-sm text-gray-500">Profit Margin</div>
                         <div class="text-lg font-semibold {% if grade.profit_margin > 20 %}text-green-600{% elif grade.profit_margin > 10 %}text-yellow-600{% else %}text-red-600{% endif %}">
                             {{ grade.profit_margin|floatformat:1 }}%
                         </div>
@@ -74,23 +74,23 @@
                 <!-- Production Stats -->
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div>
-                        <div class="text-sm text-gray-500 dark:text-gray-400">Produced</div>
-                        <div class="text-sm font-medium text-gray-900 dark:text-white">{{ grade.total_produced|floatformat:0 }}kg</div>
+                        <div class="text-sm text-gray-500">Produced</div>
+                        <div class="text-sm font-medium text-gray-900">{{ grade.total_produced|floatformat:0 }}kg</div>
                     </div>
                     <div>
-                        <div class="text-sm text-gray-500 dark:text-gray-400">Sold</div>
-                        <div class="text-sm font-medium text-gray-900 dark:text-white">{{ grade.total_sold|floatformat:0 }}kg</div>
+                        <div class="text-sm text-gray-500">Sold</div>
+                        <div class="text-sm font-medium text-gray-900">{{ grade.total_sold|floatformat:0 }}kg</div>
                     </div>
                 </div>
                 
                 <!-- Grade Components -->
                 <div class="mb-4">
-                    <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-2">Components</h4>
+                    <h4 class="text-sm font-medium text-gray-900 mb-2">Components</h4>
                     <div class="space-y-2">
                         {% for component in grade.components.all %}
                         <div class="flex justify-between items-center">
-                            <span class="text-sm text-gray-600 dark:text-gray-400">{{ component.base_grade.grade_code }}</span>
-                            <span class="text-sm font-medium text-gray-900 dark:text-white">{{ component.percentage }}%</span>
+                            <span class="text-sm text-gray-600">{{ component.base_grade.grade_code }}</span>
+                            <span class="text-sm font-medium text-gray-900">{{ component.percentage }}%</span>
                         </div>
                         {% endfor %}
                     </div>
@@ -99,8 +99,8 @@
                 <!-- Quality Specifications -->
                 {% if grade.flavor_profile or grade.burn_rate or grade.moisture_content %}
                 <div class="mb-4">
-                    <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-2">Quality Specs</h4>
-                    <div class="text-xs text-gray-600 dark:text-gray-400 space-y-1">
+                    <h4 class="text-sm font-medium text-gray-900 mb-2">Quality Specs</h4>
+                    <div class="text-xs text-gray-600 space-y-1">
                         {% if grade.flavor_profile %}
                             <div>Flavor: {{ grade.flavor_profile }}</div>
                         {% endif %}
@@ -116,7 +116,7 @@
             </div>
             
             <!-- Grade Actions -->
-            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600">
+            <div class="px-6 py-4 bg-gray-50 border-t border-gray-200">
                 <div class="flex justify-between items-center">
                     <div class="flex space-x-2">
                         <button onclick="editGrade({{ grade.id }})" class="text-indigo-600 hover:text-indigo-900 text-sm">

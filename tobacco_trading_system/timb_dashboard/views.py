@@ -18,6 +18,7 @@ from .models import (
 from authentication.models import User
 from .forms import MerchantCreationForm
 from django.db import models
+from django.db import OperationalError, DatabaseError
 from django.contrib.auth.models import Group
 
 
@@ -559,8 +560,8 @@ def create_merchant_view(request):
                 # Create the User first
                 user = User.objects.create_user(
                     username=form.cleaned_data['username'],
-                    email=form.cleaned_data['email'],
-                    password='merchant',  # Default password as requested
+                    email=form.cleaned_data.get('email', ''),
+                    password='merchant',  # Default password
                     first_name=form.cleaned_data.get('first_name', ''),
                     last_name=form.cleaned_data.get('last_name', ''),
                     phone=form.cleaned_data.get('phone', ''),
@@ -575,8 +576,6 @@ def create_merchant_view(request):
                     business_address=form.cleaned_data.get('business_address', ''),
                     business_phone=form.cleaned_data.get('business_phone', ''),
                     business_email=form.cleaned_data.get('business_email', ''),
-                    bank_name=form.cleaned_data.get('bank_name', ''),
-                    bank_account_number=form.cleaned_data.get('bank_account_number', ''),
                     is_verified=True,  # Auto-verify since created by TIMB
                     verified_by=request.user
                 )
@@ -594,7 +593,7 @@ def create_merchant_view(request):
                     f'Username: {user.username}, Default password: merchant'
                 )
 
-                return redirect('timb_dashboard:merchants')
+                return redirect('timb_dashboard:users')
 
             except Exception as e:
                 messages.error(request, f'Error creating merchant: {str(e)}')
@@ -630,3 +629,111 @@ def merchants_view(request):
     }
 
     return render(request, 'timb_dashboard/merchants.html', context)
+
+
+@login_required
+@user_passes_test(is_timb_staff)
+def users_management_view(request):
+    """TIMB admins manage merchant user accounts."""
+    users = User.objects.filter(is_merchant=True).select_related('merchant_profile').order_by('username')
+    context = {
+        'users': users,
+    }
+    return render(request, 'timb_dashboard/users.html', context)
+
+
+@login_required
+@user_passes_test(is_timb_staff)
+def reset_user_password(request, user_id):
+    """Reset a merchant user's password to a default secure temporary value."""
+    user = get_object_or_404(User, id=user_id, is_merchant=True)
+    user.set_password('merchant')
+    user.save()
+    messages.success(request, f"Password for {user.username} has been reset to 'merchant'.")
+    return redirect('timb_dashboard:users')
+
+
+@login_required
+@user_passes_test(is_timb_staff)
+def delete_user(request, user_id):
+    """Delete a merchant user and associated merchant profile (POST only)."""
+    if request.method != 'POST':
+        messages.error(request, 'Invalid request method for delete.')
+        return redirect('timb_dashboard:users')
+    user = get_object_or_404(User, id=user_id, is_merchant=True)
+    username = user.username
+    try:
+        user.delete()
+        messages.success(request, f"User '{username}' deleted successfully.")
+    except (OperationalError, DatabaseError) as e:
+        # Fallback: soft-delete if related tables are missing (e.g., ai_models)
+        error_text = str(e)
+        if 'no such table' in error_text:
+            try:
+                # Soft delete: deactivate and anonymize the user
+                user.is_active = False
+                # Ensure unique username after anonymization
+                user.username = f"{user.username}_deleted_{user.id}"
+                user.email = ''
+                user.save(update_fields=['is_active', 'username', 'email'])
+                # Also deactivate merchant profile if present
+                try:
+                    if hasattr(user, 'merchant_profile'):
+                        user.merchant_profile.is_active = False
+                        user.merchant_profile.save(update_fields=['is_active'])
+                except Exception:
+                    pass
+                messages.success(request, f"User '{username}' deactivated (soft-deleted) because a dependent table is missing.")
+            except Exception as inner_e:
+                messages.error(request, f"Failed to delete user '{username}': {inner_e}")
+        else:
+            messages.error(request, f"Failed to delete user '{username}': {error_text}")
+    return redirect('timb_dashboard:users')
+
+
+@login_required
+@user_passes_test(is_timb_staff)
+def edit_user(request, user_id):
+    """Edit a merchant user's basic details (email, names, company)."""
+    user = get_object_or_404(User, id=user_id, is_merchant=True)
+    if request.method == 'POST':
+        user.email = request.POST.get('email', user.email)
+        user.first_name = request.POST.get('first_name', user.first_name)
+        user.last_name = request.POST.get('last_name', user.last_name)
+        user.save()
+        # Optional: update merchant company name
+        if hasattr(user, 'merchant_profile'):
+            company_name = request.POST.get('company_name')
+            if company_name is not None:
+                user.merchant_profile.company_name = company_name
+                user.merchant_profile.save()
+        messages.success(request, 'User updated successfully.')
+        return redirect('timb_dashboard:users')
+    # GET
+    context = { 'u': user }
+    return render(request, 'timb_dashboard/edit_user.html', context)
+
+
+@login_required
+@user_passes_test(is_timb_staff)
+def set_user_password(request, user_id):
+    """Allow admin to set a specific new password instead of default."""
+    user = get_object_or_404(User, id=user_id, is_merchant=True)
+    if request.method == 'POST':
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+        if not new_password:
+            messages.error(request, 'Password cannot be empty.')
+            return redirect('timb_dashboard:users')
+        if new_password != confirm_password:
+            messages.error(request, 'Passwords do not match.')
+            return redirect('timb_dashboard:users')
+        if len(new_password) < 8:
+            messages.error(request, 'Password must be at least 8 characters long.')
+            return redirect('timb_dashboard:users')
+        user.set_password(new_password)
+        user.save()
+        messages.success(request, f"Password for {user.username} updated.")
+        return redirect('timb_dashboard:users')
+    # GET should not be used to set password
+    return redirect('timb_dashboard:users')

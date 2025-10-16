@@ -4,6 +4,7 @@ from . import views
 urlpatterns = [
     # Dashboard
     path('', views.dashboard, name='merchant_dashboard'),
+    path('transactions/record/', views.record_transaction, name='merchant_record_transaction'),
     
     # Profile Management
     path('profile/customize/', views.profile_customization, name='merchant_profile_customization'),

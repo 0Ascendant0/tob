@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+
+{% block title %}Record Transaction - Merchant{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8">
+    <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-primary-600 to-primary-700">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                        <i class="fas fa-plus-circle text-white text-xl"></i>
+                    </div>
+                </div>
+                <div class="ml-4">
+                    <h1 class="text-2xl font-bold text-white">Record New Transaction</h1>
+                    <p class="text-primary-100">Enter transaction details for your merchant account</p>
+                </div>
+            </div>
+        </div>
+
+        <form id="transaction-form" class="p-6">
+            {% csrf_token %}
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label for="transaction_type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Transaction Type
+                    </label>
+                    <select name="transaction_type" id="transaction_type"
+                            class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                        <option value="PURCHASE" selected>Purchase</option>
+                        <option value="SALE">Sale</option>
+                    </select>
+                </div>
+                <div>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-6">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Product Details</h3>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    <div>
+                        <label for="grade" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Tobacco Grade <span class="text-red-500">*</span>
+                        </label>
+                        <select name="grade" id="grade" required
+                                class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            <option value="">Select grade</option>
+                            {% for grade in grades %}
+                                <option value="{{ grade.id }}" data-base-price="{{ grade.base_price }}">{{ grade.grade_code }} - {{ grade.grade_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="quantity" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Quantity (kg) <span class="text-red-500">*</span>
+                        </label>
+                        <input type="number" name="quantity" id="quantity" step="0.01" min="0" required
+                               class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                               placeholder="0.00">
+                    </div>
+
+                    <div>
+                        <label for="price_per_kg" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Price per kg (USD) <span class="text-red-500">*</span>
+                        </label>
+                        <input type="number" name="price_per_kg" id="price_per_kg" step="0.01" min="0" required
+                               class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                               placeholder="0.00">
+                        <div id="price-indicator" class="text-xs mt-1"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label for="payment_method" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Payment Method
+                    </label>
+                    <select name="payment_method" id="payment_method"
+                            class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                        <option value="">Select payment method</option>
+                        <option value="CASH">Cash</option>
+                        <option value="BANK_TRANSFER">Bank Transfer</option>
+                        <option value="CHEQUE">Cheque</option>
+                        <option value="MOBILE_MONEY">Mobile Money</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="moisture_content" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Moisture Content (%)
+                    </label>
+                    <input type="number" name="moisture_content" id="moisture_content" step="0.1" min="0" max="100"
+                           class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                           placeholder="0.0">
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <label for="quality_assessment" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Quality Assessment
+                </label>
+                <textarea name="quality_assessment" id="quality_assessment" rows="3"
+                          class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                          placeholder="Enter quality assessment notes..."></textarea>
+            </div>
+
+            <div class="bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-lg p-4 mb-6">
+                <h3 class="text-lg font-medium text-blue-900 dark:text-blue-100 mb-2">Transaction Summary</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+                    <div>
+                        <span class="text-blue-700 dark:text-blue-300">Quantity:</span>
+                        <span id="summary-quantity" class="font-medium text-blue-900 dark:text-blue-100 ml-2">0 kg</span>
+                    </div>
+                    <div>
+                        <span class="text-blue-700 dark:text-blue-300">Price per kg:</span>
+                        <span id="summary-price" class="font-medium text-blue-900 dark:text-blue-100 ml-2">$0.00</span>
+                    </div>
+                    <div>
+                        <span class="text-blue-700 dark:text-blue-300">Total Amount:</span>
+                        <span id="summary-total" class="font-medium text-blue-900 dark:text-blue-100 ml-2 text-lg">$0.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3">
+                <button type="button" onclick="resetForm()" 
+                        class="px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 transition duration-200">
+                    <i class="fas fa-redo mr-2"></i>Reset Form
+                </button>
+
+                <button type="submit" id="submit-btn"
+                        class="px-6 py-3 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 transition duration-200">
+                    <i class="fas fa-save mr-2"></i>Record Transaction
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const quantityInput = document.getElementById('quantity');
+  const priceInput = document.getElementById('price_per_kg');
+  const gradeSelect = document.getElementById('grade');
+  [quantityInput, priceInput].forEach(el => el.addEventListener('input', updateSummary));
+  gradeSelect.addEventListener('change', () => {
+    const base = gradeSelect.options[gradeSelect.selectedIndex]?.dataset.basePrice;
+    if (base) { priceInput.value = base; updateSummary(); }
+  });
+  document.getElementById('transaction-form').addEventListener('submit', submitForm);
+});
+
+function updateSummary() {
+  const q = parseFloat(document.getElementById('quantity').value) || 0;
+  const p = parseFloat(document.getElementById('price_per_kg').value) || 0;
+  document.getElementById('summary-quantity').textContent = `${q.toFixed(2)} kg`;
+  document.getElementById('summary-price').textContent = `$${p.toFixed(2)}`;
+  document.getElementById('summary-total').textContent = `$${(q*p).toFixed(2)}`;
+}
+
+async function submitForm(e) {
+  e.preventDefault();
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+  try {
+    const form = document.getElementById('transaction-form');
+    const formData = new FormData(form);
+    const resp = await fetch('', {
+      method: 'POST',
+      body: formData,
+      headers: { 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value },
+    });
+    const result = await resp.json();
+    if (result.success) {
+      if (window.timbRealTime?.showNotification) {
+        window.timbRealTime.showNotification('Transaction recorded successfully!', 'success');
+      }
+      setTimeout(() => { window.location.href = '{% url 'merchant_dashboard' %}'; }, 1200);
+    } else {
+      alert(result.error || 'Failed to record transaction');
+    }
+  } catch(err) {
+    alert('An error occurred while recording the transaction');
+  }
+  btn.disabled = false; btn.innerHTML = '<i class="fas fa-save mr-2"></i>Record Transaction';
+}
+
+function resetForm(){ document.getElementById('transaction-form').reset(); updateSummary(); }
+</script>
+{% endblock %}
+
+

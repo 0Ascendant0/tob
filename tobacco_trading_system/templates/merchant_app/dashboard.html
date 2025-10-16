@@ -17,6 +17,15 @@
         box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
         transition: all 0.3s ease;
     }
+    /* Ensure selected cards share consistent, taller height */
+    .tall-card {
+        min-height: 360px;
+        display: flex;
+        flex-direction: column;
+    }
+    .tall-card .card-body { /* helper if used */
+        flex: 1 1 auto;
+    }
     
     .widget:hover {
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
@@ -41,36 +50,7 @@
 
 {% block content %}
 <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-    <!-- Welcome Header -->
-    <div class="mb-8 bg-gradient-to-r from-{{ profile.brand_colors.primary|default:'blue' }}-600 to-{{ profile.brand_colors.secondary|default:'purple' }}-600 rounded-lg shadow-lg">
-        <div class="px-6 py-8">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center">
-                    {% if profile.company_logo %}
-                        <img src="{{ profile.company_logo.url }}" alt="{{ merchant.company_name }}" class="h-16 w-16 rounded-lg mr-6">
-                    {% else %}
-                        <div class="h-16 w-16 bg-white bg-opacity-20 rounded-lg flex items-center justify-center mr-6">
-                            <i class="fas fa-building text-white text-2xl"></i>
-                        </div>
-                    {% endif %}
-                    <div>
-                        <h1 class="text-3xl font-bold text-white">Welcome back!</h1>
-                        <p class="text-white text-opacity-90">{{ merchant.company_name }}</p>
-                        <p class="text-white text-opacity-75 text-sm">{{ user.get_full_name|default:user.username }}</p>
-                    </div>
-                </div>
-                
-                <div class="text-right text-white">
-                    <div class="text-2xl font-bold" id="current-time"></div>
-                    <div class="text-white text-opacity-75">Harare, Zimbabwe</div>
-                    <div class="flex items-center mt-2">
-                        <div class="w-2 h-2 bg-green-400 rounded-full mr-2 live-indicator"></div>
-                        <span class="text-sm">Live Market Data</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    
 
     <!-- Key Metrics -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
@@ -237,12 +217,13 @@
     </div>
 
     <!-- Customizable Widget Area -->
+    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
     <div class="widget-container mb-8">
-        <!-- Recent Inventory Widget -->
-        <div class="widget">
-            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <!-- Recent Inventory Widget (light theme only) -->
+        <div class="widget bg-white shadow rounded-lg min-h-[260px]">
+            <div class="px-6 py-4 border-b border-gray-200">
                 <div class="flex justify-between items-center">
-                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                    <h3 class="text-lg font-medium text-gray-900">
                         <i class="fas fa-warehouse mr-2 text-blue-600"></i>Recent Inventory
                     </h3>
                     <a href="{% url 'merchant_inventory' %}" class="text-sm text-blue-600 hover:text-blue-500">
@@ -252,13 +233,13 @@
             </div>
             <div class="p-6">
                 {% for item in inventory %}
-                <div class="flex justify-between items-center py-2 {% if not forloop.last %}border-b border-gray-100 dark:border-gray-700{% endif %}">
+                <div class="flex justify-between items-center py-2 {% if not forloop.last %}border-b border-gray-100{% endif %}">
                     <div>
-                        <div class="text-sm font-medium text-gray-900 dark:text-white">{{ item.grade.grade_name }}</div>
+                        <div class="text-sm font-medium text-gray-900">{{ item.grade.grade_name }}</div>
                         <div class="text-xs text-gray-500">{{ item.storage_location|default:"Main Warehouse" }}</div>
                     </div>
                     <div class="text-right">
-                        <div class="text-sm font-medium text-gray-900 dark:text-white">{{ item.quantity }}kg</div>
+                        <div class="text-sm font-medium text-gray-900">{{ item.quantity }}kg</div>
                         <div class="text-xs {% if item.is_low_stock %}text-red-600{% else %}text-gray-500{% endif %}">
                             {% if item.is_low_stock %}
                                 <i class="fas fa-exclamation-triangle mr-1"></i>Low Stock
@@ -272,17 +253,16 @@
                 <div class="text-center text-gray-500 py-8">
                     <i class="fas fa-inbox text-3xl mb-2"></i>
                     <p>No inventory items</p>
-                    <a href="#" class="text-blue-600 hover:text-blue-500 text-sm">Add inventory →</a>
                 </div>
                 {% endfor %}
             </div>
         </div>
 
-        <!-- Active Orders Widget -->
-        <div class="widget">
-            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <!-- Active Orders Widget (light theme only) -->
+        <div class="widget bg-white shadow rounded-lg min-h-[260px]">
+            <div class="px-6 py-4 border-b border-gray-200">
                 <div class="flex justify-between items-center">
-                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                    <h3 class="text-lg font-medium text-gray-900">
                         <i class="fas fa-list-alt mr-2 text-green-600"></i>Active Orders
                     </h3>
                     <a href="{% url 'merchant_orders' %}" class="text-sm text-green-600 hover:text-green-500">
@@ -292,9 +272,9 @@
             </div>
             <div class="p-6">
                 {% for order in active_orders %}
-                <div class="flex justify-between items-center py-2 {% if not forloop.last %}border-b border-gray-100 dark:border-gray-700{% endif %}">
+                <div class="flex justify-between items-center py-2 {% if not forloop.last %}border-b border-gray-100{% endif %}">
                     <div>
-                        <div class="text-sm font-medium text-gray-900 dark:text-white">{{ order.order_number }}</div>
+                        <div class="text-sm font-medium text-gray-900">{{ order.order_number }}</div>
                         <div class="text-xs text-gray-500">{{ order.client_name }}</div>
                         <div class="text-xs">
                             <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
@@ -307,7 +287,7 @@
                         </div>
                     </div>
                     <div class="text-right">
-                        <div class="text-sm font-medium text-gray-900 dark:text-white">${{ order.total_amount|floatformat:2 }}</div>
+                        <div class="text-sm font-medium text-gray-900">${{ order.total_amount|floatformat:2 }}</div>
                         <div class="text-xs text-gray-500">{{ order.requested_quantity }}kg</div>
                     </div>
                 </div>
@@ -321,58 +301,12 @@
             </div>
         </div>
 
-        <!-- AI Recommendations Widget -->
-        <div class="widget">
-            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                <div class="flex justify-between items-center">
-                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">
-                        <i class="fas fa-lightbulb mr-2 text-yellow-600"></i>AI Recommendations
-                    </h3>
-                    <a href="{% url 'merchant_ai_recommendations' %}" class="text-sm text-yellow-600 hover:text-yellow-500">
-                        View all →
-                    </a>
-                </div>
-            </div>
-            <div class="p-6">
-                {% for rec in recommendations %}
-                <div class="mb-4 p-3 rounded-lg border border-gray-200 dark:border-gray-600">
-                    <div class="flex justify-between items-start mb-2">
-                        <div class="text-sm font-medium text-gray-900 dark:text-white">
-                            {{ rec.grade.grade_name }}
-                        </div>
-                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
-                            {% if rec.priority == 'HIGH' %}bg-red-100 text-red-800
-                            {% elif rec.priority == 'MEDIUM' %}bg-yellow-100 text-yellow-800
-                            {% else %}bg-green-100 text-green-800{% endif %}">
-                            {{ rec.get_priority_display }}
-                        </span>
-                    </div>
-                    <div class="text-xs text-gray-600 dark:text-gray-400 mb-2">
-                        {{ rec.reasoning|truncatewords:15 }}
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <div class="text-xs text-gray-500">
-                            {{ rec.recommended_quantity }}kg @ ${{ rec.recommended_price }}/kg
-                        </div>
-                        <div class="text-xs font-medium text-green-600">
-                            {{ rec.confidence_score|floatformat:1 }}% confidence
-                        </div>
-                    </div>
-                </div>
-                {% empty %}
-                <div class="text-center text-gray-500 py-8">
-                    <i class="fas fa-brain text-3xl mb-2"></i>
-                    <p>No recommendations available</p>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
 
-        <!-- Risk Alerts Widget -->
-        <div class="widget">
-            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <!-- Risk Alerts Widget (light theme only) -->
+        <div class="widget bg-white shadow rounded-lg tall-card">
+            <div class="px-6 py-4 border-b border-gray-200">
                 <div class="flex justify-between items-center">
-                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                    <h3 class="text-lg font-medium text-gray-900">
                         <i class="fas fa-exclamation-triangle mr-2 text-red-600"></i>Risk Alerts
                     </h3>
                     <a href="{% url 'merchant_farmer_risk_assessment' %}" class="text-sm text-red-600 hover:text-red-500">
@@ -380,7 +314,7 @@
                     </a>
                 </div>
             </div>
-            <div class="p-6">
+            <div class="p-6 card-body">
                 {% for risk in risks %}
                 <div class="mb-3 p-3 rounded-lg {% if risk.risk_level == 'CRITICAL' %}bg-red-50 border border-red-200{% elif risk.risk_level == 'HIGH' %}bg-yellow-50 border border-yellow-200{% else %}bg-gray-50 border border-gray-200{% endif %}">
                     <div class="flex justify-between items-start">
@@ -405,54 +339,53 @@
                 {% endfor %}
             </div>
         </div>
-    </div>
 
-    <!-- Quick Actions -->
-    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
-        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h3 class="text-lg font-medium text-gray-900 dark:text-white">
-                <i class="fas fa-bolt mr-2 text-purple-600"></i>Quick Actions
-            </h3>
-        </div>
-        <div class="p-6">
-            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                <a href="#" 
-                   class="flex flex-col items-center p-4 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-200">
-                    <i class="fas fa-plus-circle text-2xl text-blue-600 mb-2"></i>
-                    <span class="text-sm font-medium text-gray-900 dark:text-white">Add Inventory</span>
-                </a>
-                
-                <a href="{% url 'merchant_create_order' %}" 
-                   class="flex flex-col items-center p-4 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-200">
-                    <i class="fas fa-shopping-cart text-2xl text-green-600 mb-2"></i>
-                    <span class="text-sm font-medium text-gray-900 dark:text-white">New Order</span>
-                </a>
-                
-                <a href="{% url 'merchant_create_custom_grade' %}" 
-                   class="flex flex-col items-center p-4 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-200">
-                    <i class="fas fa-flask text-2xl text-purple-600 mb-2"></i>
-                    <span class="text-sm font-medium text-gray-900 dark:text-white">Custom Grade</span>
-                </a>
-                
-                <a href="{% url 'merchant_farmer_risk_assessment' %}" 
-                   class="flex flex-col items-center p-4 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-200">
-                    <i class="fas fa-user-check text-2xl text-orange-600 mb-2"></i>
-                    <span class="text-sm font-medium text-gray-900 dark:text-white">Risk Assessment</span>
-                </a>
-                
-                <button onclick="generateQRReport()" 
-                        class="flex flex-col items-center p-4 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-200">
-                    <i class="fas fa-qrcode text-2xl text-indigo-600 mb-2"></i>
-                    <span class="text-sm font-medium text-gray-900 dark:text-white">QR Report</span>
-                </button>
-                
-                <a href="{% url 'merchant_communications' %}" 
-                   class="flex flex-col items-center p-4 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-200">
-                    <i class="fas fa-comments text-2xl text-pink-600 mb-2"></i>
-                    <span class="text-sm font-medium text-gray-900 dark:text-white">Messages</span>
-                </a>
+        <!-- Quick Actions as a card directly under Active Orders (same height as Risk Alerts) -->
+        <div class="widget bg-white shadow rounded-lg tall-card">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">
+                    <i class="fas fa-bolt mr-2 text-purple-600"></i>Quick Actions
+                </h3>
+            </div>
+            <div class="p-6 card-body">
+                <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 h-full">
+                    <a href="{% url 'merchant_create_order' %}" 
+                       class="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition duration-200">
+                        <i class="fas fa-shopping-cart text-2xl text-green-600 mb-2"></i>
+                        <span class="text-sm font-medium text-gray-900">New Order</span>
+                    </a>
+                    <a href="{% url 'merchant_record_transaction' %}" 
+                       class="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition duration-200">
+                        <i class="fas fa-plus-circle text-2xl text-blue-600 mb-2"></i>
+                        <span class="text-sm font-medium text-gray-900">Record Transaction</span>
+                    </a>
+                    <a href="{% url 'merchant_create_custom_grade' %}" 
+                       class="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition duration-200">
+                        <i class="fas fa-flask text-2xl text-purple-600 mb-2"></i>
+                        <span class="text-sm font-medium text-gray-900">Custom Grade</span>
+                    </a>
+                    <a href="{% url 'merchant_farmer_risk_assessment' %}" 
+                       class="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition duration-200">
+                        <i class="fas fa-user-check text-2xl text-orange-600 mb-2"></i>
+                        <span class="text-sm font-medium text-gray-900">Risk Assessment</span>
+                    </a>
+                    <button onclick="generateQRReport()" 
+                            class="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition duration-200">
+                        <i class="fas fa-qrcode text-2xl text-indigo-600 mb-2"></i>
+                        <span class="text-sm font-medium text-gray-900">QR Report</span>
+                    </button>
+                    <a href="{% url 'merchant_communications' %}" 
+                       class="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition duration-200">
+                        <i class="fas fa-comments text-2xl text-pink-600 mb-2"></i>
+                        <span class="text-sm font-medium text-gray-900">Messages</span>
+                    </a>
+                </div>
             </div>
         </div>
+        
+    </div>
+
+    
     </div>
 </div>
 

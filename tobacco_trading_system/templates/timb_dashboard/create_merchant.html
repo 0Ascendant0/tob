@@ -133,13 +133,13 @@
                                     <div class="text-red-600 text-sm mt-1">{{ form.username.errors.0 }}</div>
                                 {% endif %}
                             </div>
-                            <div class="col-md-6">
+                            {% comment %} <div class="col-md-6">
                                 <label for="{{ form.email.id_for_label }}" class="form-label">Email *</label>
                                 {{ form.email }}
                                 {% if form.email.errors %}
                                     <div class="text-red-600 text-sm mt-1">{{ form.email.errors.0 }}</div>
                                 {% endif %}
-                            </div>
+                            </div> {% endcomment %}
                         </div>
 
                         <div class="row mb-3">
@@ -154,10 +154,10 @@
                         </div>
 
                         <div class="row mb-4">
-                            <div class="col-md-6">
+                            {% comment %} <div class="col-md-6">
                                 <label for="{{ form.phone.id_for_label }}" class="form-label">Phone</label>
                                 {{ form.phone }}
-                            </div>
+                            </div> {% endcomment %}
                             <div class="col-md-6">
                                 <div class="alert-info">
                                     <small class="font-medium">Default Password: <strong>merchant</strong></small>
@@ -201,8 +201,8 @@
                         </div>
 
                         <!-- Banking Information -->
-                        <h6 class="mb-3 text-sm font-medium text-gray-700">Banking Information</h6>
-                        <div class="row mb-4">
+                        {% comment %} <h6 class="mb-3 text-sm font-medium text-gray-700">Banking Information</h6> {% endcomment %}
+                        {% comment %} <div class="row mb-4">
                             <div class="col-md-6">
                                 <label for="{{ form.bank_name.id_for_label }}" class="form-label">Bank Name</label>
                                 {{ form.bank_name }}
@@ -211,13 +211,13 @@
                                 <label for="{{ form.bank_account_number.id_for_label }}" class="form-label">Bank Account Number</label>
                                 {{ form.bank_account_number }}
                             </div>
-                        </div>
+                        </div> {% endcomment %}
 
                         <!-- Form Actions -->
                         <div class="flex justify-between" style="display:flex; justify-content:space-between; gap:1rem;">
-                            <a href="{% url 'timb_dashboard:merchants' %}" class="btn-secondary">
+                            {% comment %} <a href="{% url 'timb_dashboard:merchants' %}" class="btn-secondary">
                                 <span class="inline-flex items-center"><i class="bi bi-arrow-left mr-2"></i> Back to Merchants</span>
-                            </a>
+                            </a> {% endcomment %}
                             <button type="submit" class="btn-primary">
                                 <i class="bi bi-person-plus"></i> Create Merchant
                             </button>
