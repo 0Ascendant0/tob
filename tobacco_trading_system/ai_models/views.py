@@ -598,101 +598,223 @@ def run_fraud_detection(transaction):
         }
 
 def run_farmer_risk_assessment(data):
-    """Enhanced farmer risk assessment algorithm using new form fields"""
+    """Comprehensive farmer risk assessment algorithm with realistic scoring"""
     risk_factors = []
     risk_score = 0.0
+    positive_factors = []
     
     try:
-        # Financial risk factors
+        # Extract and validate input data
         annual_income = float(data.get('annual_income', 0))
         debt_level = float(data.get('debt_level', 0))
         proposed_contract_value = float(data.get('proposed_contract_value', 0))
         previous_defaults = int(data.get('previous_defaults', 0))
-        
-        # Debt-to-income ratio
-        if annual_income > 0:
-            debt_ratio = debt_level / annual_income
-            if debt_ratio > 0.5:
-                risk_score += 0.2
-                risk_factors.append(f"High debt-to-income ratio: {debt_ratio*100:.1f}%")
-            elif debt_ratio > 0.3:
-                risk_score += 0.1
-                risk_factors.append(f"Moderate debt-to-income ratio: {debt_ratio*100:.1f}%")
-        
-        # Contract size vs income
-        if annual_income > 0:
-            contract_ratio = proposed_contract_value / annual_income
-            if contract_ratio > 1.0:
-                risk_score += 0.2
-                risk_factors.append(f"Contract value exceeds annual income: {contract_ratio*100:.1f}%")
-            elif contract_ratio > 0.7:
-                risk_score += 0.1
-                risk_factors.append(f"Large contract relative to income: {contract_ratio*100:.1f}%")
-        
-        # Previous defaults
-        if previous_defaults > 2:
-            risk_score += 0.3
-            risk_factors.append(f"Multiple previous defaults: {previous_defaults}")
-        elif previous_defaults > 0:
-            risk_score += 0.15
-            risk_factors.append(f"Previous default history: {previous_defaults}")
-        
-        # Experience factor
         years_experience = int(data.get('years_experience', 0))
-        if years_experience < 3:
-            risk_score += 0.2
-            risk_factors.append(f"Limited farming experience: {years_experience} years")
-        elif years_experience < 5:
-            risk_score += 0.1
-            risk_factors.append(f"Moderate farming experience: {years_experience} years")
-        
-        # Land size analysis
         total_hectares = float(data.get('total_hectares', 0))
         proposed_quantity = float(data.get('proposed_quantity', 0))
+        price_per_kg = float(data.get('price_per_kg', 0))
+        contract_duration = int(data.get('contract_duration', 0))
+        location = data.get('location', '').lower()
+        primary_tobacco_type = data.get('primary_tobacco_type', '').lower()
         
+        # 1. FINANCIAL STABILITY ASSESSMENT (40% weight)
+        financial_risk = 0.0
+        
+        # Debt-to-income ratio analysis
+        if annual_income > 0:
+            debt_ratio = debt_level / annual_income
+            if debt_ratio > 0.6:  # Very high debt
+                financial_risk += 0.4
+                risk_factors.append(f"Critical debt-to-income ratio: {debt_ratio*100:.1f}%")
+            elif debt_ratio > 0.4:  # High debt
+                financial_risk += 0.25
+                risk_factors.append(f"High debt-to-income ratio: {debt_ratio*100:.1f}%")
+            elif debt_ratio > 0.2:  # Moderate debt
+                financial_risk += 0.1
+                risk_factors.append(f"Moderate debt-to-income ratio: {debt_ratio*100:.1f}%")
+            else:  # Low debt
+                positive_factors.append(f"Low debt-to-income ratio: {debt_ratio*100:.1f}%")
+        
+        # Contract affordability analysis
+        if annual_income > 0:
+            contract_ratio = proposed_contract_value / annual_income
+            if contract_ratio > 1.5:  # Contract exceeds 1.5x income
+                financial_risk += 0.3
+                risk_factors.append(f"Contract value significantly exceeds annual income: {contract_ratio*100:.1f}%")
+            elif contract_ratio > 1.0:  # Contract exceeds income
+                financial_risk += 0.2
+                risk_factors.append(f"Contract value exceeds annual income: {contract_ratio*100:.1f}%")
+            elif contract_ratio > 0.5:  # Large but manageable contract
+                financial_risk += 0.05
+                risk_factors.append(f"Large contract relative to income: {contract_ratio*100:.1f}%")
+            else:  # Conservative contract
+                positive_factors.append(f"Conservative contract size: {contract_ratio*100:.1f}% of income")
+        
+        # 2. CREDIT HISTORY ASSESSMENT (25% weight)
+        credit_risk = 0.0
+        
+        if previous_defaults >= 3:
+            credit_risk += 0.4
+            risk_factors.append(f"Multiple previous defaults: {previous_defaults} - High credit risk")
+        elif previous_defaults == 2:
+            credit_risk += 0.25
+            risk_factors.append(f"Two previous defaults: {previous_defaults} - Moderate credit risk")
+        elif previous_defaults == 1:
+            credit_risk += 0.15
+            risk_factors.append(f"One previous default: {previous_defaults} - Low credit risk")
+        else:
+            positive_factors.append("Clean credit history - No previous defaults")
+        
+        # 3. EXPERIENCE AND CAPABILITY ASSESSMENT (20% weight)
+        experience_risk = 0.0
+        
+        if years_experience < 2:
+            experience_risk += 0.3
+            risk_factors.append(f"Very limited farming experience: {years_experience} years")
+        elif years_experience < 5:
+            experience_risk += 0.15
+            risk_factors.append(f"Limited farming experience: {years_experience} years")
+        elif years_experience < 10:
+            experience_risk += 0.05
+            risk_factors.append(f"Moderate farming experience: {years_experience} years")
+        else:
+            positive_factors.append(f"Extensive farming experience: {years_experience} years")
+        
+        # 4. OPERATIONAL FEASIBILITY ASSESSMENT (15% weight)
+        operational_risk = 0.0
+        
+        # Yield analysis
         if total_hectares > 0:
             yield_per_hectare = proposed_quantity / total_hectares
-            if yield_per_hectare > 3000:  # kg per hectare
-                risk_score += 0.15
-                risk_factors.append(f"Unusually high projected yield: {yield_per_hectare:.0f}kg/ha")
-            elif yield_per_hectare < 800:
-                risk_score += 0.1
+            if yield_per_hectare > 4000:  # Unrealistically high yield
+                operational_risk += 0.2
+                risk_factors.append(f"Unrealistically high projected yield: {yield_per_hectare:.0f}kg/ha")
+            elif yield_per_hectare > 2500:  # High but possible yield
+                operational_risk += 0.1
+                risk_factors.append(f"High projected yield: {yield_per_hectare:.0f}kg/ha")
+            elif yield_per_hectare < 1000:  # Low yield
+                operational_risk += 0.1
                 risk_factors.append(f"Low projected yield: {yield_per_hectare:.0f}kg/ha")
+            else:
+                positive_factors.append(f"Realistic projected yield: {yield_per_hectare:.0f}kg/ha")
         
-        # Location risk (some areas have higher risk)
-        location = data.get('location', '').lower()
+        # Farm size analysis
+        if total_hectares < 1:
+            operational_risk += 0.15
+            risk_factors.append(f"Very small farm size: {total_hectares} hectares")
+        elif total_hectares < 3:
+            operational_risk += 0.05
+            risk_factors.append(f"Small farm size: {total_hectares} hectares")
+        else:
+            positive_factors.append(f"Appropriate farm size: {total_hectares} hectares")
+        
+        # 5. MARKET AND LOCATION RISK (10% weight)
+        market_risk = 0.0
+        
+        # Location-based risk
         high_risk_areas = ['matabeleland', 'masvingo']
-        if any(area in location for area in high_risk_areas):
-            risk_score += 0.1
-            risk_factors.append(f"Higher-risk geographical area: {location}")
+        medium_risk_areas = ['midlands']
+        low_risk_areas = ['mashonaland', 'manicaland']
         
-        # Normalize risk score
-        risk_score = min(risk_score, 1.0)
+        if any(area in location for area in high_risk_areas):
+            market_risk += 0.15
+            risk_factors.append(f"Higher-risk geographical area: {location.title()}")
+        elif any(area in location for area in medium_risk_areas):
+            market_risk += 0.05
+            risk_factors.append(f"Medium-risk geographical area: {location.title()}")
+        elif any(area in location for area in low_risk_areas):
+            positive_factors.append(f"Lower-risk geographical area: {location.title()}")
+        
+        # Tobacco type risk
+        if primary_tobacco_type in ['flue cured']:
+            positive_factors.append(f"Premium tobacco type: {primary_tobacco_type.title()}")
+        elif primary_tobacco_type in ['burley']:
+            market_risk += 0.05
+            risk_factors.append(f"Standard tobacco type: {primary_tobacco_type.title()}")
+        else:
+            market_risk += 0.1
+            risk_factors.append(f"Specialized tobacco type: {primary_tobacco_type.title()}")
+        
+        # 6. CONTRACT TERMS ANALYSIS
+        contract_risk = 0.0
+        
+        # Contract duration risk
+        if contract_duration > 24:  # Very long contract
+            contract_risk += 0.1
+            risk_factors.append(f"Long contract duration: {contract_duration} months")
+        elif contract_duration < 6:  # Very short contract
+            contract_risk += 0.05
+            risk_factors.append(f"Short contract duration: {contract_duration} months")
+        else:
+            positive_factors.append(f"Appropriate contract duration: {contract_duration} months")
+        
+        # Price analysis
+        if price_per_kg > 8:  # Very high price
+            contract_risk += 0.1
+            risk_factors.append(f"High contract price: ${price_per_kg:.2f}/kg")
+        elif price_per_kg < 3:  # Very low price
+            contract_risk += 0.05
+            risk_factors.append(f"Low contract price: ${price_per_kg:.2f}/kg")
+        else:
+            positive_factors.append(f"Market-appropriate price: ${price_per_kg:.2f}/kg")
+        
+        # Calculate weighted risk score
+        risk_score = (
+            financial_risk * 0.40 +      # 40% weight
+            credit_risk * 0.25 +         # 25% weight
+            experience_risk * 0.20 +     # 20% weight
+            operational_risk * 0.10 +    # 10% weight
+            market_risk * 0.03 +         # 3% weight
+            contract_risk * 0.02         # 2% weight
+        )
+        
+        # Apply positive factors (reduce risk)
+        positive_factor_reduction = len(positive_factors) * 0.02
+        risk_score = max(0.0, risk_score - positive_factor_reduction)
+        
+        # Normalize to 0-1 scale
+        risk_score = min(1.0, risk_score)
         
         # Determine risk level and recommendation
-        if risk_score < 0.3:
+        if risk_score < 0.2:
             risk_level = "LOW"
-            recommendation = "APPROVE: Low risk farmer with good financial standing and experience."
-        elif risk_score < 0.6:
+            recommendation = "APPROVE: Excellent candidate with strong financial position, clean credit history, and adequate experience."
+        elif risk_score < 0.4:
             risk_level = "MEDIUM"
-            recommendation = "APPROVE WITH CONDITIONS: Medium risk farmer. Consider additional monitoring and smaller initial contract."
-        elif risk_score < 0.8:
+            recommendation = "APPROVE WITH CONDITIONS: Good candidate with minor risk factors. Recommend standard monitoring and regular check-ins."
+        elif risk_score < 0.6:
             risk_level = "HIGH"
-            recommendation = "REJECT OR REDUCE: High risk farmer. Consider reducing contract size or requiring additional guarantees."
-        else:
+            recommendation = "APPROVE WITH ENHANCED CONDITIONS: Moderate risk candidate. Require additional collateral, shorter contract terms, or enhanced monitoring."
+        elif risk_score < 0.8:
             risk_level = "CRITICAL"
-            recommendation = "REJECT: Critical risk farmer. Do not approve contract without significant risk mitigation measures."
+            recommendation = "REJECT OR SIGNIFICANTLY REDUCE: High risk candidate. Only approve with substantial risk mitigation measures, reduced contract size, or additional guarantees."
+        else:
+            risk_level = "REJECT"
+            recommendation = "REJECT: Very high risk candidate. Do not approve contract due to multiple significant risk factors."
         
-        # Calculate confidence
-        confidence = abs(risk_score - 0.5) * 2
+        # Calculate confidence based on data completeness and consistency
+        confidence = 0.7  # Base confidence
+        if len(risk_factors) > 0 and len(positive_factors) > 0:
+            confidence += 0.1  # Balanced assessment
+        if annual_income > 0 and total_hectares > 0:
+            confidence += 0.1  # Complete financial data
+        if years_experience > 0:
+            confidence += 0.1  # Experience data available
         
-        # Calculate financial metrics
+        confidence = min(0.95, confidence)
+        
+        # Calculate comprehensive financial metrics
         financial_metrics = {
             'debt_to_income_ratio': debt_level / annual_income if annual_income > 0 else 0,
             'contract_to_income_ratio': proposed_contract_value / annual_income if annual_income > 0 else 0,
             'yield_per_hectare': proposed_quantity / total_hectares if total_hectares > 0 else 0,
-            'previous_defaults': previous_defaults
+            'previous_defaults': previous_defaults,
+            'contract_value_per_hectare': proposed_contract_value / total_hectares if total_hectares > 0 else 0,
+            'income_per_hectare': annual_income / total_hectares if total_hectares > 0 else 0
         }
+        
+        # Combine all risk factors and positive factors
+        all_factors = risk_factors + [f"✓ {factor}" for factor in positive_factors]
         
         return {
             'risk_score': float(risk_score),
@@ -700,9 +822,16 @@ def run_farmer_risk_assessment(data):
             'confidence': float(confidence),
             'risk_level': risk_level,
             'recommendation': recommendation,
-            'risk_factors': risk_factors,
+            'risk_factors': all_factors,
             'financial_metrics': financial_metrics,
-            'feature_importance': {}
+            'feature_importance': {
+                'financial_stability': financial_risk,
+                'credit_history': credit_risk,
+                'experience': experience_risk,
+                'operational_feasibility': operational_risk,
+                'market_location': market_risk,
+                'contract_terms': contract_risk
+            }
         }
         
     except Exception as e:
@@ -711,7 +840,7 @@ def run_farmer_risk_assessment(data):
             'is_risky': True,
             'confidence': 0.3,
             'risk_level': 'MEDIUM',
-            'recommendation': 'Unable to assess risk due to data error',
+            'recommendation': f'Unable to assess risk due to data error: {str(e)}',
             'risk_factors': [f'Assessment error: {str(e)}'],
             'financial_metrics': {},
             'feature_importance': {}

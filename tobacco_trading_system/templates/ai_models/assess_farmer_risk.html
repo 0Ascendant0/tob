@@ -248,13 +248,13 @@ function displayResults(assessment) {
             ` : ''}
             
             ${assessment.financial_metrics ? `
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mt-4">
                     <div class="text-center p-3 bg-white dark:bg-gray-700 rounded-lg">
-                        <div class="text-sm text-gray-500">Debt-to-Income Ratio</div>
+                        <div class="text-sm text-gray-500">Debt-to-Income</div>
                         <div class="font-semibold">${(assessment.financial_metrics.debt_to_income_ratio * 100).toFixed(1)}%</div>
                     </div>
                     <div class="text-center p-3 bg-white dark:bg-gray-700 rounded-lg">
-                        <div class="text-sm text-gray-500">Contract-to-Income Ratio</div>
+                        <div class="text-sm text-gray-500">Contract-to-Income</div>
                         <div class="font-semibold">${(assessment.financial_metrics.contract_to_income_ratio * 100).toFixed(1)}%</div>
                     </div>
                     <div class="text-center p-3 bg-white dark:bg-gray-700 rounded-lg">
@@ -262,8 +262,48 @@ function displayResults(assessment) {
                         <div class="font-semibold">${assessment.financial_metrics.yield_per_hectare.toFixed(0)}kg</div>
                     </div>
                     <div class="text-center p-3 bg-white dark:bg-gray-700 rounded-lg">
-                        <div class="text-sm text-gray-500">Default History</div>
-                        <div class="font-semibold">${assessment.financial_metrics.previous_defaults} defaults</div>
+                        <div class="text-sm text-gray-500">Previous Defaults</div>
+                        <div class="font-semibold">${assessment.financial_metrics.previous_defaults}</div>
+                    </div>
+                    <div class="text-center p-3 bg-white dark:bg-gray-700 rounded-lg">
+                        <div class="text-sm text-gray-500">Contract Value/ha</div>
+                        <div class="font-semibold">$${assessment.financial_metrics.contract_value_per_hectare.toFixed(0)}</div>
+                    </div>
+                    <div class="text-center p-3 bg-white dark:bg-gray-700 rounded-lg">
+                        <div class="text-sm text-gray-500">Income per Hectare</div>
+                        <div class="font-semibold">$${assessment.financial_metrics.income_per_hectare.toFixed(0)}</div>
+                    </div>
+                </div>
+            ` : ''}
+            
+            ${assessment.feature_importance ? `
+                <div class="mt-6">
+                    <h5 class="font-medium text-gray-900 dark:text-white mb-3">Risk Assessment Breakdown:</h5>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                        <div class="p-3 bg-white dark:bg-gray-700 rounded-lg">
+                            <div class="text-sm text-gray-500">Financial Stability</div>
+                            <div class="font-semibold text-red-600">${(assessment.feature_importance.financial_stability * 100).toFixed(1)}%</div>
+                        </div>
+                        <div class="p-3 bg-white dark:bg-gray-700 rounded-lg">
+                            <div class="text-sm text-gray-500">Credit History</div>
+                            <div class="font-semibold text-orange-600">${(assessment.feature_importance.credit_history * 100).toFixed(1)}%</div>
+                        </div>
+                        <div class="p-3 bg-white dark:bg-gray-700 rounded-lg">
+                            <div class="text-sm text-gray-500">Experience</div>
+                            <div class="font-semibold text-yellow-600">${(assessment.feature_importance.experience * 100).toFixed(1)}%</div>
+                        </div>
+                        <div class="p-3 bg-white dark:bg-gray-700 rounded-lg">
+                            <div class="text-sm text-gray-500">Operational Risk</div>
+                            <div class="font-semibold text-blue-600">${(assessment.feature_importance.operational_feasibility * 100).toFixed(1)}%</div>
+                        </div>
+                        <div class="p-3 bg-white dark:bg-gray-700 rounded-lg">
+                            <div class="text-sm text-gray-500">Market/Location</div>
+                            <div class="font-semibold text-purple-600">${(assessment.feature_importance.market_location * 100).toFixed(1)}%</div>
+                        </div>
+                        <div class="p-3 bg-white dark:bg-gray-700 rounded-lg">
+                            <div class="text-sm text-gray-500">Contract Terms</div>
+                            <div class="font-semibold text-indigo-600">${(assessment.feature_importance.contract_terms * 100).toFixed(1)}%</div>
+                        </div>
                     </div>
                 </div>
             ` : ''}
