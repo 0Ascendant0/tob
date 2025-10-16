@@ -5,163 +5,163 @@
 
 {% block extra_css %}
 <style>
+    /* Reuse create_merchant styles for consistent padding and colors */
+    .create-merchant-container {
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    .custom-card, .card-body {
+        background: #ffffff;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    .card-header-custom {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #e6e6e6;
+    }
+
+    .card-body { padding: 1.25rem; }
+
+    /* form control to match project look */
+    .form-control {
+        width: 100%;
+        padding: 0.625rem 0.75rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        background: #fff;
+        color: #111827;
+        transition: box-shadow .15s ease, border-color .15s ease;
+        box-shadow: none;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #5D5CDE;
+        box-shadow: 0 0 0 4px rgba(93,92,222,0.08);
+    }
+
+    label.form-label {
+        display: block;
+        font-size: 0.875rem;
+        margin-bottom: 0.35rem;
+        color: #374151;
+    }
+
+    .btn-primary, .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: #5D5CDE;
+        color: #fff;
+        padding: 0.55rem 0.9rem;
+        border-radius: 0.5rem;
+        border: none;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .btn-secondary {
+        background: #f3f4f6;
+        color: #111827;
+        padding: 0.5rem 0.9rem;
+        border-radius: 0.5rem;
+        border: 1px solid #e5e7eb;
+    }
+
+    .input-group {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .input-group .btn {
+        padding: 0.5rem 0.75rem;
+        background: #eef2ff;
+        color: #4f46e5;
+        border: 1px solid #e5e7eb;
+    }
+
+    .big {
+        font-size: 2.5rem;
+    }
+
+    .alert-info, .alert-warning {
+        background: #f8fafc; /* subtle */
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        border: 1px solid #eef2ff;
+    }
+
+    .row { display: flex; flex-wrap: wrap; gap: 1rem; }
+    .col-lg-8 { flex: 0 0 66%; max-width: 66%; }
+    .col-lg-4 { flex: 0 0 32%; max-width: 32%; }
+    .col-12 { flex: 0 0 100%; }
+    .col-md-6 { flex: 0 0 48%; }
+
+    @media (max-width: 768px) {
+        .col-lg-8, .col-lg-4, .col-md-6 { flex: 0 0 100%; max-width: 100%; }
+    }
+
+    /* Grade-builder specific styles preserved and adjusted to match merchant look */
     .component-row {
-        border: 2px dashed #ddd;
+        border: 1px dashed #e5e7eb;
         border-radius: 8px;
         padding: 1rem;
         margin-bottom: 1rem;
-        background: #f8f9fa;
+        background: #ffffff;
         transition: all 0.3s ease;
         position: relative;
     }
-    .component-row.valid {
-        border-color: #28a745;
-        background: #d4edda;
-    }
-    .component-row.invalid {
-        border-color: #dc3545;
-        background: #f8d7da;
-    }
+    .component-row.valid { border-color: #28a745; background: #d4edda; }
+    .component-row.invalid { border-color: #dc3545; background: #f8d7da; }
+
     .grade-preview {
-        border: 2px solid #5D5CDE;
+        border: 1px solid #e5e7eb;
         border-radius: 12px;
-        padding: 1.5rem;
-        background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+        padding: 1.25rem;
+        background: #fff;
         position: sticky;
         top: 2rem;
         max-height: calc(100vh - 4rem);
         overflow-y: auto;
     }
-    .percentage-meter {
-        height: 30px;
-        background: #e9ecef;
-        border-radius: 15px;
-        overflow: hidden;
-        position: relative;
-        margin: 1rem 0;
-    }
-    .percentage-fill {
-        height: 100%;
-        background: linear-gradient(90deg, #5D5CDE, #4338ca);
-        transition: width 0.5s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: bold;
-        min-width: 30px;
-    }
-    .remove-component {
-        position: absolute;
-        top: 0.5rem;
-        right: 0.5rem;
-        background: #dc3545;
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 25px;
-        height: 25px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.8rem;
-        cursor: pointer;
-        z-index: 10;
-    }
-    .remove-component:hover {
-        background: #c82333;
-    }
-    .component-bar {
-        height: 20px;
-        border-radius: 10px;
-        margin: 0.5rem 0;
-        position: relative;
-        overflow: hidden;
-        background: #e9ecef;
-    }
-    .component-fill {
-        height: 100%;
-        transition: width 0.3s ease;
-        background: linear-gradient(90deg, #5D5CDE, #4338ca);
-    }
-    .custom-card {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-    }
-    .card-header-custom {
-        background: linear-gradient(135deg, #5D5CDE, #4338ca);
-        color: white;
-        padding: 1rem 1.5rem;
-        font-weight: 600;
-    }
-    .alert-info-custom {
-        background: linear-gradient(135deg, #e3f2fd, #bbdefb);
-        border: none;
-        border-left: 4px solid #2196f3;
-        border-radius: 8px;
-        color: #1565c0;
-    }
-    .alert-warning-custom {
-        background: linear-gradient(135deg, #fff3e0, #ffcc02);
-        border: none;
-        border-left: 4px solid #ff9800;
-        border-radius: 8px;
-        color: #f57f17;
-    }
-    .btn-primary-custom {
-        background: linear-gradient(135deg, #5D5CDE, #4338ca);
-        border: none;
-        color: white;
-        padding: 0.5rem 1.5rem;
-        border-radius: 8px;
-        font-weight: 500;
-        transition: all 0.3s ease;
-    }
-    .btn-primary-custom:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(93, 92, 222, 0.3);
-        color: white;
-    }
-    .grade-demand-badge {
-        font-size: 0.75rem;
-        padding: 0.25rem 0.5rem;
-        border-radius: 12px;
-    }
-    .demand-high { background: #d4edda; color: #155724; }
-    .demand-medium { background: #fff3cd; color: #856404; }
-    .demand-low { background: #f8d7da; color: #721c24; }
+
+    .percentage-meter { height: 30px; background: #e9ecef; border-radius: 15px; overflow: hidden; position: relative; margin: 1rem 0; }
+    .percentage-fill { height: 100%; background: linear-gradient(90deg, #5D5CDE, #4338ca); transition: width 0.5s ease; display:flex; align-items:center; justify-content:center; color:white; font-weight:bold; min-width:30px; }
+
+    .remove-component { position: absolute; top: 0.5rem; right: 0.5rem; background: #dc3545; color: white; border: none; border-radius: 50%; width: 25px; height: 25px; display:flex; align-items:center; justify-content:center; font-size:0.8rem; cursor:pointer; z-index:10; }
+    .remove-component:hover { background: #c82333; }
+
+    .component-bar { height: 20px; border-radius: 10px; margin: 0.5rem 0; position: relative; overflow: hidden; background: #e9ecef; }
+    .component-fill { height: 100%; transition: width 0.3s ease; background: linear-gradient(90deg, #5D5CDE, #4338ca); }
+
+    .custom-card { background: #fff; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .custom-card .card-body { padding: 1.25rem; }
+
+    .alert-info-custom { background: linear-gradient(135deg, #e3f2fd, #bbdefb); border: none; border-left: 4px solid #2196f3; border-radius: 8px; color: #1565c0; }
+
+    .btn-primary-custom { background: linear-gradient(135deg, #5D5CDE, #4338ca); border: none; color: white; padding: 0.5rem 1.5rem; border-radius: 8px; font-weight: 500; transition: all 0.3s ease; }
+    .btn-primary-custom:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(93, 92, 222, 0.3); color: white; }
 
     @media (max-width: 768px) {
-        .grade-preview {
-            position: static;
-            margin-top: 2rem;
-        }
-        .component-row {
-            padding: 0.75rem;
-        }
+        .grade-preview { position: static; margin-top: 2rem; }
+        .component-row { padding: 0.75rem; }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid py-4">
+<div class="create-merchant-container container-fluid py-4">
     <div class="row mb-4">
         <div class="col-12">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{% url 'merchant_dashboard' %}">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'merchant_custom_grades' %}">Custom Grades</a></li>
-                    <li class="breadcrumb-item active">Create New Grade</li>
-                </ol>
-            </nav>
-            <h1 class="h3 mb-0" style="color: #5D5CDE;">Create Custom Grade</h1>
+           
+            <h1 class="big">Create Custom Grade</h1>
             <p class="text-muted">Design a custom tobacco grade by blending different TIMB base grades</p>
         </div>
     </div>
 
-    <form id="customGradeForm" class="row">
+    <form id="customGradeForm" class="row g-3" method="post" novalidate>
         {% csrf_token %}
         <div class="col-lg-8">
             <!-- Basic Information -->
@@ -170,45 +170,45 @@
                     <h5 class="mb-0">Basic Information</h5>
                 </div>
                 <div class="card-body">
-                    <div class="row">
+                    <div class="row g-3">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Custom Grade Name *</label>
-                            <input type="text" class="form-control" name="custom_grade_name" required
-                                   placeholder="e.g., Premium Blend A1" onchange="updatePreview()" style="border-color: #5D5CDE;">
+                <input type="text" class="form-control input-highlight" name="custom_grade_name" required
+                    placeholder="e.g., Premium Blend A1" onchange="updatePreview()">
                             <div class="form-text">Choose a descriptive name for your custom blend</div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Target Price ($/kg) *</label>
-                            <input type="number" class="form-control" name="target_price" step="0.01" min="0" required
-                                   placeholder="5.50" onchange="updatePreview()" style="border-color: #5D5CDE;">
+                <input type="number" class="form-control input-highlight" name="target_price" step="0.01" min="0" required
+                    placeholder="5.50" onchange="updatePreview()">
                             <div class="form-text">Expected selling price per kilogram</div>
                         </div>
                         <div class="col-12 mb-3">
                             <label class="form-label">Description</label>
-                            <textarea class="form-control" name="description" rows="3" onchange="updatePreview()"
-                                      placeholder="Describe the characteristics and intended use of this custom grade..." style="border-color: #5D5CDE;"></textarea>
+                            <textarea class="form-control input-highlight" name="description" rows="3" onchange="updatePreview()"
+                                      placeholder="Describe the characteristics and intended use of this custom grade..."></textarea>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Minimum Order Quantity (kg)</label>
-                            <input type="number" class="form-control" name="minimum_order_quantity" step="0.01" min="0"
-                                   placeholder="100" onchange="updatePreview()" style="border-color: #5D5CDE;">
+                <input type="number" class="form-control input-highlight" name="minimum_order_quantity" step="0.01" min="0"
+                    placeholder="100" onchange="updatePreview()">
                             <div class="form-text">Minimum quantity for orders of this grade</div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Required Weight per Grade (kg) *</label>
-                            <input type="number" class="form-control" name="required_weight_per_grade" step="0.01" min="0" required
-                                   placeholder="500" onchange="updatePreview()" style="border-color: #5D5CDE;">
+                <input type="number" class="form-control input-highlight" name="required_weight_per_grade" step="0.01" min="0" required
+                    placeholder="500" onchange="updatePreview()">
                             <div class="form-text">Total weight required to complete this grade</div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Acquired Weight per Grade (kg)</label>
-                            <input type="number" class="form-control" name="acquired_weight_per_grade" step="0.01" min="0"
-                                   placeholder="0" value="0" onchange="updatePreview()" style="border-color: #5D5CDE;">
+                <input type="number" class="form-control input-highlight" name="acquired_weight_per_grade" step="0.01" min="0"
+                    placeholder="0" value="0" onchange="updatePreview()">
                             <div class="form-text">Current weight acquired for this grade</div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Quality Standard</label>
-                            <select class="form-select" name="quality_standard" onchange="updatePreview()" style="border-color: #5D5CDE;">
+                            <select class="form-select input-highlight" name="quality_standard" onchange="updatePreview()">
                                 <option value="PREMIUM">Premium</option>
                                 <option value="STANDARD" selected>Standard</option>
                                 <option value="BASIC">Basic</option>
@@ -235,7 +235,7 @@
                             <button type="button" class="remove-component" onclick="removeComponent(this)" style="display: none;">
                                 <i class="bi bi-x"></i>
                             </button>
-                            <div class="row">
+                            <div class="row g-2 align-items-center">
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Base Grade</label>
                                     <select class="form-select component-grade" name="base_grade_0" required onchange="updateComponent(0)">
@@ -517,11 +517,11 @@ let componentCount = 1;
 function addComponent() {
     const container = document.getElementById('componentsContainer');
     const componentHtml = `
-        <div class="component-row" data-component="${componentCount}">
+            <div class="component-row" data-component="${componentCount}">
             <button type="button" class="remove-component" onclick="removeComponent(this)">
                 <i class="bi bi-x"></i>
             </button>
-            <div class="row">
+            <div class="row g-2 align-items-center">
                 <div class="col-md-4 mb-3">
                     <label class="form-label">Base Grade</label>
                     <select class="form-select component-grade" name="base_grade_${componentCount}" required onchange="updateComponent(${componentCount})">
@@ -623,7 +623,7 @@ function addComponent() {
                     <div class="component-weight fw-bold text-center p-2 bg-light rounded">0%</div>
                 </div>
             </div>
-            <div class="row">
+            <div class="row g-2">
                 <div class="col-12">
                     <div class="component-bar">
                         <div class="component-fill" style="width: 0%;"></div>

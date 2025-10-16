@@ -6394,3 +6394,128 @@ INFO 2025-10-16 12:07:05,766 basehttp 4324 13880 "GET /timb/ HTTP/1.1" 200 38526
 WARNING 2025-10-16 12:07:10,157 log 4324 21452 Not Found: /ws/realtime/dashboard/timb/
 WARNING 2025-10-16 12:07:10,158 basehttp 4324 21452 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
 INFO 2025-10-16 12:07:15,270 basehttp 4324 8812 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:07:21,318 log 4324 7324 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:07:21,319 basehttp 4324 7324 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:07:26,413 basehttp 4324 22620 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:07:30,761 log 4324 17484 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:07:30,763 basehttp 4324 17484 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:07:34,475 basehttp 4324 22620 "GET /timb/merchants/ HTTP/1.1" 200 32604
+INFO 2025-10-16 12:07:36,067 basehttp 4324 22908 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:07:41,248 log 4324 22144 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:07:41,250 basehttp 4324 22144 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:07:42,557 basehttp 4324 22908 "GET /timb/merchants/?q= HTTP/1.1" 200 32604
+INFO 2025-10-16 12:07:45,830 basehttp 4324 8740 "GET /timb/merchants/create/ HTTP/1.1" 200 29254
+INFO 2025-10-16 12:07:47,057 basehttp 4324 8740 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:07:51,221 log 4324 6572 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:07:51,222 basehttp 4324 6572 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:07:57,051 basehttp 4324 7056 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:08:00,881 log 4324 20664 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:08:00,882 basehttp 4324 20664 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:08:06,088 basehttp 4324 22916 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:08:07,787 log 4324 22884 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:08:07,788 basehttp 4324 22884 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:08:13,078 basehttp 4324 22916 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:08:15,624 log 4324 17844 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:08:15,627 basehttp 4324 17844 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:08:21,092 basehttp 4324 7600 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:08:23,259 log 4324 13880 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:08:23,261 basehttp 4324 13880 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:08:29,081 basehttp 4324 5744 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:08:31,001 log 4324 22876 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:08:31,002 basehttp 4324 22876 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:08:37,096 basehttp 4324 14948 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:08:38,963 log 4324 22076 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:08:38,965 basehttp 4324 22076 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:08:45,077 basehttp 4324 4196 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:08:48,540 log 4324 3728 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:08:48,541 basehttp 4324 3728 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:08:54,072 basehttp 4324 4196 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:08:56,205 log 4324 10832 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:08:56,207 basehttp 4324 10832 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:09:02,073 basehttp 4324 17624 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:09:07,501 log 4324 19020 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:09:07,502 basehttp 4324 19020 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:09:13,059 basehttp 4324 22376 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:09:17,839 log 4324 15908 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:09:17,840 basehttp 4324 15908 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:09:23,087 basehttp 4324 20748 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:09:25,872 log 4324 19524 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:09:25,873 basehttp 4324 19524 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:09:31,121 basehttp 4324 18780 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:09:33,002 log 4324 19108 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:09:33,004 basehttp 4324 19108 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:09:39,078 basehttp 4324 21456 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:09:39,444 log 4324 21628 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:09:39,444 basehttp 4324 21628 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:09:45,051 basehttp 4324 21456 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:09:45,351 log 4324 7996 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:09:45,352 basehttp 4324 7996 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:09:51,071 basehttp 4324 21456 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:09:51,335 log 4324 19828 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:09:51,336 basehttp 4324 19828 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:09:53,918 basehttp 4324 21456 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:09:54,191 log 4324 13000 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:09:54,194 basehttp 4324 13000 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:09:56,271 basehttp 4324 21780 "GET /timb/merchants/create/ HTTP/1.1" 200 29254
+INFO 2025-10-16 12:09:57,065 basehttp 4324 21780 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:09:57,336 log 4324 4256 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:09:57,336 basehttp 4324 4256 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:10:00,379 basehttp 4324 21780 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:10:00,545 log 4324 6816 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:10:00,546 basehttp 4324 6816 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:10:03,051 basehttp 4324 21780 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:10:03,329 log 4324 10832 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:10:03,330 basehttp 4324 10832 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:10:04,067 basehttp 4324 21780 "GET /auth/logout/ HTTP/1.1" 302 0
+INFO 2025-10-16 12:10:04,080 basehttp 4324 21780 "GET /auth/login/ HTTP/1.1" 200 18772
+INFO 2025-10-16 12:10:09,030 basehttp 4324 3860 "GET /timb/ HTTP/1.1" 302 0
+INFO 2025-10-16 12:10:09,043 basehttp 4324 3860 "GET /auth/login/?next=/timb/ HTTP/1.1" 200 17835
+INFO 2025-10-16 12:10:16,817 basehttp 4324 9596 "POST /auth/login/ HTTP/1.1" 302 0
+INFO 2025-10-16 12:10:16,896 basehttp 4324 9596 "GET /merchant/ HTTP/1.1" 200 43003
+WARNING 2025-10-16 12:10:17,184 log 4324 5712 Not Found: /ws/realtime/dashboard/merchant/
+WARNING 2025-10-16 12:10:17,186 basehttp 4324 5712 "GET /ws/realtime/dashboard/merchant/ HTTP/1.1" 404 3090
+INFO 2025-10-16 12:10:31,859 basehttp 4324 7808 "GET /merchant/grades/create/ HTTP/1.1" 200 641839
+INFO 2025-10-16 12:19:15,269 basehttp 4324 19168 "GET /merchant/grades/create/ HTTP/1.1" 200 641791
+INFO 2025-10-16 12:19:17,305 basehttp 4324 20384 "GET /merchant/grades/create/ HTTP/1.1" 200 641791
+INFO 2025-10-16 12:19:18,297 basehttp 4324 20384 "GET /merchant/grades/create/ HTTP/1.1" 200 641791
+INFO 2025-10-16 12:24:09,367 basehttp 4324 17748 "GET /merchant/grades/create/ HTTP/1.1" 200 642006
+INFO 2025-10-16 12:26:21,790 basehttp 4324 16348 "GET /merchant/grades/create/ HTTP/1.1" 200 642318
+INFO 2025-10-16 12:26:36,454 basehttp 4324 23416 "GET /merchant/grades/ HTTP/1.1" 200 31072
+INFO 2025-10-16 12:35:28,685 basehttp 4324 19776 "GET /merchant/grades/create/ HTTP/1.1" 200 642311
+INFO 2025-10-16 12:38:18,011 basehttp 4324 12588 "GET /merchant/grades/create/ HTTP/1.1" 200 642311
+INFO 2025-10-16 12:40:33,529 basehttp 4324 22788 "GET /merchant/ HTTP/1.1" 200 42083
+WARNING 2025-10-16 12:40:33,803 log 4324 19844 Not Found: /ws/realtime/dashboard/merchant/
+WARNING 2025-10-16 12:40:33,806 basehttp 4324 19844 "GET /ws/realtime/dashboard/merchant/ HTTP/1.1" 404 3090
+INFO 2025-10-16 12:41:04,039 basehttp 4324 14456 "GET /merchant/api/dashboard-data/ HTTP/1.1" 200 138
+INFO 2025-10-16 12:41:31,308 basehttp 4324 9476 "GET /auth/logout/ HTTP/1.1" 302 0
+INFO 2025-10-16 12:41:31,317 basehttp 4324 9476 "GET /auth/login/ HTTP/1.1" 200 18772
+INFO 2025-10-16 12:41:37,333 basehttp 4324 9476 "POST /auth/login/ HTTP/1.1" 302 0
+INFO 2025-10-16 12:41:37,385 basehttp 4324 9476 "GET /merchant/ HTTP/1.1" 200 43003
+WARNING 2025-10-16 12:41:37,652 log 4324 11568 Not Found: /ws/realtime/dashboard/merchant/
+WARNING 2025-10-16 12:41:37,654 basehttp 4324 11568 "GET /ws/realtime/dashboard/merchant/ HTTP/1.1" 404 3090
+INFO 2025-10-16 12:41:55,116 basehttp 4324 16432 "GET /auth/profile/ HTTP/1.1" 200 34416
+INFO 2025-10-16 12:42:23,791 basehttp 4324 21452 "GET /auth/logout/ HTTP/1.1" 302 0
+INFO 2025-10-16 12:42:23,796 basehttp 4324 21452 "GET /auth/login/ HTTP/1.1" 200 18772
+INFO 2025-10-16 12:42:47,225 basehttp 4324 1560 "POST /auth/login/ HTTP/1.1" 302 0
+INFO 2025-10-16 12:42:47,270 basehttp 4324 1560 "GET /timb/ HTTP/1.1" 200 39450
+INFO 2025-10-16 12:42:47,303 basehttp 4324 1560 "GET /static/images/timb-logo.png HTTP/1.1" 304 0
+WARNING 2025-10-16 12:42:47,539 log 4324 15812 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:42:47,542 basehttp 4324 15812 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:42:51,365 basehttp 4324 3608 "GET /timb/merchants/create/ HTTP/1.1" 200 29254
+INFO 2025-10-16 12:49:05,633 basehttp 4324 11088 "GET /auth/logout/ HTTP/1.1" 302 0
+INFO 2025-10-16 12:49:05,645 basehttp 4324 11088 "GET /auth/login/ HTTP/1.1" 200 18772
+INFO 2025-10-16 12:49:10,516 basehttp 4324 16348 "POST /auth/login/ HTTP/1.1" 302 0
+INFO 2025-10-16 12:49:10,578 basehttp 4324 16348 "GET /merchant/ HTTP/1.1" 200 43003
+WARNING 2025-10-16 12:49:10,833 log 4324 6964 Not Found: /ws/realtime/dashboard/merchant/
+WARNING 2025-10-16 12:49:10,835 basehttp 4324 6964 "GET /ws/realtime/dashboard/merchant/ HTTP/1.1" 404 3090
+INFO 2025-10-16 12:49:17,569 basehttp 4324 16348 "GET /merchant/grades/create/ HTTP/1.1" 200 642774
+INFO 2025-10-16 12:50:17,480 basehttp 4324 12900 "GET /merchant/grades/ HTTP/1.1" 200 31072
+INFO 2025-10-16 12:50:19,674 basehttp 4324 3292 "GET /merchant/grades/create/ HTTP/1.1" 200 642774
+INFO 2025-10-16 12:52:09,753 basehttp 4324 6036 "GET /merchant/grades/create/ HTTP/1.1" 200 642609
+INFO 2025-10-16 12:52:14,211 basehttp 4324 6036 "GET /merchant/grades/ HTTP/1.1" 200 31072
+INFO 2025-10-16 12:52:15,937 basehttp 4324 6036 "GET /merchant/grades/create/ HTTP/1.1" 200 642609
+INFO 2025-10-16 12:52:48,295 basehttp 4324 2792 "GET /merchant/grades/create/ HTTP/1.1" 200 642399
+INFO 2025-10-16 12:53:26,827 basehttp 4324 15144 "GET /merchant/grades/create/ HTTP/1.1" 200 642379
+INFO 2025-10-16 12:53:29,015 basehttp 4324 15144 "GET /merchant/grades/create/ HTTP/1.1" 200 642379
+INFO 2025-10-16 12:53:29,907 basehttp 4324 15144 "GET /merchant/grades/create/ HTTP/1.1" 200 642379
+INFO 2025-10-16 12:54:07,723 basehttp 4324 16480 "GET /merchant/grades/create/ HTTP/1.1" 200 642427
