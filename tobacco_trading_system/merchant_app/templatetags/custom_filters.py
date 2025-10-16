@@ -1,58 +1,57 @@
 from django import template
+from django.db.models import Avg
 
 register = template.Library()
 
 
 @register.filter(name='average')
-def average(iterable, attr=None):
-    """Return the average of values in an iterable.
+def average(value, arg=None):
+    """Template filter to compute average.
 
-    Usage in template:
-        {{ queryset|average:"field_name" }}
-    or for list of numbers:
-        {{ numbers|average }}
+    Usage:
+      - For a queryset and field name: {{ queryset|average:"field_name" }}
+      - For a list of numbers: {{ numbers|average }}
+      - For a list of objects and attribute name: {{ objects|average:"attr_name" }}
+
+    Returns 0 when no values found or on error.
     """
     try:
-        if iterable is None:
+        # If it's a Django queryset (has aggregate), and arg provided, use DB aggregation
+        if hasattr(value, 'aggregate') and arg:
+            res = value.aggregate(avg=Avg(arg))
+            return res.get('avg') or 0
+
+        # Otherwise, try to iterate and compute average in Python
+        iterable = list(value or [])
+        if not iterable:
             return 0
 
-        # If attr passed, extract attribute or dict key
-        values = []
-        if attr:
+        numbers = []
+        if arg:
             for item in iterable:
-                # support dict-like and object attribute access
+                # support attribute or dict lookup
+                val = None
                 try:
-                    val = getattr(item, attr)
+                    val = getattr(item, arg)
                 except Exception:
                     try:
-                        val = item.get(attr)
+                        val = item.get(arg)
                     except Exception:
                         val = None
                 if val is not None:
                     try:
-                        values.append(float(val))
+                        numbers.append(float(val))
                     except Exception:
                         continue
         else:
             for item in iterable:
                 try:
-                    values.append(float(item))
+                    numbers.append(float(item))
                 except Exception:
                     continue
 
-        if not values:
+        if not numbers:
             return 0
-
-        return sum(values) / len(values)
+        return sum(numbers) / len(numbers)
     except Exception:
         return 0
-from django import template
-from django.db.models import Avg
-
-register = template.Library()
-
-@register.filter
-def average(queryset, field_name):
-    if not queryset:
-        return 0
-    return queryset.aggregate(avg=Avg(field_name))['avg'] or 0

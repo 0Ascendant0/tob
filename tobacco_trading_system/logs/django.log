@@ -5215,3 +5215,1182 @@ django.urls.exceptions.NoReverseMatch: Reverse for 'merchant_add_inventory' not 
 ERROR 2025-10-16 10:53:53,948 basehttp 15280 23072 "GET /merchant/ HTTP/1.1" 500 198463
 INFO 2025-10-16 10:54:40,743 autoreload 15280 21332 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\templatetags\custom_filters.py changed, reloading.
 INFO 2025-10-16 10:54:44,080 autoreload 17900 23644 Watching for file changes with StatReloader
+ERROR 2025-10-16 10:55:04,148 log 17900 18036 Internal Server Error: /merchant/
+Traceback (most recent call last):
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py", line 144, in dashboard
+    return render(request, 'merchant_app/dashboard.html', context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\backends\django.py", line 61, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\base.py", line 175, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\test\utils.py", line 112, in instrumented_test_render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\base.py", line 966, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\loader_tags.py", line 157, in render
+    return compiled_parent._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\test\utils.py", line 112, in instrumented_test_render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\base.py", line 966, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\loader_tags.py", line 63, in render
+    result = block.nodelist.render(context)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\base.py", line 966, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\defaulttags.py", line 196, in render
+    return self.nodelist_empty.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\base.py", line 966, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\defaulttags.py", line 471, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\urls\base.py", line 88, in reverse
+    return resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\urls\resolvers.py", line 828, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'merchant_add_inventory' not found. 'merchant_add_inventory' is not a valid view function or pattern name.
+ERROR 2025-10-16 10:55:04,184 basehttp 17900 18036 "GET /merchant/ HTTP/1.1" 500 198205
+ERROR 2025-10-16 10:55:37,385 log 17900 14504 Internal Server Error: /merchant/
+Traceback (most recent call last):
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py", line 144, in dashboard
+    return render(request, 'merchant_app/dashboard.html', context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\backends\django.py", line 61, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\base.py", line 175, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\test\utils.py", line 112, in instrumented_test_render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\base.py", line 966, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\loader_tags.py", line 157, in render
+    return compiled_parent._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\test\utils.py", line 112, in instrumented_test_render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\base.py", line 966, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\loader_tags.py", line 63, in render
+    result = block.nodelist.render(context)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\base.py", line 966, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\defaulttags.py", line 471, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\urls\base.py", line 88, in reverse
+    return resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\urls\resolvers.py", line 828, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'merchant_add_inventory' not found. 'merchant_add_inventory' is not a valid view function or pattern name.
+ERROR 2025-10-16 10:55:37,391 basehttp 17900 14504 "GET /merchant/ HTTP/1.1" 500 184753
+INFO 2025-10-16 10:56:08,955 basehttp 17900 20692 "GET /merchant/ HTTP/1.1" 200 41867
+INFO 2025-10-16 10:56:09,004 basehttp 17900 20692 "GET /static/images/timb-logo.png HTTP/1.1" 304 0
+WARNING 2025-10-16 10:56:09,875 log 17900 21612 Not Found: /ws/realtime/dashboard/merchant/
+WARNING 2025-10-16 10:56:09,879 basehttp 17900 21612 "GET /ws/realtime/dashboard/merchant/ HTTP/1.1" 404 3090
+INFO 2025-10-16 10:56:21,800 basehttp 17900 16300 "GET /merchant/grades/create/ HTTP/1.1" 302 0
+INFO 2025-10-16 10:56:21,850 basehttp 17900 16300 "GET /merchant/grades/ HTTP/1.1" 200 32020
+INFO 2025-10-16 10:56:23,945 basehttp 17900 16300 "GET /merchant/grades/create/ HTTP/1.1" 302 0
+INFO 2025-10-16 10:56:24,003 basehttp 17900 16300 "GET /merchant/grades/ HTTP/1.1" 200 32020
+INFO 2025-10-16 10:56:26,139 basehttp 17900 16300 "GET /merchant/grades/ HTTP/1.1" 200 31062
+INFO 2025-10-16 10:56:50,106 basehttp 17900 7720 "GET / HTTP/1.1" 302 0
+INFO 2025-10-16 10:56:50,151 basehttp 17900 7720 "GET /merchant/ HTTP/1.1" 200 41867
+WARNING 2025-10-16 10:56:50,721 log 17900 1824 Not Found: /ws/realtime/dashboard/merchant/
+WARNING 2025-10-16 10:56:50,725 basehttp 17900 1824 "GET /ws/realtime/dashboard/merchant/ HTTP/1.1" 404 3090
+INFO 2025-10-16 10:56:52,753 basehttp 17900 7720 "GET /auth/logout/ HTTP/1.1" 302 0
+INFO 2025-10-16 10:56:52,783 basehttp 17900 7720 "GET /auth/login/ HTTP/1.1" 200 18772
+INFO 2025-10-16 10:57:08,334 basehttp 17900 4668 "POST /auth/login/ HTTP/1.1" 302 0
+INFO 2025-10-16 10:57:08,415 basehttp 17900 4668 "GET /timb/ HTTP/1.1" 200 38666
+WARNING 2025-10-16 10:57:09,132 log 17900 8760 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 10:57:09,135 basehttp 17900 8760 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 10:57:14,531 basehttp 17900 2396 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 10:57:14,845 log 17900 24504 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 10:57:14,845 basehttp 17900 24504 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 10:57:20,153 basehttp 17900 17320 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 10:57:20,708 log 17900 12272 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 10:57:20,711 basehttp 17900 12272 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 10:57:26,083 basehttp 17900 17320 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 10:57:26,661 log 17900 1440 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 10:57:26,663 basehttp 17900 1440 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 10:57:32,087 basehttp 17900 18832 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 10:57:32,722 log 17900 19492 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 10:57:32,722 basehttp 17900 19492 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 10:57:38,161 basehttp 17900 18832 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 10:57:39,103 log 17900 23548 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 10:57:39,109 basehttp 17900 23548 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 10:57:45,114 basehttp 17900 19588 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 10:57:45,868 log 17900 23556 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 10:57:45,874 basehttp 17900 23556 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 10:57:52,161 basehttp 17900 17684 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 10:57:53,321 log 17900 13512 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 10:57:53,321 basehttp 17900 13512 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 10:57:59,155 basehttp 17900 6740 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 10:58:00,241 log 17900 12068 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 10:58:00,243 basehttp 17900 12068 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 10:58:06,092 basehttp 17900 6740 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 10:58:06,801 log 17900 708 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 10:58:06,801 basehttp 17900 708 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 10:58:12,117 basehttp 17900 22800 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 10:58:12,813 log 17900 3292 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 10:58:12,813 basehttp 17900 3292 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 10:58:18,149 basehttp 17900 22800 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 10:58:19,241 log 17900 19820 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 10:58:19,241 basehttp 17900 19820 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 10:58:25,151 basehttp 17900 22276 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 10:58:25,841 log 17900 23152 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 10:58:25,841 basehttp 17900 23152 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 10:58:31,172 basehttp 17900 4544 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 10:58:32,256 log 17900 18924 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 10:58:32,263 basehttp 17900 18924 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 10:58:38,201 basehttp 17900 4544 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 10:58:38,882 log 17900 10300 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 10:58:38,882 basehttp 17900 10300 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 10:58:45,193 basehttp 17900 19592 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 10:58:46,101 log 17900 19864 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 10:58:46,104 basehttp 17900 19864 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 10:58:52,176 basehttp 17900 9972 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 10:58:53,223 log 17900 9916 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 10:58:53,227 basehttp 17900 9916 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 10:58:59,178 basehttp 17900 23668 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 10:59:00,301 log 17900 24176 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 10:59:00,304 basehttp 17900 24176 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 10:59:06,161 basehttp 17900 23668 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 10:59:07,271 log 17900 15452 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 10:59:07,273 basehttp 17900 15452 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 10:59:13,136 basehttp 17900 1792 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 10:59:14,169 log 17900 21948 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 10:59:14,171 basehttp 17900 21948 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 10:59:20,141 basehttp 17900 23876 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 10:59:20,917 log 17900 13956 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 10:59:20,921 basehttp 17900 13956 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 10:59:27,151 basehttp 17900 23876 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 10:59:28,303 log 17900 21080 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 10:59:28,303 basehttp 17900 21080 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 10:59:34,193 basehttp 17900 11036 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 10:59:35,193 log 17900 17620 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 10:59:35,193 basehttp 17900 17620 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 10:59:41,177 basehttp 17900 6712 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 10:59:42,341 log 17900 5148 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 10:59:42,346 basehttp 17900 5148 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 10:59:48,174 basehttp 17900 6712 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 10:59:49,911 log 17900 8196 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 10:59:49,911 basehttp 17900 8196 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 10:59:55,187 basehttp 17900 19040 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 10:59:57,423 log 17900 24340 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 10:59:57,423 basehttp 17900 24340 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:00:03,161 basehttp 17900 5112 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:00:08,405 log 17900 14784 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:00:08,407 basehttp 17900 14784 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:00:14,251 basehttp 17900 18580 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:00:14,964 log 17900 24184 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:00:14,966 basehttp 17900 24184 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:00:21,155 basehttp 17900 19552 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:00:22,195 log 17900 18924 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:00:22,204 basehttp 17900 18924 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:00:28,188 basehttp 17900 19552 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:00:28,876 log 17900 23652 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:00:28,876 basehttp 17900 23652 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:00:35,072 basehttp 17900 19972 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:00:35,689 log 17900 8104 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:00:35,691 basehttp 17900 8104 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:00:41,117 basehttp 17900 24048 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:00:41,961 log 17900 13492 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:00:41,964 basehttp 17900 13492 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:00:48,145 basehttp 17900 24048 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:00:49,157 log 17900 22480 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:00:49,160 basehttp 17900 22480 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:00:55,083 basehttp 17900 10016 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:00:55,611 log 17900 23668 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:00:55,615 basehttp 17900 23668 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:01:01,081 basehttp 17900 2012 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:01:01,721 log 17900 21892 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:01:01,722 basehttp 17900 21892 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:01:07,169 basehttp 17900 2012 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:01:07,801 log 17900 13984 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:01:07,801 basehttp 17900 13984 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:01:13,151 basehttp 17900 8096 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:01:14,293 log 17900 13912 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:01:14,298 basehttp 17900 13912 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:01:20,168 basehttp 17900 5148 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:01:21,151 log 17900 7100 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:01:21,151 basehttp 17900 7100 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:01:27,181 basehttp 17900 5148 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:01:28,183 log 17900 19400 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:01:28,185 basehttp 17900 19400 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:01:34,158 basehttp 17900 20148 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:01:35,201 log 17900 13720 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:01:35,203 basehttp 17900 13720 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:01:41,151 basehttp 17900 23452 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:01:42,791 log 17900 22960 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:01:42,794 basehttp 17900 22960 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:01:48,162 basehttp 17900 23452 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:01:49,704 log 17900 3328 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:01:49,704 basehttp 17900 3328 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:01:55,187 basehttp 17900 15164 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:01:57,821 log 17900 21236 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:01:57,825 basehttp 17900 21236 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:02:03,194 basehttp 17900 9572 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:02:07,562 log 17900 17268 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:02:07,562 basehttp 17900 17268 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:02:13,260 basehttp 17900 7636 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:02:15,741 log 17900 5300 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:02:15,741 basehttp 17900 5300 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:02:20,986 basehttp 17900 7224 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:02:23,701 log 17900 19136 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:02:23,703 basehttp 17900 19136 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:02:28,919 basehttp 17900 7224 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:02:32,815 log 17900 19900 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:02:32,817 basehttp 17900 19900 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:02:37,981 basehttp 17900 7224 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:02:40,086 log 17900 7400 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:02:40,091 basehttp 17900 7400 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:02:45,328 basehttp 17900 19384 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:02:49,102 log 17900 16180 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:02:49,104 basehttp 17900 16180 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:02:54,335 basehttp 17900 1108 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:02:56,855 log 17900 15048 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:02:56,861 basehttp 17900 15048 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:03:02,001 basehttp 17900 20732 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:03:03,630 log 17900 24048 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:03:03,633 basehttp 17900 24048 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:03:08,847 basehttp 17900 20732 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:03:11,099 log 17900 10136 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:03:11,101 basehttp 17900 10136 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:03:16,351 basehttp 17900 15804 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:03:20,165 log 17900 18944 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:03:20,168 basehttp 17900 18944 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:03:25,371 basehttp 17900 2484 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:03:27,301 log 17900 23604 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:03:27,307 basehttp 17900 23604 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:03:32,559 basehttp 17900 23920 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:03:34,901 log 17900 9924 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:03:34,907 basehttp 17900 9924 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:03:40,187 basehttp 17900 23912 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:03:44,311 log 17900 18088 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:03:44,318 basehttp 17900 18088 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:03:49,621 basehttp 17900 7100 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:03:54,011 log 17900 15312 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:03:54,011 basehttp 17900 15312 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:03:59,172 basehttp 17900 13732 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:04:03,130 log 17900 19428 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:04:03,135 basehttp 17900 19428 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:04:08,381 basehttp 17900 13732 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:04:12,493 log 17900 21432 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:04:12,498 basehttp 17900 21432 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:04:17,724 basehttp 17900 9908 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:04:18,138 log 17900 11280 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:04:18,141 basehttp 17900 11280 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:04:23,433 basehttp 17900 9184 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:04:23,844 log 17900 16556 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:04:23,849 basehttp 17900 16556 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:04:29,129 basehttp 17900 9184 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:04:29,569 log 17900 19312 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:04:29,575 basehttp 17900 19312 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:04:34,870 basehttp 17900 9184 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:04:35,300 log 17900 5300 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:04:35,302 basehttp 17900 5300 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:04:40,646 basehttp 17900 6948 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:04:41,186 log 17900 20400 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:04:41,186 basehttp 17900 20400 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:04:46,516 basehttp 17900 6948 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:04:47,271 log 17900 12804 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:04:47,275 basehttp 17900 12804 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:04:52,549 basehttp 17900 380 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:04:53,236 log 17900 19576 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:04:53,239 basehttp 17900 19576 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:04:58,518 basehttp 17900 380 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:04:59,101 log 17900 22220 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:04:59,109 basehttp 17900 22220 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:05:04,341 basehttp 17900 20192 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:05:04,965 log 17900 20376 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:05:04,965 basehttp 17900 20376 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:05:10,185 basehttp 17900 22664 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:05:10,906 log 17900 1460 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:05:10,914 basehttp 17900 1460 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:05:16,198 basehttp 17900 22664 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:05:16,928 log 17900 4960 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:05:16,928 basehttp 17900 4960 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:05:22,155 basehttp 17900 23996 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:05:23,014 log 17900 21072 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:05:23,017 basehttp 17900 21072 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:05:28,275 basehttp 17900 23996 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:05:28,923 log 17900 18676 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:05:28,923 basehttp 17900 18676 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:05:34,220 basehttp 17900 9444 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:05:35,285 log 17900 17556 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:05:35,289 basehttp 17900 17556 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:05:40,558 basehttp 17900 3764 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:05:41,819 log 17900 14192 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:05:41,826 basehttp 17900 14192 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:05:47,046 basehttp 17900 3764 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:05:49,633 log 17900 17888 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:05:49,640 basehttp 17900 17888 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:05:49,644 basehttp 17900 17888 - Broken pipe from ('127.0.0.1', 55562)
+INFO 2025-10-16 11:05:54,936 basehttp 17900 16840 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:05:58,809 log 17900 9920 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:05:58,818 basehttp 17900 9920 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:06:04,154 basehttp 17900 20260 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:06:07,534 log 17900 14904 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:06:07,534 basehttp 17900 14904 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:06:12,767 basehttp 17900 23788 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:06:18,164 log 17900 22324 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:06:18,165 basehttp 17900 22324 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:06:23,382 basehttp 17900 20664 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:06:28,521 log 17900 22480 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:06:28,521 basehttp 17900 22480 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:06:33,774 basehttp 17900 24100 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:06:38,646 log 17900 21432 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:06:38,649 basehttp 17900 21432 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:06:43,900 basehttp 17900 23816 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:06:49,074 log 17900 10964 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:06:49,076 basehttp 17900 10964 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:06:49,084 basehttp 17900 10964 - Broken pipe from ('127.0.0.1', 61875)
+INFO 2025-10-16 11:06:54,304 basehttp 17900 23408 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:06:56,228 log 17900 18404 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:06:56,228 basehttp 17900 18404 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:06:56,239 basehttp 17900 18404 - Broken pipe from ('127.0.0.1', 54772)
+INFO 2025-10-16 11:07:01,549 basehttp 17900 18976 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:07:04,875 log 17900 14052 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:07:04,887 basehttp 17900 14052 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:07:10,203 basehttp 17900 8512 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:07:12,060 log 17900 7080 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:07:12,060 basehttp 17900 7080 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:07:17,392 basehttp 17900 8512 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:07:22,850 log 17900 23412 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:07:22,856 basehttp 17900 23412 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:07:28,196 basehttp 17900 2012 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:07:33,295 log 17900 18372 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:07:33,302 basehttp 17900 18372 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:07:38,556 basehttp 17900 21128 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:07:41,456 log 17900 5084 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:07:41,461 basehttp 17900 5084 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:07:46,692 basehttp 17900 3144 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:07:51,633 log 17900 17664 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:07:51,638 basehttp 17900 17664 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:07:56,847 basehttp 17900 22096 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:08:02,516 log 17900 7056 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:08:02,516 basehttp 17900 7056 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:08:07,716 basehttp 17900 1816 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:08:11,894 log 17900 14612 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:08:11,894 basehttp 17900 14612 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:08:17,221 basehttp 17900 15440 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:08:17,857 log 17900 8736 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:08:17,869 basehttp 17900 8736 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:08:23,353 basehttp 17900 11964 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:08:23,933 log 17900 9444 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:08:23,936 basehttp 17900 9444 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:08:29,288 basehttp 17900 11964 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:08:29,899 log 17900 8580 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:08:29,899 basehttp 17900 8580 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:08:35,237 basehttp 17900 1096 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:08:35,766 log 17900 3764 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:08:35,766 basehttp 17900 3764 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:08:41,128 basehttp 17900 7600 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:08:41,973 log 17900 4704 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:08:41,979 basehttp 17900 4704 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:08:47,379 basehttp 17900 7600 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:08:47,856 log 17900 4920 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:08:47,858 basehttp 17900 4920 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:08:53,239 basehttp 17900 20344 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:08:53,857 log 17900 19672 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:08:53,857 basehttp 17900 19672 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:08:59,183 basehttp 17900 20344 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:08:59,555 log 17900 19092 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:08:59,555 basehttp 17900 19092 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:09:04,618 autoreload 17900 23644 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\timb_dashboard\views.py changed, reloading.
+INFO 2025-10-16 11:09:08,384 autoreload 23332 4016 Watching for file changes with StatReloader
+INFO 2025-10-16 11:09:10,455 basehttp 23332 20664 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:09:11,598 log 23332 2408 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:09:11,607 basehttp 23332 2408 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:09:17,171 basehttp 23332 20664 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:09:17,545 log 23332 2304 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:09:17,547 basehttp 23332 2304 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:09:22,865 basehttp 23332 18036 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:09:23,424 log 23332 8820 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:09:23,424 basehttp 23332 8820 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:09:28,751 basehttp 23332 18036 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:09:29,270 log 23332 11768 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:09:29,270 basehttp 23332 11768 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:09:34,640 basehttp 23332 14608 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:09:35,288 log 23332 24132 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:09:35,293 basehttp 23332 24132 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:09:40,675 basehttp 23332 19516 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:09:41,138 log 23332 10648 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:09:41,140 basehttp 23332 10648 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:09:46,473 basehttp 23332 19516 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:09:46,852 log 23332 10512 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:09:46,852 basehttp 23332 10512 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:09:52,132 basehttp 23332 24052 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:09:52,685 log 23332 10408 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:09:52,690 basehttp 23332 10408 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:09:57,965 basehttp 23332 24052 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:09:58,662 log 23332 1792 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:09:58,662 basehttp 23332 1792 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:10:03,907 basehttp 23332 20024 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:10:04,665 log 23332 23944 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:10:04,667 basehttp 23332 23944 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:10:09,984 basehttp 23332 22316 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:10:10,703 log 23332 1180 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:10:10,708 basehttp 23332 1180 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:10:15,991 basehttp 23332 22316 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:10:16,962 log 23332 3608 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:10:16,969 basehttp 23332 3608 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:10:22,370 basehttp 23332 22056 "GET /timb/ HTTP/1.1" 200 37742
+INFO 2025-10-16 11:10:22,609 autoreload 23332 4016 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\timb_dashboard\views.py changed, reloading.
+INFO 2025-10-16 11:10:26,626 autoreload 18844 23324 Watching for file changes with StatReloader
+INFO 2025-10-16 11:10:28,362 basehttp 18844 4260 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:10:28,761 log 18844 23248 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:10:28,761 basehttp 18844 23248 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:10:34,000 basehttp 18844 22096 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:10:34,450 log 18844 10304 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:10:34,451 basehttp 18844 10304 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:10:36,517 basehttp 18844 22096 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:10:37,114 log 18844 9944 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:10:37,114 basehttp 18844 9944 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:10:42,375 basehttp 18844 9640 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:10:43,022 log 18844 11188 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:10:43,027 basehttp 18844 11188 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:10:48,287 basehttp 18844 9640 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:10:48,921 log 18844 6980 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:10:48,926 basehttp 18844 6980 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:10:54,216 basehttp 18844 15168 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:10:54,861 log 18844 21456 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:10:54,865 basehttp 18844 21456 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:11:00,197 basehttp 18844 6392 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:11:00,771 log 18844 22068 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:11:00,771 basehttp 18844 22068 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:11:05,920 basehttp 18844 6392 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:11:06,466 log 18844 20584 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:11:06,466 basehttp 18844 20584 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:11:11,739 basehttp 18844 15784 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:11:12,295 log 18844 7732 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:11:12,303 basehttp 18844 7732 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:11:17,596 basehttp 18844 15784 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:11:18,174 log 18844 23556 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:11:18,176 basehttp 18844 23556 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:11:23,371 basehttp 18844 10700 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:11:24,052 log 18844 3580 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:11:24,055 basehttp 18844 3580 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:11:25,274 basehttp 18844 10700 "GET /timb/record-transaction/ HTTP/1.1" 200 82517
+INFO 2025-10-16 11:11:27,082 basehttp 18844 10700 "GET /realtime/ HTTP/1.1" 200 44944
+INFO 2025-10-16 11:11:28,252 basehttp 18844 10700 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:11:28,792 log 18844 3472 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:11:28,802 basehttp 18844 3472 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:11:31,400 basehttp 18844 16336 "GET /auth/logout/ HTTP/1.1" 302 0
+INFO 2025-10-16 11:11:31,414 basehttp 18844 16336 "GET /auth/login/ HTTP/1.1" 200 18772
+INFO 2025-10-16 11:11:39,385 basehttp 18844 16336 "POST /auth/login/ HTTP/1.1" 302 0
+INFO 2025-10-16 11:11:39,499 basehttp 18844 16336 "GET /timb/ HTTP/1.1" 200 38666
+WARNING 2025-10-16 11:11:40,695 log 18844 1648 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:11:40,695 basehttp 18844 1648 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:11:45,905 basehttp 18844 18856 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:11:46,968 log 18844 17484 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:11:46,974 basehttp 18844 17484 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:11:52,219 basehttp 18844 13880 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:11:54,426 log 18844 22628 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:11:54,431 basehttp 18844 22628 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:11:59,643 basehttp 18844 13880 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:12:03,154 log 18844 9672 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:12:03,157 basehttp 18844 9672 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:12:03,958 basehttp 18844 11768 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:12:07,851 log 18844 3600 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:12:07,851 basehttp 18844 3600 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:12:13,110 basehttp 18844 16364 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:12:14,988 log 18844 19440 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:12:14,996 basehttp 18844 19440 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:12:20,283 basehttp 18844 10868 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:12:22,415 log 18844 20968 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:12:22,423 basehttp 18844 20968 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:12:27,641 basehttp 18844 10868 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:12:28,309 log 18844 20088 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:12:28,311 basehttp 18844 20088 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:12:33,540 basehttp 18844 3476 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:12:34,163 log 18844 10456 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:12:34,165 basehttp 18844 10456 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:12:39,390 basehttp 18844 3476 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:12:39,859 log 18844 4052 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:12:39,861 basehttp 18844 4052 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:12:45,018 basehttp 18844 21184 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:12:45,354 log 18844 18088 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:12:45,359 basehttp 18844 18088 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:12:50,600 basehttp 18844 18204 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:12:51,169 log 18844 7344 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:12:51,169 basehttp 18844 7344 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:12:56,360 basehttp 18844 18204 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:12:57,059 log 18844 16180 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:12:57,060 basehttp 18844 16180 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:13:02,393 basehttp 18844 4668 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:13:02,993 log 18844 17532 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:13:02,995 basehttp 18844 17532 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:13:08,191 basehttp 18844 4668 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:13:08,822 log 18844 22140 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:13:08,827 basehttp 18844 22140 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:13:14,045 basehttp 18844 11284 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:13:14,632 log 18844 18800 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:13:14,637 basehttp 18844 18800 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:13:19,854 basehttp 18844 11284 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:13:20,378 log 18844 20416 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:13:20,378 basehttp 18844 20416 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:13:25,546 basehttp 18844 11284 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:13:26,208 log 18844 11964 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:13:26,212 basehttp 18844 11964 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:13:31,450 basehttp 18844 17572 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:13:32,178 log 18844 22068 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:13:32,183 basehttp 18844 22068 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:13:37,378 basehttp 18844 17572 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:13:38,184 log 18844 24464 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:13:38,192 basehttp 18844 24464 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:13:43,390 basehttp 18844 20836 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:13:44,207 log 18844 22448 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:13:44,207 basehttp 18844 22448 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:13:49,316 basehttp 18844 20836 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:13:50,558 log 18844 3708 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:13:50,559 basehttp 18844 3708 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:13:55,623 basehttp 18844 9584 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:13:57,974 log 18844 10604 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:13:57,975 basehttp 18844 10604 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:14:03,042 basehttp 18844 19988 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:14:06,977 log 18844 18864 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:14:06,978 basehttp 18844 18864 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:14:12,050 basehttp 18844 18848 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:14:14,239 log 18844 17620 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:14:14,240 basehttp 18844 17620 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:14:19,302 basehttp 18844 18848 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:14:23,975 log 18844 17476 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:14:23,976 basehttp 18844 17476 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:14:29,046 basehttp 18844 19232 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:14:29,189 log 18844 12404 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:14:29,190 basehttp 18844 12404 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:14:34,302 basehttp 18844 9480 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:14:34,466 log 18844 23320 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:14:34,468 basehttp 18844 23320 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:14:39,552 basehttp 18844 9480 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:14:39,740 log 18844 8036 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:14:39,741 basehttp 18844 8036 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:14:44,831 basehttp 18844 8788 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:14:44,997 log 18844 21880 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:14:44,998 basehttp 18844 21880 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:14:50,077 basehttp 18844 12556 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:14:50,245 log 18844 10012 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:14:50,247 basehttp 18844 10012 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:14:55,331 basehttp 18844 12556 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:14:55,493 log 18844 6980 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:14:55,494 basehttp 18844 6980 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:15:00,593 basehttp 18844 8168 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:15:00,750 log 18844 21088 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:15:00,750 basehttp 18844 21088 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:15:05,824 basehttp 18844 8168 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:15:05,995 log 18844 13496 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:15:05,995 basehttp 18844 13496 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:15:11,050 basehttp 18844 18900 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:15:11,233 log 18844 22600 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:15:11,234 basehttp 18844 22600 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:15:16,306 basehttp 18844 18900 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:15:16,487 log 18844 9940 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:15:16,488 basehttp 18844 9940 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:15:21,539 basehttp 18844 23664 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:15:21,764 log 18844 18104 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:15:21,764 basehttp 18844 18104 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:15:26,845 basehttp 18844 23664 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:15:27,078 log 18844 7732 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:15:27,080 basehttp 18844 7732 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:15:32,151 basehttp 18844 22152 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:15:32,416 log 18844 19428 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:15:32,417 basehttp 18844 19428 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:15:37,512 basehttp 18844 22152 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:15:38,161 log 18844 22076 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:15:38,165 basehttp 18844 22076 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:15:43,272 basehttp 18844 23112 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:15:44,161 log 18844 21708 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:15:44,162 basehttp 18844 21708 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:15:49,254 basehttp 18844 23112 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:15:51,251 log 18844 7696 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:15:51,252 basehttp 18844 7696 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:15:56,346 basehttp 18844 8644 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:15:57,620 log 18844 1620 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:15:57,621 basehttp 18844 1620 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:16:02,748 basehttp 18844 15412 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:16:05,851 log 18844 21092 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:16:05,853 basehttp 18844 21092 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:16:10,950 basehttp 18844 23872 "GET /timb/ HTTP/1.1" 200 37742
+WARNING 2025-10-16 11:16:15,860 log 18844 24156 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:16:15,863 basehttp 18844 24156 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:16:20,970 basehttp 18844 9184 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 11:16:23,566 log 18844 16060 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:16:23,568 basehttp 18844 16060 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:16:28,638 basehttp 18844 9184 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 11:16:30,255 log 18844 10544 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:16:30,256 basehttp 18844 10544 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:16:35,347 basehttp 18844 19312 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 11:16:38,239 log 18844 22980 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:16:38,242 basehttp 18844 22980 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:16:43,339 basehttp 18844 7600 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 11:16:47,456 log 18844 22632 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:16:47,457 basehttp 18844 22632 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:16:52,538 basehttp 18844 16336 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 11:16:57,678 log 18844 23372 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:16:57,679 basehttp 18844 23372 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:17:02,761 basehttp 18844 20712 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 11:17:06,304 log 18844 23272 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:17:06,306 basehttp 18844 23272 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:17:11,393 basehttp 18844 23996 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 11:17:14,304 log 18844 23548 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:17:14,307 basehttp 18844 23548 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:17:14,311 basehttp 18844 23548 - Broken pipe from ('127.0.0.1', 55307)
+INFO 2025-10-16 11:17:19,379 basehttp 18844 23996 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 11:17:22,193 log 18844 9112 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:17:22,195 basehttp 18844 9112 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:17:27,273 basehttp 18844 16820 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 11:17:31,564 log 18844 10312 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:17:31,566 basehttp 18844 10312 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:17:36,650 basehttp 18844 20568 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 11:17:38,375 log 18844 10264 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:17:38,376 basehttp 18844 10264 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:17:38,377 basehttp 18844 10264 - Broken pipe from ('127.0.0.1', 59985)
+INFO 2025-10-16 11:17:43,449 basehttp 18844 6192 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 11:17:45,919 log 18844 7068 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:17:45,920 basehttp 18844 7068 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:17:51,017 basehttp 18844 22408 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 11:17:52,797 log 18844 16932 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:17:52,798 basehttp 18844 16932 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:17:57,890 basehttp 18844 22408 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 11:18:00,321 log 18844 7780 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:18:00,323 basehttp 18844 7780 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:18:01,388 basehttp 18844 1732 "GET /timb/merchants/create/ HTTP/1.1" 200 26094
+INFO 2025-10-16 11:19:49,083 basehttp 18844 14020 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 11:19:49,264 log 18844 1992 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:19:49,264 basehttp 18844 1992 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:19:54,395 basehttp 18844 7344 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 11:19:54,565 log 18844 4388 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:19:54,566 basehttp 18844 4388 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:19:59,653 basehttp 18844 7344 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 11:19:59,804 log 18844 17960 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:19:59,804 basehttp 18844 17960 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:20:04,893 basehttp 18844 21444 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 11:20:05,057 log 18844 22012 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:20:05,058 basehttp 18844 22012 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:20:10,168 basehttp 18844 21444 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 11:20:10,338 log 18844 3476 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:20:10,339 basehttp 18844 3476 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:20:15,450 basehttp 18844 24348 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 11:20:15,606 log 18844 7364 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:20:15,607 basehttp 18844 7364 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:20:20,700 basehttp 18844 12056 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 11:20:20,854 log 18844 19020 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:20:20,855 basehttp 18844 19020 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:20:25,920 basehttp 18844 12056 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 11:20:26,082 log 18844 10628 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:20:26,083 basehttp 18844 10628 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:20:31,175 basehttp 18844 23876 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 11:20:31,316 log 18844 1096 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:20:31,317 basehttp 18844 1096 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:20:36,415 basehttp 18844 23876 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 11:20:36,681 log 18844 4208 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:20:36,682 basehttp 18844 4208 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:20:38,556 basehttp 18844 23876 "POST /timb/update-daily-prices/ HTTP/1.1" 200 79
+INFO 2025-10-16 11:20:41,805 basehttp 18844 21068 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 11:20:41,971 log 18844 24100 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:20:41,971 basehttp 18844 24100 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:20:47,046 basehttp 18844 21068 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 11:20:47,265 log 18844 4392 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:20:47,267 basehttp 18844 4392 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:20:52,338 basehttp 18844 17572 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 11:20:52,686 log 18844 14784 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:20:52,687 basehttp 18844 14784 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:20:57,756 basehttp 18844 17572 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 11:20:58,064 log 18844 4568 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:20:58,064 basehttp 18844 4568 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:21:03,146 basehttp 18844 23264 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 11:21:03,953 log 18844 20192 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:21:03,955 basehttp 18844 20192 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:21:09,027 basehttp 18844 23264 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 11:21:10,262 log 18844 15124 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:21:10,266 basehttp 18844 15124 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:21:15,346 basehttp 18844 11252 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 11:21:17,330 log 18844 19560 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:21:17,332 basehttp 18844 19560 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:21:22,406 basehttp 18844 24304 "GET /timb/ HTTP/1.1" 200 38526
+INFO 2025-10-16 11:21:23,124 basehttp 18844 24304 "GET /timb/merchants/create/ HTTP/1.1" 200 29254
+ERROR 2025-10-16 11:22:25,440 log 18844 14520 Internal Server Error: /timb/merchants/create/
+Traceback (most recent call last):
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_trading_system\timb_dashboard\views.py", line 557, in create_merchant_view
+    if form.is_valid():
+       ^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\forms\forms.py", line 201, in is_valid
+    return self.is_bound and not self.errors
+                                 ^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\forms\forms.py", line 196, in errors
+    self.full_clean()
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\forms\forms.py", line 433, in full_clean
+    self._clean_fields()
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\forms\forms.py", line 448, in _clean_fields
+    value = getattr(self, "clean_%s" % name)()
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_trading_system\timb_dashboard\forms.py", line 233, in clean_username
+    if User.objects.filter(username=username).exists():
+       ^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\db\models\manager.py", line 196, in __get__
+    raise AttributeError(
+AttributeError: Manager isn't available; 'auth.User' has been swapped for 'authentication.User'
+ERROR 2025-10-16 11:22:25,446 basehttp 18844 14520 "POST /timb/merchants/create/ HTTP/1.1" 500 114986
+INFO 2025-10-16 11:25:48,353 autoreload 18844 23324 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\templatetags\custom_filters.py changed, reloading.
+INFO 2025-10-16 11:25:49,945 autoreload 14848 6784 Watching for file changes with StatReloader
+INFO 2025-10-16 11:26:36,174 autoreload 14848 6784 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\templatetags\custom_filters.py changed, reloading.
+INFO 2025-10-16 11:26:37,683 autoreload 19356 16144 Watching for file changes with StatReloader
+ERROR 2025-10-16 11:26:41,007 log 19356 15116 Internal Server Error: /timb/merchants/create/
+Traceback (most recent call last):
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_trading_system\timb_dashboard\views.py", line 557, in create_merchant_view
+    if form.is_valid():
+       ^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\forms\forms.py", line 201, in is_valid
+    return self.is_bound and not self.errors
+                                 ^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\forms\forms.py", line 196, in errors
+    self.full_clean()
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\forms\forms.py", line 433, in full_clean
+    self._clean_fields()
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\forms\forms.py", line 448, in _clean_fields
+    value = getattr(self, "clean_%s" % name)()
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_trading_system\timb_dashboard\forms.py", line 233, in clean_username
+    if User.objects.filter(username=username).exists():
+       ^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\db\models\manager.py", line 196, in __get__
+    raise AttributeError(
+AttributeError: Manager isn't available; 'auth.User' has been swapped for 'authentication.User'
+ERROR 2025-10-16 11:26:41,010 basehttp 19356 15116 "POST /timb/merchants/create/ HTTP/1.1" 500 114986
+ERROR 2025-10-16 11:26:52,453 log 19356 21444 Internal Server Error: /timb/merchants/create/
+Traceback (most recent call last):
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_trading_system\timb_dashboard\views.py", line 557, in create_merchant_view
+    if form.is_valid():
+       ^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\forms\forms.py", line 201, in is_valid
+    return self.is_bound and not self.errors
+                                 ^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\forms\forms.py", line 196, in errors
+    self.full_clean()
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\forms\forms.py", line 433, in full_clean
+    self._clean_fields()
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\forms\forms.py", line 448, in _clean_fields
+    value = getattr(self, "clean_%s" % name)()
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_trading_system\timb_dashboard\forms.py", line 233, in clean_username
+    if User.objects.filter(username=username).exists():
+       ^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\db\models\manager.py", line 196, in __get__
+    raise AttributeError(
+AttributeError: Manager isn't available; 'auth.User' has been swapped for 'authentication.User'
+ERROR 2025-10-16 11:26:52,457 basehttp 19356 21444 "POST /timb/merchants/create/ HTTP/1.1" 500 114986
+INFO 2025-10-16 11:28:17,054 autoreload 19356 16144 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\timb_dashboard\forms.py changed, reloading.
+INFO 2025-10-16 11:28:18,410 autoreload 17300 23580 Watching for file changes with StatReloader
+INFO 2025-10-16 11:29:18,824 autoreload 17300 23580 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\timb_dashboard\forms.py changed, reloading.
+INFO 2025-10-16 11:29:20,192 autoreload 18224 18884 Watching for file changes with StatReloader
+INFO 2025-10-16 11:33:46,206 basehttp 18224 23580 "POST /timb/merchants/create/ HTTP/1.1" 302 0
+ERROR 2025-10-16 11:33:46,363 log 18224 23580 Internal Server Error: /timb/merchants/
+Traceback (most recent call last):
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\base.py", line 880, in _resolve_lookup
+    current = current[bit]
+              ~~~~~~~^^^^^
+TypeError: 'int' object is not subscriptable
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\base.py", line 890, in _resolve_lookup
+    current = getattr(current, bit)
+              ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'int' object has no attribute 'total_purchases'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\base.py", line 896, in _resolve_lookup
+    current = current[int(bit)]
+                      ^^^^^^^^
+ValueError: invalid literal for int() with base 10: 'total_purchases'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_trading_system\timb_dashboard\views.py", line 625, in merchants_view
+    return render(request, 'timb_dashboard/merchants.html', context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\backends\django.py", line 61, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\base.py", line 175, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\test\utils.py", line 112, in instrumented_test_render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\base.py", line 966, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\loader_tags.py", line 157, in render
+    return compiled_parent._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\test\utils.py", line 112, in instrumented_test_render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\base.py", line 966, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\loader_tags.py", line 63, in render
+    result = block.nodelist.render(context)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\base.py", line 966, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\defaulttags.py", line 238, in render
+    nodelist.append(node.render_annotated(context))
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\base.py", line 966, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\base.py", line 1064, in render
+    output = self.filter_expression.resolve(context)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\base.py", line 736, in resolve
+    arg_vals.append(arg.resolve(context))
+                    ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\base.py", line 847, in resolve
+    value = self._resolve_lookup(context)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\template\base.py", line 903, in _resolve_lookup
+    raise VariableDoesNotExist(
+django.template.base.VariableDoesNotExist: Failed lookup for key [total_purchases] in 1
+ERROR 2025-10-16 11:33:46,377 basehttp 18224 23580 "GET /timb/merchants/ HTTP/1.1" 500 203820
+INFO 2025-10-16 11:40:00,431 autoreload 18224 18884 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\timb_dashboard\views.py changed, reloading.
+INFO 2025-10-16 11:40:01,969 autoreload 6140 23764 Watching for file changes with StatReloader
+INFO 2025-10-16 11:43:09,694 autoreload 6140 23764 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\timb_dashboard\views.py changed, reloading.
+INFO 2025-10-16 11:43:11,185 autoreload 4324 6668 Watching for file changes with StatReloader
+INFO 2025-10-16 11:43:12,488 basehttp 4324 18444 "GET /timb/merchants/ HTTP/1.1" 200 28219
+INFO 2025-10-16 11:43:21,724 basehttp 4324 11400 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 11:43:21,986 log 4324 12068 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 11:43:21,987 basehttp 4324 12068 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 11:43:27,135 basehttp 4324 11400 - Broken pipe from ('127.0.0.1', 55995)
+INFO 2025-10-16 11:43:27,158 basehttp 4324 1556 "GET /timb/merchants/create/ HTTP/1.1" 200 29254
+INFO 2025-10-16 11:46:31,983 basehttp 4324 23180 "GET /timb/merchants/ HTTP/1.1" 200 28255
+INFO 2025-10-16 11:46:33,841 basehttp 4324 6836 "GET /timb/merchants/ HTTP/1.1" 200 28255
+INFO 2025-10-16 11:46:34,533 basehttp 4324 6836 "GET /timb/merchants/ HTTP/1.1" 200 28255
+INFO 2025-10-16 11:46:34,936 basehttp 4324 6836 "GET /timb/merchants/ HTTP/1.1" 200 28255
+INFO 2025-10-16 11:46:35,146 basehttp 4324 6836 "GET /timb/merchants/ HTTP/1.1" 200 28255
+INFO 2025-10-16 11:46:35,335 basehttp 4324 6836 "GET /timb/merchants/ HTTP/1.1" 200 28255
+INFO 2025-10-16 11:46:35,536 basehttp 4324 6836 "GET /timb/merchants/ HTTP/1.1" 200 28255
+INFO 2025-10-16 11:46:40,297 basehttp 4324 6836 "GET /timb/merchants/create/ HTTP/1.1" 200 29254
+INFO 2025-10-16 11:51:20,627 basehttp 4324 17680 "GET /timb/merchants/ HTTP/1.1" 200 28255
+INFO 2025-10-16 11:51:21,619 basehttp 4324 17680 "GET /timb/merchants/ HTTP/1.1" 200 28255
+INFO 2025-10-16 11:53:18,394 basehttp 4324 8764 "GET /timb/merchants/ HTTP/1.1" 200 29547
+INFO 2025-10-16 11:53:19,865 basehttp 4324 8764 "GET /timb/merchants/ HTTP/1.1" 200 29547
+INFO 2025-10-16 11:53:46,278 basehttp 4324 9908 "GET /timb/merchants/ HTTP/1.1" 200 29547
+INFO 2025-10-16 11:57:11,595 basehttp 4324 6964 "GET /timb/merchants/ HTTP/1.1" 200 30538
+INFO 2025-10-16 12:01:26,393 basehttp 4324 4192 "GET /timb/merchants/ HTTP/1.1" 200 30538
+INFO 2025-10-16 12:01:29,076 basehttp 4324 4192 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:01:29,324 log 4324 16296 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:01:29,325 basehttp 4324 16296 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:01:34,469 basehttp 4324 10820 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:01:34,621 log 4324 19176 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:01:34,623 basehttp 4324 19176 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:01:39,697 basehttp 4324 10820 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:01:39,842 log 4324 14608 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:01:39,843 basehttp 4324 14608 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:01:44,920 basehttp 4324 9672 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:01:45,040 log 4324 18728 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:01:45,041 basehttp 4324 18728 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:01:50,120 basehttp 4324 9672 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:01:50,254 log 4324 24172 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:01:50,255 basehttp 4324 24172 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:01:55,339 basehttp 4324 20384 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:01:55,496 log 4324 15448 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:01:55,497 basehttp 4324 15448 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:02:00,586 basehttp 4324 20384 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:02:00,741 log 4324 15824 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:02:00,743 basehttp 4324 15824 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:02:05,817 basehttp 4324 1864 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:02:05,975 log 4324 22096 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:02:05,976 basehttp 4324 22096 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:02:11,044 basehttp 4324 1864 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:02:11,246 log 4324 14540 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:02:11,247 basehttp 4324 14540 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:02:16,329 basehttp 4324 23624 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:02:16,595 log 4324 14880 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:02:16,596 basehttp 4324 14880 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:02:21,687 basehttp 4324 23624 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:02:21,856 log 4324 23872 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:02:21,857 basehttp 4324 23872 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:02:26,945 basehttp 4324 22876 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:02:27,207 log 4324 5368 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:02:27,208 basehttp 4324 5368 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:02:32,284 basehttp 4324 22876 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:02:32,748 log 4324 14144 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:02:32,748 basehttp 4324 14144 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:02:37,841 basehttp 4324 22268 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:02:38,376 log 4324 8940 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:02:38,377 basehttp 4324 8940 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:02:43,479 basehttp 4324 22268 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:02:44,839 log 4324 10636 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:02:44,840 basehttp 4324 10636 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:02:49,956 basehttp 4324 9868 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:02:51,028 log 4324 17420 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:02:51,031 basehttp 4324 17420 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:02:56,134 basehttp 4324 336 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:03:00,429 log 4324 20260 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:03:00,430 basehttp 4324 20260 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:03:05,565 basehttp 4324 3004 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:03:09,802 log 4324 4840 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:03:09,806 basehttp 4324 4840 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:03:14,896 basehttp 4324 19232 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:03:19,017 log 4324 23332 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:03:19,021 basehttp 4324 23332 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:03:24,085 basehttp 4324 19232 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:03:29,134 log 4324 11596 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:03:29,135 basehttp 4324 11596 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:03:34,276 basehttp 4324 9672 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:03:34,490 log 4324 13348 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:03:34,491 basehttp 4324 13348 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:03:39,596 basehttp 4324 19108 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:03:39,752 log 4324 2736 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:03:39,754 basehttp 4324 2736 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:03:44,838 basehttp 4324 21356 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:03:45,001 log 4324 6232 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:03:45,002 basehttp 4324 6232 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:03:50,117 basehttp 4324 21356 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:03:50,299 log 4324 22976 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:03:50,299 basehttp 4324 22976 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:03:55,379 basehttp 4324 21260 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:03:55,565 log 4324 23808 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:03:55,566 basehttp 4324 23808 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:04:00,660 basehttp 4324 21260 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:04:00,982 log 4324 14948 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:04:00,983 basehttp 4324 14948 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:04:06,095 basehttp 4324 10076 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:04:06,265 log 4324 19780 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:04:06,270 basehttp 4324 19780 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:04:11,358 basehttp 4324 10076 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:04:11,644 log 4324 22636 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:04:11,649 basehttp 4324 22636 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:04:16,785 basehttp 4324 24168 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:04:17,004 log 4324 18888 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:04:17,005 basehttp 4324 18888 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:04:22,134 basehttp 4324 24168 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:04:22,467 log 4324 4920 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:04:22,479 basehttp 4324 4920 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:04:27,582 basehttp 4324 14316 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:04:27,779 log 4324 11704 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:04:27,780 basehttp 4324 11704 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:04:32,846 basehttp 4324 14316 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:04:33,062 log 4324 14052 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:04:33,063 basehttp 4324 14052 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:04:33,064 basehttp 4324 14052 - Broken pipe from ('127.0.0.1', 57676)
+INFO 2025-10-16 12:04:38,146 basehttp 4324 7604 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:04:38,442 log 4324 23072 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:04:38,443 basehttp 4324 23072 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:04:43,527 basehttp 4324 7604 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:04:44,181 log 4324 18188 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:04:44,185 basehttp 4324 18188 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:04:49,277 basehttp 4324 16224 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:04:49,823 log 4324 348 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:04:49,826 basehttp 4324 348 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:04:54,940 basehttp 4324 18728 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:04:55,938 log 4324 22512 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:04:55,941 basehttp 4324 22512 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:05:01,026 basehttp 4324 18728 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:05:06,027 log 4324 9408 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:05:06,028 basehttp 4324 9408 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:05:11,107 basehttp 4324 17668 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:05:15,102 log 4324 6424 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:05:15,103 basehttp 4324 6424 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:05:20,192 basehttp 4324 18532 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:05:24,866 log 4324 13868 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:05:24,866 basehttp 4324 13868 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:05:29,958 basehttp 4324 6816 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:05:33,218 log 4324 4444 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:05:33,219 basehttp 4324 4444 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:05:38,336 basehttp 4324 15608 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:05:38,528 log 4324 21704 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:05:38,529 basehttp 4324 21704 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:05:43,616 basehttp 4324 15608 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:05:43,800 log 4324 15480 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:05:43,800 basehttp 4324 15480 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:05:48,894 basehttp 4324 20712 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:05:49,087 log 4324 19828 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:05:49,090 basehttp 4324 19828 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:05:54,181 basehttp 4324 20712 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:05:54,373 log 4324 5368 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:05:54,374 basehttp 4324 5368 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:05:59,482 basehttp 4324 18440 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:05:59,684 log 4324 15064 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:05:59,685 basehttp 4324 15064 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:06:04,770 basehttp 4324 18440 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:06:04,957 log 4324 20660 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:06:04,958 basehttp 4324 20660 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:06:10,040 basehttp 4324 18440 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:06:10,222 log 4324 23640 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:06:10,223 basehttp 4324 23640 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:06:15,314 basehttp 4324 10432 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:06:15,532 log 4324 24172 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:06:15,534 basehttp 4324 24172 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:06:20,628 basehttp 4324 10432 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:06:20,809 log 4324 3720 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:06:20,810 basehttp 4324 3720 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:06:25,878 basehttp 4324 19344 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:06:26,082 log 4324 22888 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:06:26,083 basehttp 4324 22888 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:06:31,173 basehttp 4324 19344 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:06:31,368 log 4324 10312 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:06:31,369 basehttp 4324 10312 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:06:36,443 basehttp 4324 22800 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:06:36,815 log 4324 22884 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:06:36,817 basehttp 4324 22884 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:06:36,819 basehttp 4324 22884 - Broken pipe from ('127.0.0.1', 52698)
+INFO 2025-10-16 12:06:41,883 basehttp 4324 22800 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:06:42,293 log 4324 23332 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:06:42,297 basehttp 4324 23332 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:06:47,417 basehttp 4324 19900 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:06:48,090 log 4324 11252 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:06:48,094 basehttp 4324 11252 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:06:53,187 basehttp 4324 19900 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:06:54,209 log 4324 8644 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:06:54,210 basehttp 4324 8644 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:06:59,297 basehttp 4324 19880 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:07:00,685 log 4324 3964 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:07:00,688 basehttp 4324 3964 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:07:05,766 basehttp 4324 13880 "GET /timb/ HTTP/1.1" 200 38526
+WARNING 2025-10-16 12:07:10,157 log 4324 21452 Not Found: /ws/realtime/dashboard/timb/
+WARNING 2025-10-16 12:07:10,158 basehttp 4324 21452 "GET /ws/realtime/dashboard/timb/ HTTP/1.1" 404 3078
+INFO 2025-10-16 12:07:15,270 basehttp 4324 8812 "GET /timb/ HTTP/1.1" 200 38526

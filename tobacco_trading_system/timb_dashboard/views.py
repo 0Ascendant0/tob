@@ -540,7 +540,20 @@ class TransactionDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView)
 def create_merchant_view(request):
     """Create new merchant from TIMB dashboard"""
     if request.method == 'POST':
-        form = MerchantCreationForm(request.POST)
+        # Allow empty username: if no username provided, auto-generate a unique one
+        post_data = request.POST.copy()
+        username = post_data.get('username', '').strip()
+        if not username:
+            base = 'merchant'
+            candidate = base
+            suffix = 1
+            # find unique username (merchant, merchant1, merchant2, ...)
+            while User.objects.filter(username=candidate).exists():
+                candidate = f"{base}{suffix}"
+                suffix += 1
+            post_data['username'] = candidate
+
+        form = MerchantCreationForm(post_data)
         if form.is_valid():
             try:
                 # Create the User first
@@ -588,7 +601,8 @@ def create_merchant_view(request):
         else:
             messages.error(request, 'Please correct the errors below.')
     else:
-        form = MerchantCreationForm()
+        # Prefill the username field with the default suggestion
+        form = MerchantCreationForm(initial={'username': 'merchant'})
 
     context = {
         'form': form,
@@ -602,7 +616,14 @@ def create_merchant_view(request):
 @user_passes_test(is_timb_staff)
 def merchants_view(request):
     """Merchants management view"""
-    merchants = Merchant.objects.select_related('user').order_by('company_name')
+    # Annotate merchants with aggregated trading statistics (as buyer/purchases)
+    # total_purchases: sum of total_amount where the merchant's user was the buyer
+    # total_quantity: sum of quantity where the merchant's user was the buyer
+    merchants = Merchant.objects.select_related('user').annotate(
+        total_purchases=Sum('user__purchases__total_amount', filter=Q(user__purchases__status='COMPLETED')),
+        total_quantity=Sum('user__purchases__quantity', filter=Q(user__purchases__status='COMPLETED')),
+        transaction_count=Count('user__purchases', filter=Q(user__purchases__status='COMPLETED'))
+    ).order_by('company_name')
 
     context = {
         'merchants': merchants,

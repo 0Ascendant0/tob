@@ -3,149 +3,252 @@
 
 {% block title %}Create Merchant - TIMB Dashboard{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Make bootstrap-form fields look like the Tailwind style used across the project */
+    .create-merchant-container {
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    .custom-card, .card-body {
+        background: #ffffff;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    .card-header-custom {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #e6e6e6;
+    }
+
+    .card-body {
+        padding: 1.25rem;
+    }
+
+    /* form control to match project look */
+    .form-control {
+        width: 100%;
+        padding: 0.625rem 0.75rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        background: #fff;
+        color: #111827;
+        transition: box-shadow .15s ease, border-color .15s ease;
+        box-shadow: none;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #5D5CDE;
+        box-shadow: 0 0 0 4px rgba(93,92,222,0.08);
+    }
+
+    label.form-label {
+        display: block;
+        font-size: 0.875rem;
+        margin-bottom: 0.35rem;
+        color: #374151;
+    }
+
+    .btn-primary, .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: #5D5CDE;
+        color: #fff;
+        padding: 0.55rem 0.9rem;
+        border-radius: 0.5rem;
+        border: none;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .btn-secondary {
+        background: #f3f4f6;
+        color: #111827;
+        padding: 0.5rem 0.9rem;
+        border-radius: 0.5rem;
+        border: 1px solid #e5e7eb;
+    }
+
+    .input-group {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .input-group .btn {
+        padding: 0.5rem 0.75rem;
+        background: #eef2ff;
+        color: #4f46e5;
+        border: 1px solid #e5e7eb;
+    }
+
+    .alert-info, .alert-warning {
+        background: #f8fafc; /* subtle */
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        border: 1px solid #eef2ff;
+    }
+
+    .row { display: flex; flex-wrap: wrap; gap: 1rem; }
+    .col-lg-8 { flex: 0 0 66%; max-width: 66%; }
+    .col-lg-4 { flex: 0 0 32%; max-width: 32%; }
+    .col-12 { flex: 0 0 100%; }
+    .col-md-6 { flex: 0 0 48%; }
+
+    @media (max-width: 768px) {
+        .col-lg-8, .col-lg-4, .col-md-6 { flex: 0 0 100%; max-width: 100%; }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="row mb-4">
-    <div class="col-12">
-        <h1 class="h3 mb-0">Create New Merchant</h1>
-        <p class="text-muted">Add a new tobacco merchant to the system</p>
+<div class="create-merchant-container py-6 sm:px-6 lg:px-8">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">Create New Merchant</h1>
+        <p class="text-sm text-gray-600 mt-1">Add a new tobacco merchant to the system</p>
     </div>
-</div>
 
-<div class="row">
-    <div class="col-lg-8">
-        <div class="custom-card">
-            <div class="card-header-custom">
-                <h5 class="mb-0">Merchant Information</h5>
-            </div>
-            <div class="card-body">
-                <form method="post">
-                    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="custom-card">
+                <div class="card-header-custom">
+                    <h5 class="mb-0 text-lg font-medium">Merchant Information</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
 
-                    <!-- User Account Information -->
-                    <h6 class="mb-3 text-primary">Account Information</h6>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="{{ form.username.id_for_label }}" class="form-label">Username *</label>
-                            {{ form.username }}
-                            {% if form.username.errors %}
-                                <div class="text-danger small">{{ form.username.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-                        <div class="col-md-6">
-                            <label for="{{ form.email.id_for_label }}" class="form-label">Email *</label>
-                            {{ form.email }}
-                            {% if form.email.errors %}
-                                <div class="text-danger small">{{ form.email.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="{{ form.first_name.id_for_label }}" class="form-label">First Name</label>
-                            {{ form.first_name }}
-                        </div>
-                        <div class="col-md-6">
-                            <label for="{{ form.last_name.id_for_label }}" class="form-label">Last Name</label>
-                            {{ form.last_name }}
-                        </div>
-                    </div>
-
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <label for="{{ form.phone.id_for_label }}" class="form-label">Phone</label>
-                            {{ form.phone }}
-                        </div>
-                        <div class="col-md-6">
-                            <div class="alert alert-info py-2">
-                                <small><strong>Default Password:</strong> merchant</small>
+                        <!-- User Account Information -->
+                        <h6 class="mb-3 text-sm font-medium text-gray-700">Account Information</h6>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.username.id_for_label }}" class="form-label">Username *</label>
+                                <div class="input-group">
+                                    {{ form.username }}
+                                    <button type="button" class="btn" id="set-default-username" title="Set default username to 'merchant'">merchant</button>
+                                </div>
+                                {% if form.username.errors %}
+                                    <div class="text-red-600 text-sm mt-1">{{ form.username.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.email.id_for_label }}" class="form-label">Email *</label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                    <div class="text-red-600 text-sm mt-1">{{ form.email.errors.0 }}</div>
+                                {% endif %}
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Business Information -->
-                    <h6 class="mb-3 text-primary">Business Information</h6>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="{{ form.company_name.id_for_label }}" class="form-label">Company Name *</label>
-                            {{ form.company_name }}
-                            {% if form.company_name.errors %}
-                                <div class="text-danger small">{{ form.company_name.errors.0 }}</div>
-                            {% endif %}
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.first_name.id_for_label }}" class="form-label">First Name</label>
+                                {{ form.first_name }}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.last_name.id_for_label }}" class="form-label">Last Name</label>
+                                {{ form.last_name }}
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <label for="{{ form.license_number.id_for_label }}" class="form-label">License Number *</label>
-                            {{ form.license_number }}
-                            {% if form.license_number.errors %}
-                                <div class="text-danger small">{{ form.license_number.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-                    </div>
 
-                    <div class="mb-3">
-                        <label for="{{ form.business_address.id_for_label }}" class="form-label">Business Address</label>
-                        {{ form.business_address }}
-                    </div>
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="{{ form.phone.id_for_label }}" class="form-label">Phone</label>
+                                {{ form.phone }}
+                            </div>
+                            <div class="col-md-6">
+                                <div class="alert-info">
+                                    <small class="font-medium">Default Password: <strong>merchant</strong></small>
+                                </div>
+                            </div>
+                        </div>
 
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="{{ form.business_phone.id_for_label }}" class="form-label">Business Phone</label>
-                            {{ form.business_phone }}
+                        <!-- Business Information -->
+                        <h6 class="mb-3 text-sm font-medium text-gray-700">Business Information</h6>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.company_name.id_for_label }}" class="form-label">Company Name *</label>
+                                {{ form.company_name }}
+                                {% if form.company_name.errors %}
+                                    <div class="text-red-600 text-sm mt-1">{{ form.company_name.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.license_number.id_for_label }}" class="form-label">License Number *</label>
+                                {{ form.license_number }}
+                                {% if form.license_number.errors %}
+                                    <div class="text-red-600 text-sm mt-1">{{ form.license_number.errors.0 }}</div>
+                                {% endif %}
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <label for="{{ form.business_email.id_for_label }}" class="form-label">Business Email</label>
-                            {{ form.business_email }}
-                        </div>
-                    </div>
 
-                    <!-- Banking Information -->
-                    <h6 class="mb-3 text-primary">Banking Information</h6>
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <label for="{{ form.bank_name.id_for_label }}" class="form-label">Bank Name</label>
-                            {{ form.bank_name }}
+                        <div class="mb-3">
+                            <label for="{{ form.business_address.id_for_label }}" class="form-label">Business Address</label>
+                            {{ form.business_address }}
                         </div>
-                        <div class="col-md-6">
-                            <label for="{{ form.bank_account_number.id_for_label }}" class="form-label">Bank Account Number</label>
-                            {{ form.bank_account_number }}
-                        </div>
-                    </div>
 
-                    <!-- Form Actions -->
-                    <div class="d-flex justify-content-between">
-                        <a href="{% url 'timb_dashboard:merchants' %}" class="btn btn-secondary">
-                            <i class="bi bi-arrow-left"></i> Back to Merchants
-                        </a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-person-plus"></i> Create Merchant
-                        </button>
-                    </div>
-                </form>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.business_phone.id_for_label }}" class="form-label">Business Phone</label>
+                                {{ form.business_phone }}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.business_email.id_for_label }}" class="form-label">Business Email</label>
+                                {{ form.business_email }}
+                            </div>
+                        </div>
+
+                        <!-- Banking Information -->
+                        <h6 class="mb-3 text-sm font-medium text-gray-700">Banking Information</h6>
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="{{ form.bank_name.id_for_label }}" class="form-label">Bank Name</label>
+                                {{ form.bank_name }}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.bank_account_number.id_for_label }}" class="form-label">Bank Account Number</label>
+                                {{ form.bank_account_number }}
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="flex justify-between" style="display:flex; justify-content:space-between; gap:1rem;">
+                            <a href="{% url 'timb_dashboard:merchants' %}" class="btn-secondary">
+                                <span class="inline-flex items-center"><i class="bi bi-arrow-left mr-2"></i> Back to Merchants</span>
+                            </a>
+                            <button type="submit" class="btn-primary">
+                                <i class="bi bi-person-plus"></i> Create Merchant
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="col-lg-4">
-        <div class="custom-card">
-            <div class="card-header-custom">
-                <h5 class="mb-0">Information</h5>
-            </div>
-            <div class="card-body">
-                <div class="alert alert-info">
-                    <h6><i class="bi bi-info-circle"></i> Merchant Creation</h6>
-                    <ul class="mb-0 small">
-                        <li>New merchants are automatically verified</li>
-                        <li>Default password is set to "merchant"</li>
-                        <li>Merchants can change their password after first login</li>
-                        <li>All required fields are marked with *</li>
-                    </ul>
+        <div class="col-lg-4">
+            <div class="custom-card">
+                <div class="card-header-custom">
+                    <h5 class="mb-0 text-lg font-medium">Information</h5>
                 </div>
+                <div class="card-body">
+                    <div class="alert-info">
+                        <h6 class="font-medium"><i class="bi bi-info-circle"></i> Merchant Creation</h6>
+                        <ul class="mb-0 text-sm mt-2" style="line-height:1.6;">
+                            <li>New merchants are automatically verified</li>
+                            <li>Default password is set to "merchant"</li>
+                            <li>Merchants can change their password after first login</li>
+                            <li>All required fields are marked with *</li>
+                        </ul>
+                    </div>
 
-                <div class="alert alert-warning">
-                    <h6><i class="bi bi-exclamation-triangle"></i> Important</h6>
-                    <p class="mb-0 small">
-                        Ensure license numbers are unique and valid before creating the merchant account.
-                    </p>
+                    <div class="alert-warning mt-4">
+                        <h6 class="font-medium"><i class="bi bi-exclamation-triangle"></i> Important</h6>
+                        <p class="mb-0 text-sm">
+                            Ensure license numbers are unique and valid before creating the merchant account.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -177,6 +280,15 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Please fill in all required fields.');
         }
     });
+});
+</script>
+<script>
+document.getElementById('set-default-username').addEventListener('click', function() {
+    const usernameInput = document.querySelector('[name="username"]');
+    if (usernameInput) {
+        usernameInput.value = 'merchant';
+        usernameInput.focus();
+    }
 });
 </script>
 {% endblock %}

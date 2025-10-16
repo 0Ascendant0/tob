@@ -1,9 +1,62 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load humanize %}
+
+{% block extra_css %}
+<style>
+    /* Reuse create_merchant styles for consistent padding and colors */
+    .create-merchant-container {
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    .custom-card, .card-body {
+        background: #ffffff;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    .card-header-custom {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #e6e6e6;
+    }
+
+    .card-body { padding: 1.25rem; }
+
+    .btn-primary, .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: #5D5CDE;
+        color: #fff;
+        padding: 0.55rem 0.9rem;
+        border-radius: 0.5rem;
+        border: none;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .btn-secondary {
+        background: #f3f4f6;
+        color: #111827;
+        padding: 0.5rem 0.9rem;
+        border-radius: 0.5rem;
+        border: 1px solid #e5e7eb;
+    }
+
+    /* Table compact padding to match create page spacing */
+    .table-custom td, .table-custom th { padding: 0.75rem 0.85rem; }
+
+    @media (max-width: 768px) {
+        .create-merchant-container { padding-left: 1rem; padding-right: 1rem; }
+    }
+</style>
+{% endblock %}
 
 {% block title %}Merchants - TIMB Dashboard{% endblock %}
 
 {% block content %}
+<div class="create-merchant-container py-6 sm:px-6 lg:px-8 merchant-theme">
 <div class="row mb-4">
     <div class="col-12">
         <h1 class="h3 mb-0">Merchant Management</h1>
@@ -12,54 +65,95 @@
 </div>
 
 <!-- Merchant Statistics -->
-<div class="row mb-4">
-    <div class="col-lg-3 col-md-6">
-        <div class="stat-card">
-            <div class="stat-icon">
-                <i class="bi bi-building"></i>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="metric-card bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg">
+        <div class="p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-8 h-8 bg-blue-100 rounded-md flex items-center justify-center">
+                        <i class="fas fa-store text-blue-600"></i>
+                    </div>
+                </div>
+                <div class="ml-5 w-0 flex-1">
+                    <dl>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Total Merchants</dt>
+                        <dd class="text-lg font-medium text-gray-900 dark:text-white">{{ merchants.count }}</dd>
+                    </dl>
+                </div>
             </div>
-            <div class="stat-value">{{ merchants.count }}</div>
-            <div class="stat-label">Total Merchants</div>
         </div>
     </div>
 
-    <div class="col-lg-3 col-md-6">
-        <div class="stat-card">
-            <div class="stat-icon">
-                <i class="bi bi-check-circle"></i>
+    <div class="metric-card bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg">
+        <div class="p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-8 h-8 bg-green-100 rounded-md flex items-center justify-center">
+                        <i class="fas fa-check-circle text-green-600"></i>
+                    </div>
+                </div>
+                <div class="ml-5 w-0 flex-1">
+                    <dl>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Active Merchants</dt>
+                        <dd class="text-lg font-medium text-gray-900 dark:text-white">{{ merchants|length }}</dd>
+                    </dl>
+                </div>
             </div>
-            <div class="stat-value">{{ merchants|length }}</div>
-            <div class="stat-label">Active Merchants</div>
         </div>
     </div>
 
-    <div class="col-lg-3 col-md-6">
-        <div class="stat-card">
-            <div class="stat-icon">
-                <i class="bi bi-exclamation-triangle"></i>
+    <div class="metric-card bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg">
+        <div class="p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-8 h-8 bg-yellow-100 rounded-md flex items-center justify-center">
+                        <i class="fas fa-exclamation-triangle text-yellow-600"></i>
+                    </div>
+                </div>
+                <div class="ml-5 w-0 flex-1">
+                    <dl>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">High Risk</dt>
+                        <dd class="text-lg font-medium text-gray-900 dark:text-white">0</dd>
+                    </dl>
+                </div>
             </div>
-            <div class="stat-value">0</div>
-            <div class="stat-label">High Risk</div>
         </div>
     </div>
 
-    <div class="col-lg-3 col-md-6">
-        <div class="stat-card">
-            <div class="stat-icon">
-                <i class="bi bi-clock"></i>
+    <div class="metric-card bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg">
+        <div class="p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-8 h-8 bg-red-100 rounded-md flex items-center justify-center">
+                        <i class="fas fa-clock text-red-600"></i>
+                    </div>
+                </div>
+                <div class="ml-5 w-0 flex-1">
+                    <dl>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Pending Approval</dt>
+                        <dd class="text-lg font-medium text-gray-900 dark:text-white">0</dd>
+                    </dl>
+                </div>
             </div>
-            <div class="stat-value">0</div>
-            <div class="stat-label">Pending Approval</div>
         </div>
     </div>
 </div>
 
-<!-- Action Buttons -->
+<!-- Action / Search Bar -->
 <div class="row mb-4">
     <div class="col-12">
-        <a href="{% url 'timb_dashboard:create_merchant' %}" class="btn btn-primary">
-            <i class="bi bi-person-plus"></i> Add New Merchant
-        </a>
+        <div class="d-flex justify-content-between align-items-center">
+            <form class="d-flex w-50" method="get" action="">
+                <input name="q" class="form-control me-2" type="search" placeholder="Search merchants, company, license..." aria-label="Search">
+                <button class="btn btn-outline-primary" type="submit"><i class="bi bi-search"></i></button>
+            </form>
+
+            <div>
+                <a href="{% url 'timb_dashboard:create_merchant' %}" class="btn btn-primary">
+                    <i class="bi bi-person-plus"></i> Add New Merchant
+                </a>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -67,12 +161,13 @@
 <div class="row">
     <div class="col-12">
         <div class="custom-card">
-            <div class="card-header-custom">
+            <div class="card-header-custom d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Merchant Directory</h5>
+                <small class="text-muted">Showing {{ merchants|length }} merchants</small>
             </div>
-            <div class="card-body">
+            <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-custom">
+                    <table class="table table-custom mb-0">
                         <thead>
                             <tr>
                                 <th>Company Name</th>
@@ -84,37 +179,40 @@
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
+                                <tbody>
                             {% for merchant in merchants %}
                             <tr>
                                 <td>
-                                    <strong>{{ merchant.company_name }}</strong>
-                                    <br>
-                                    <small class="text-muted">{{ merchant.user.email }}</small>
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3">
+                                            <div class="metric-icon" style="width:44px;height:44px;font-size:1rem;border-radius:8px;display:flex;align-items:center;justify-content:center;">{{ merchant.company_name|default:merchant.user.username|slice:":1"|upper }}</div>
+                                        </div>
+                                        <div>
+                                            <strong>{{ merchant.company_name|default:merchant.user.username }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ merchant.user.email }}</small>
+                                        </div>
+                                    </div>
                                 </td>
                                 <td>{{ merchant.license_number }}</td>
                                 <td>{{ merchant.user.get_full_name|default:merchant.user.username }}</td>
                                 <td>
-                                    <span class="badge bg-{% if merchant.status == 'ACTIVE' %}success{% elif merchant.status == 'SUSPENDED' %}danger{% else %}warning{% endif %}">
+                                    <span class="badge {% if merchant.status == 'ACTIVE' %}bg-success{% elif merchant.status == 'SUSPENDED' %}bg-danger{% else %}bg-warning{% endif %}">
                                         {{ merchant.get_status_display }}
                                     </span>
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <div class="progress me-2" style="width: 60px; height: 6px;">
-                                            <div class="progress-bar 
-                                                {% if merchant.risk_score < 30 %}bg-success
-                                                {% elif merchant.risk_score < 70 %}bg-warning
-                                                {% else %}bg-danger{% endif %}"
-                                                style="width: {{ merchant.risk_score }}%"></div>
+                                        <div class="progress me-2" style="width: 70px; height: 8px;">
+                                            <div class="progress-bar {% if merchant.risk_score < 30 %}bg-success{% elif merchant.risk_score < 70 %}bg-warning{% else %}bg-danger{% endif %}" style="width: {{ merchant.risk_score }}%"></div>
                                         </div>
                                         <small>{{ merchant.risk_score|floatformat:1 }}%</small>
                                     </div>
                                 </td>
                                 <td>
-                                    <strong>${{ merchant_stats|default_if_none:merchant.id.total_purchases|default:0|floatformat:2 }}</strong>
+                                    <strong>${{ merchant.total_purchases|default:0|floatformat:2|intcomma }}</strong>
                                     <br>
-                                    <small class="text-muted">{{ merchant_stats|default_if_none:merchant.id.total_quantity|default:0|floatformat:0 }}kg</small>
+                                    <small class="text-muted">{{ merchant.total_quantity|default:0|floatformat:0|intcomma }} kg</small>
                                 </td>
                                 <td>
                                     <div class="btn-group btn-group-sm">
@@ -163,6 +261,7 @@
             </div>
         </div>
     </div>
+</div>
 </div>
 {% endblock %}
 
