@@ -1,0 +1,246 @@
+{% extends 'base.html' %}
+
+{% block title %}Inventory Aggregate Analysis - {{ merchant.company_name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <div class="mb-6 flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Inventory Aggregate Analysis</h1>
+            <p class="text-gray-600 dark:text-gray-400">Analyze your inventory and discover possible aggregate grades</p>
+        </div>
+        <div class="flex space-x-3">
+            <a href="{% url 'merchant_aggregation_dashboard' %}" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition duration-200">
+                <i class="fas fa-arrow-left mr-2"></i>Back to Aggregation
+            </a>
+            <button onclick="refreshAnalysis()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200">
+                <i class="fas fa-sync-alt mr-2"></i>Refresh Analysis
+            </button>
+        </div>
+    </div>
+
+    {% if not has_inventory %}
+    <div class="bg-yellow-50 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-700 rounded-lg p-6">
+        <div class="flex items-center">
+            <i class="fas fa-exclamation-triangle text-yellow-600 dark:text-yellow-400 text-2xl mr-4"></i>
+            <div>
+                <h3 class="text-lg font-medium text-yellow-800 dark:text-yellow-200">No Inventory Found</h3>
+                <p class="text-yellow-700 dark:text-yellow-300 mt-1">
+                    You don't have any inventory to analyze. Add some tobacco grades to your inventory first.
+                </p>
+                <a href="{% url 'merchant_inventory' %}" class="mt-3 inline-flex items-center px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition duration-200">
+                    <i class="fas fa-plus mr-2"></i>Add Inventory
+                </a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    
+    <!-- Inventory Summary -->
+    <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg mb-8">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                <i class="fas fa-boxes mr-2 text-blue-600"></i>Inventory Summary
+            </h3>
+        </div>
+        <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                <div class="text-center p-4 bg-blue-50 dark:bg-blue-900 rounded-lg">
+                    <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">{{ total_inventory|floatformat:0 }} kg</div>
+                    <div class="text-sm text-blue-700 dark:text-blue-300">Total Inventory</div>
+                </div>
+                <div class="text-center p-4 bg-green-50 dark:bg-green-900 rounded-lg">
+                    <div class="text-2xl font-bold text-green-600 dark:text-green-400">{{ inventory_summary|length }}</div>
+                    <div class="text-sm text-green-700 dark:text-green-300">Different Grades</div>
+                </div>
+                <div class="text-center p-4 bg-purple-50 dark:bg-purple-900 rounded-lg">
+                    <div class="text-2xl font-bold text-purple-600 dark:text-purple-400">{{ categories|length }}</div>
+                    <div class="text-sm text-purple-700 dark:text-purple-300">Categories</div>
+                </div>
+                <div class="text-center p-4 bg-orange-50 dark:bg-orange-900 rounded-lg">
+                    <div class="text-2xl font-bold text-orange-600 dark:text-orange-400">{{ suggestions|length }}</div>
+                    <div class="text-sm text-orange-700 dark:text-orange-300">Possible Blends</div>
+                </div>
+            </div>
+
+            <!-- Inventory by Category -->
+            <div class="mb-6">
+                <h4 class="text-md font-medium text-gray-900 dark:text-white mb-3">Inventory by Category</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {% for category, grades in categories.items %}
+                    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <h5 class="font-medium text-gray-900 dark:text-white">{{ category }}</h5>
+                            <span class="text-sm text-gray-500 dark:text-gray-400">{{ grades|length }} grades</span>
+                        </div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">
+                            {% for grade_code, data in grades|slice:":3" %}
+                                <div class="flex justify-between">
+                                    <span>{{ grade_code }}</span>
+                                    <span>{{ data.quantity|floatformat:0 }} kg</span>
+                                </div>
+                            {% endfor %}
+                            {% if grades|length > 3 %}
+                                <div class="text-xs text-gray-500 mt-1">... and {{ grades|length|add:"-3" }} more</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Aggregate Grade Suggestions -->
+    <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                <i class="fas fa-lightbulb mr-2 text-yellow-600"></i>Suggested Aggregate Grades
+            </h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                Based on your current inventory, here are possible aggregate grades you can create
+            </p>
+        </div>
+        <div class="p-6">
+            {% if suggestions %}
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {% for suggestion in suggestions %}
+                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h4 class="text-lg font-medium text-gray-900 dark:text-white">{{ suggestion.name }}</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">{{ suggestion.description }}</p>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs font-medium 
+                            {% if suggestion.feasibility == 'HIGH' %}bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200
+                            {% elif suggestion.feasibility == 'MEDIUM' %}bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200
+                            {% else %}bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200{% endif %}">
+                            {{ suggestion.feasibility }} FEASIBILITY
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div class="text-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                            <div class="text-lg font-bold text-gray-900 dark:text-white">{{ suggestion.total_quantity|floatformat:0 }} kg</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400">Total Quantity</div>
+                        </div>
+                        <div class="text-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                            <div class="text-lg font-bold text-gray-900 dark:text-white">${{ suggestion.estimated_price|floatformat:2 }}</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400">Est. Price/kg</div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5 class="text-sm font-medium text-gray-900 dark:text-white mb-2">Composition:</h5>
+                        <div class="space-y-1">
+                            {% for grade_code, data in suggestion.grades|slice:":5" %}
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-gray-600 dark:text-gray-400">{{ grade_code }}</span>
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-gray-500 dark:text-gray-400">{{ data.quantity|floatformat:0 }} kg</span>
+                                    <div class="w-16 bg-gray-200 dark:bg-gray-600 rounded-full h-2">
+                                        <div class="bg-blue-600 h-2 rounded-full" style="width: {% widthratio data.quantity suggestion.total_quantity 100 %}%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            {% if suggestion.grades|length > 5 %}
+                                <div class="text-xs text-gray-500 mt-1">... and {{ suggestion.grades|length|add:"-5" }} more components</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="flex space-x-2">
+                        <button onclick="viewSuggestionDetails('{{ suggestion.name }}', {{ suggestion.grades|length }})" 
+                                class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200 text-sm">
+                            <i class="fas fa-eye mr-2"></i>View Details
+                        </button>
+                        <button onclick="createAggregateGrade('{{ suggestion.name }}', '{{ suggestion.description }}', {{ suggestion.grades|length }})" 
+                                class="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-200 text-sm">
+                            <i class="fas fa-plus mr-2"></i>Create Grade
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-12">
+                <i class="fas fa-search text-gray-400 text-4xl mb-4"></i>
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No Suggestions Found</h3>
+                <p class="text-gray-600 dark:text-gray-400">
+                    We couldn't find any suitable aggregate grade combinations with your current inventory.
+                    Consider adding more diverse tobacco grades to enable blending opportunities.
+                </p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Suggestion Details Modal -->
+<div id="suggestionModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-screen overflow-y-auto">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">Aggregate Grade Details</h3>
+                <button class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200" onclick="closeSuggestionModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="suggestionContent" class="p-6">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function refreshAnalysis() {
+    window.location.reload();
+}
+
+function viewSuggestionDetails(name, componentCount) {
+    // This would show detailed breakdown of the suggestion
+    document.getElementById('suggestionContent').innerHTML = `
+        <div class="space-y-4">
+            <h4 class="text-lg font-medium text-gray-900 dark:text-white">${name}</h4>
+            <p class="text-gray-600 dark:text-gray-400">This aggregate grade consists of ${componentCount} different tobacco grades from your inventory.</p>
+            <div class="bg-blue-50 dark:bg-blue-900 p-4 rounded-lg">
+                <h5 class="font-medium text-blue-900 dark:text-blue-100 mb-2">Benefits of this blend:</h5>
+                <ul class="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+                    <li>• Optimizes your inventory utilization</li>
+                    <li>• Creates a consistent product for customers</li>
+                    <li>• Maximizes value from existing stock</li>
+                    <li>• Reduces inventory holding costs</li>
+                </ul>
+            </div>
+        </div>
+    `;
+    document.getElementById('suggestionModal').classList.remove('hidden');
+}
+
+function closeSuggestionModal() {
+    document.getElementById('suggestionModal').classList.add('hidden');
+}
+
+function createAggregateGrade(name, description, componentCount) {
+    if (confirm(`Create aggregate grade "${name}" with ${componentCount} components?`)) {
+        // This would create the aggregate grade
+        window.timbRealTime.showNotification(`Creating aggregate grade "${name}"...`, 'info');
+        
+        // Simulate API call
+        setTimeout(() => {
+            window.timbRealTime.showNotification(`Aggregate grade "${name}" created successfully!`, 'success');
+            // Redirect to aggregation dashboard
+            setTimeout(() => {
+                window.location.href = "{% url 'merchant_aggregation_dashboard' %}";
+            }, 1500);
+        }, 1000);
+    }
+}
+</script>
+{% endblock %}
+

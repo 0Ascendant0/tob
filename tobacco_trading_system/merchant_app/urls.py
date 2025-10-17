@@ -37,6 +37,8 @@ path('', views.inventory_management, name='merchant_dashboard'),
     path('aggregation/rule/save/', views.save_aggregation_rule, name='merchant_save_aggregation_rule'),
     path('aggregation/rule/<int:rule_id>/run/', views.run_aggregation_rule, name='merchant_run_aggregation_rule'),
     path('aggregation/output/<int:aggregated_id>/', views.aggregated_grade_detail, name='merchant_aggregated_grade_detail'),
+    path('aggregation/inventory-analysis/', views.inventory_aggregate_analysis, name='merchant_inventory_aggregate_analysis'),
+    path('aggregation/create-grade/', views.create_aggregate_grade, name='merchant_create_aggregate_grade'),
 
     # Inter-Merchant Features
     path('communications/', views.inter_merchant_communications, name='merchant_communications'),

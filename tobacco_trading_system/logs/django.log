@@ -16286,3 +16286,458 @@ INFO 2025-10-17 01:22:03,209 basehttp 28348 13580 "GET / HTTP/1.1" 302 0
 INFO 2025-10-17 01:22:03,225 basehttp 28348 13580 "GET / HTTP/1.1" 302 0
 INFO 2025-10-17 01:22:03,241 basehttp 28348 13580 "GET / HTTP/1.1" 302 0
 INFO 2025-10-17 01:22:03,259 basehttp 28348 13580 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:24:11,129 basehttp 28348 3848 "GET /admin/merchant_app/merchantprofile/ HTTP/1.1" 200 22948
+INFO 2025-10-17 01:24:11,145 basehttp 28348 18984 "GET /static/admin/img/icon-no.svg HTTP/1.1" 200 563
+INFO 2025-10-17 01:24:11,151 basehttp 28348 3848 "GET /admin/jsi18n/ HTTP/1.1" 200 3343
+INFO 2025-10-17 01:26:32,489 basehttp 28348 3848 "GET /admin/merchant_app/merchantinventory/ HTTP/1.1" 200 25680
+INFO 2025-10-17 01:26:32,516 basehttp 28348 3848 "GET /admin/jsi18n/ HTTP/1.1" 200 3343
+INFO 2025-10-17 01:27:35,364 basehttp 28348 3848 "GET /admin/merchant_app/merchantinventory/2/change/ HTTP/1.1" 200 48689
+INFO 2025-10-17 01:27:35,378 basehttp 28348 3848 "GET /static/admin/css/forms.css HTTP/1.1" 200 9577
+INFO 2025-10-17 01:27:35,388 basehttp 28348 18984 "GET /static/admin/js/calendar.js HTTP/1.1" 200 8687
+INFO 2025-10-17 01:27:35,390 basehttp 28348 24956 "GET /static/admin/js/prepopulate_init.js HTTP/1.1" 200 601
+INFO 2025-10-17 01:27:35,391 basehttp 28348 11396 "GET /static/admin/img/icon-viewlink.svg HTTP/1.1" 200 584
+INFO 2025-10-17 01:27:35,391 basehttp 28348 13928 "GET /static/admin/js/admin/DateTimeShortcuts.js HTTP/1.1" 200 19727
+INFO 2025-10-17 01:27:35,398 basehttp 28348 3848 "GET /static/admin/css/widgets.css HTTP/1.1" 200 12503
+INFO 2025-10-17 01:27:35,403 basehttp 28348 4448 "GET /admin/jsi18n/ HTTP/1.1" 200 3343
+INFO 2025-10-17 01:27:35,405 basehttp 28348 3848 "GET /static/admin/js/change_form.js HTTP/1.1" 200 622
+INFO 2025-10-17 01:27:35,485 basehttp 28348 4448 "GET /static/admin/img/icon-clock.svg HTTP/1.1" 200 686
+INFO 2025-10-17 01:27:35,485 basehttp 28348 3848 "GET /static/admin/img/icon-calendar.svg HTTP/1.1" 200 1095
+INFO 2025-10-17 01:27:39,523 basehttp 28348 3848 "GET /admin/merchant_app/merchantinventory/2/delete/ HTTP/1.1" 200 17681
+INFO 2025-10-17 01:27:39,536 basehttp 28348 3848 "GET /static/admin/js/cancel.js HTTP/1.1" 200 913
+INFO 2025-10-17 01:27:41,385 basehttp 28348 3848 "POST /admin/merchant_app/merchantinventory/2/delete/ HTTP/1.1" 302 0
+INFO 2025-10-17 01:27:41,441 basehttp 28348 3848 "GET /admin/merchant_app/merchantinventory/ HTTP/1.1" 200 25294
+INFO 2025-10-17 01:27:41,464 basehttp 28348 3848 "GET /admin/jsi18n/ HTTP/1.1" 200 3343
+INFO 2025-10-17 01:27:45,103 basehttp 28348 3848 "GET /admin/merchant_app/merchantinventory/1/change/ HTTP/1.1" 200 48704
+INFO 2025-10-17 01:27:45,121 basehttp 28348 3848 "GET /admin/jsi18n/ HTTP/1.1" 200 3343
+INFO 2025-10-17 01:27:48,411 basehttp 28348 3848 "GET /admin/merchant_app/merchantinventory/1/delete/ HTTP/1.1" 200 17699
+INFO 2025-10-17 01:27:50,297 basehttp 28348 3848 "POST /admin/merchant_app/merchantinventory/1/delete/ HTTP/1.1" 302 0
+INFO 2025-10-17 01:27:50,368 basehttp 28348 3848 "GET /admin/merchant_app/merchantinventory/ HTTP/1.1" 200 24716
+INFO 2025-10-17 01:27:50,392 basehttp 28348 3848 "GET /admin/jsi18n/ HTTP/1.1" 200 3343
+INFO 2025-10-17 01:28:03,881 basehttp 28348 3848 "GET /merchant/transactions/record/ HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:03,897 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:03,907 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:03,914 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:03,925 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:03,937 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:03,947 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:03,957 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:03,967 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:03,978 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:03,989 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:03,998 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:04,010 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:04,021 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:04,030 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:04,042 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:04,055 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:04,068 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:04,083 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:04,098 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:05,176 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:05,193 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:05,206 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:05,223 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:05,237 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:05,252 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:05,268 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:05,283 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:05,299 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:05,315 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:05,329 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:05,345 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:05,362 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:05,379 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:05,396 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:05,414 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:05,430 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:05,444 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:05,456 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:05,472 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:15,533 basehttp 28348 3848 "GET /merchant/transactions/record/ HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:15,546 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:15,558 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:15,568 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:15,576 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:15,587 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:15,600 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:15,609 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:15,621 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:15,633 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:15,642 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:15,656 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:15,669 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:15,680 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:15,692 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:15,705 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:15,718 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:15,728 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:15,741 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:15,751 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:16,849 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:16,865 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:16,879 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:16,896 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:16,916 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:16,933 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:16,952 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:16,969 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:16,985 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:17,000 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:17,017 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:17,035 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:17,052 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:17,071 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:17,086 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:17,099 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:17,112 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:17,125 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:17,139 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:28:17,154 basehttp 28348 3848 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:30:00,202 basehttp 28348 3848 "GET /merchant/ HTTP/1.1" 200 36579
+WARNING 2025-10-17 01:30:00,451 log 28348 31724 Not Found: /ws/inventory/
+WARNING 2025-10-17 01:30:00,456 basehttp 28348 31724 "GET /ws/inventory/ HTTP/1.1" 404 3146
+INFO 2025-10-17 01:30:00,472 basehttp 28348 3848 "GET /merchant/api/grades/ HTTP/1.1" 200 35291
+INFO 2025-10-17 01:30:05,106 basehttp 28348 3848 "GET /merchant/ HTTP/1.1" 200 36579
+WARNING 2025-10-17 01:30:05,270 log 28348 2860 Not Found: /ws/inventory/
+WARNING 2025-10-17 01:30:05,271 basehttp 28348 2860 "GET /ws/inventory/ HTTP/1.1" 404 3146
+INFO 2025-10-17 01:30:05,286 basehttp 28348 3848 "GET /merchant/api/grades/ HTTP/1.1" 200 35291
+INFO 2025-10-17 01:30:20,979 basehttp 28348 3848 "GET /auth/logout/ HTTP/1.1" 302 0
+INFO 2025-10-17 01:30:20,986 basehttp 28348 3848 "GET /auth/login/ HTTP/1.1" 200 17002
+INFO 2025-10-17 01:30:26,817 basehttp 28348 3848 "POST /auth/login/ HTTP/1.1" 302 0
+INFO 2025-10-17 01:30:26,850 basehttp 28348 3848 "GET /merchant/ HTTP/1.1" 200 41328
+WARNING 2025-10-17 01:30:27,129 log 28348 24692 Not Found: /ws/inventory/
+WARNING 2025-10-17 01:30:27,130 basehttp 28348 24692 "GET /ws/inventory/ HTTP/1.1" 404 3146
+INFO 2025-10-17 01:30:27,147 basehttp 28348 3848 "GET /merchant/api/grades/ HTTP/1.1" 200 35291
+INFO 2025-10-17 01:31:20,957 basehttp 28348 3848 "GET /merchant/transactions/record/ HTTP/1.1" 200 25200
+INFO 2025-10-17 01:32:03,327 basehttp 28348 29312 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:32:03,343 basehttp 28348 29312 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:32:03,372 basehttp 28348 29312 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:32:03,396 basehttp 28348 29312 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:32:03,415 basehttp 28348 29312 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:32:03,434 basehttp 28348 29312 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:32:03,449 basehttp 28348 29312 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:32:03,465 basehttp 28348 29312 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:32:03,482 basehttp 28348 29312 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:32:03,500 basehttp 28348 29312 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:32:03,518 basehttp 28348 29312 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:32:03,531 basehttp 28348 29312 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:32:03,549 basehttp 28348 29312 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:32:03,566 basehttp 28348 29312 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:32:03,579 basehttp 28348 29312 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:32:03,590 basehttp 28348 29312 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:32:03,604 basehttp 28348 29312 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:32:03,620 basehttp 28348 29312 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:32:03,635 basehttp 28348 29312 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:32:03,655 basehttp 28348 29312 "GET / HTTP/1.1" 302 0
+INFO 2025-10-17 01:32:41,306 basehttp 28348 3848 "POST /merchant/transactions/record/ HTTP/1.1" 200 278
+INFO 2025-10-17 01:32:42,582 basehttp 28348 3848 "GET /merchant/ HTTP/1.1" 200 42778
+WARNING 2025-10-17 01:32:42,891 log 28348 34080 Not Found: /ws/inventory/
+WARNING 2025-10-17 01:32:42,897 basehttp 28348 34080 "GET /ws/inventory/ HTTP/1.1" 404 3146
+INFO 2025-10-17 01:32:42,918 basehttp 28348 3848 "GET /merchant/api/grades/ HTTP/1.1" 200 35291
+INFO 2025-10-17 01:32:55,062 basehttp 28348 3848 "GET /merchant/transactions/record/ HTTP/1.1" 200 25200
+INFO 2025-10-17 01:33:16,169 basehttp 28348 3848 "POST /merchant/transactions/record/ HTTP/1.1" 200 275
+INFO 2025-10-17 01:33:17,430 basehttp 28348 3848 "GET /merchant/ HTTP/1.1" 200 45138
+WARNING 2025-10-17 01:33:17,694 log 28348 25216 Not Found: /ws/inventory/
+WARNING 2025-10-17 01:33:17,699 basehttp 28348 25216 "GET /ws/inventory/ HTTP/1.1" 404 3146
+INFO 2025-10-17 01:33:17,701 basehttp 28348 25216 - Broken pipe from ('127.0.0.1', 52020)
+INFO 2025-10-17 01:33:17,720 basehttp 28348 3848 "GET /merchant/api/grades/ HTTP/1.1" 200 35291
+INFO 2025-10-17 01:33:34,578 basehttp 28348 3848 "GET /merchant/transactions/record/ HTTP/1.1" 200 25200
+INFO 2025-10-17 01:33:48,056 basehttp 28348 3848 "POST /merchant/transactions/record/ HTTP/1.1" 200 272
+INFO 2025-10-17 01:33:49,323 basehttp 28348 3848 "GET /merchant/ HTTP/1.1" 200 47497
+WARNING 2025-10-17 01:33:49,635 log 28348 15836 Not Found: /ws/inventory/
+WARNING 2025-10-17 01:33:49,636 basehttp 28348 15836 "GET /ws/inventory/ HTTP/1.1" 404 3146
+INFO 2025-10-17 01:33:49,651 basehttp 28348 3848 "GET /merchant/api/grades/ HTTP/1.1" 200 35291
+INFO 2025-10-17 01:34:30,504 basehttp 28348 3848 "GET /merchant/transactions/record/ HTTP/1.1" 200 25200
+INFO 2025-10-17 01:34:50,151 basehttp 28348 3848 "POST /merchant/transactions/record/ HTTP/1.1" 200 281
+INFO 2025-10-17 01:34:51,423 basehttp 28348 3848 "GET /merchant/ HTTP/1.1" 200 49870
+WARNING 2025-10-17 01:34:51,714 log 28348 22128 Not Found: /ws/inventory/
+WARNING 2025-10-17 01:34:51,717 basehttp 28348 22128 "GET /ws/inventory/ HTTP/1.1" 404 3146
+INFO 2025-10-17 01:34:51,736 basehttp 28348 3848 "GET /merchant/api/grades/ HTTP/1.1" 200 35291
+INFO 2025-10-17 01:35:07,933 basehttp 28348 3848 "GET /merchant/transactions/record/ HTTP/1.1" 200 25200
+INFO 2025-10-17 01:36:22,280 basehttp 28348 3848 "POST /merchant/transactions/record/ HTTP/1.1" 200 269
+INFO 2025-10-17 01:36:23,543 basehttp 28348 3848 "GET /merchant/ HTTP/1.1" 200 52205
+WARNING 2025-10-17 01:36:23,887 log 28348 36792 Not Found: /ws/inventory/
+WARNING 2025-10-17 01:36:23,889 basehttp 28348 36792 "GET /ws/inventory/ HTTP/1.1" 404 3146
+INFO 2025-10-17 01:36:23,910 basehttp 28348 3848 "GET /merchant/api/grades/ HTTP/1.1" 200 35393
+INFO 2025-10-17 01:38:01,592 basehttp 28348 3848 "GET /merchant/aggregation/ HTTP/1.1" 200 23550
+INFO 2025-10-17 01:39:03,924 basehttp 28348 3848 "GET /merchant/aggregation/ HTTP/1.1" 200 23550
+INFO 2025-10-17 01:50:23,599 autoreload 28348 35476 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-17 01:50:27,026 autoreload 26268 22068 Watching for file changes with StatReloader
+INFO 2025-10-17 01:50:58,451 autoreload 26268 22068 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-17 01:51:00,822 autoreload 20860 29716 Watching for file changes with StatReloader
+INFO 2025-10-17 01:51:09,218 autoreload 20860 29716 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\urls.py changed, reloading.
+INFO 2025-10-17 01:51:11,561 autoreload 17996 19436 Watching for file changes with StatReloader
+INFO 2025-10-17 01:52:49,574 autoreload 17996 19436 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-17 01:52:51,137 autoreload 31628 24464 Watching for file changes with StatReloader
+INFO 2025-10-17 01:53:01,155 basehttp 31628 36104 "GET /merchant/aggregation/ HTTP/1.1" 200 23821
+ERROR 2025-10-17 01:53:04,028 log 31628 25132 Internal Server Error: /merchant/aggregation/inventory-analysis/
+Traceback (most recent call last):
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py", line 1381, in inventory_aggregate_analysis
+    inventory = MerchantInventory.objects.filter(merchant=merchant).select_related('grade')
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\db\models\query.py", line 1436, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\db\models\query.py", line 1454, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\db\models\query.py", line 1461, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\db\models\sql\query.py", line 1545, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\db\models\sql\query.py", line 1576, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\db\models\sql\query.py", line 1464, in build_filter
+    self.check_related_objects(join_info.final_field, value, join_info.opts)
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\db\models\sql\query.py", line 1275, in check_related_objects
+    self.check_query_object_type(value, opts, field)
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\db\models\sql\query.py", line 1252, in check_query_object_type
+    raise ValueError(
+ValueError: Cannot query "merchant (Merchant)": Must be "Merchant" instance.
+ERROR 2025-10-17 01:53:04,038 basehttp 31628 25132 "GET /merchant/aggregation/inventory-analysis/ HTTP/1.1" 500 129373
+INFO 2025-10-17 01:53:06,239 autoreload 31628 24464 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\urls.py changed, reloading.
+INFO 2025-10-17 01:53:07,855 autoreload 17624 35976 Watching for file changes with StatReloader
+INFO 2025-10-17 01:53:10,276 basehttp 17624 36360 "GET /merchant/aggregation/ HTTP/1.1" 200 23821
+ERROR 2025-10-17 01:53:12,220 log 17624 36360 Internal Server Error: /merchant/aggregation/inventory-analysis/
+Traceback (most recent call last):
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py", line 1381, in inventory_aggregate_analysis
+    inventory = MerchantInventory.objects.filter(merchant=merchant).select_related('grade')
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\db\models\query.py", line 1436, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\db\models\query.py", line 1454, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\db\models\query.py", line 1461, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\db\models\sql\query.py", line 1545, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\db\models\sql\query.py", line 1576, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\db\models\sql\query.py", line 1464, in build_filter
+    self.check_related_objects(join_info.final_field, value, join_info.opts)
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\db\models\sql\query.py", line 1275, in check_related_objects
+    self.check_query_object_type(value, opts, field)
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\db\models\sql\query.py", line 1252, in check_query_object_type
+    raise ValueError(
+ValueError: Cannot query "merchant (Merchant)": Must be "Merchant" instance.
+ERROR 2025-10-17 01:53:12,227 basehttp 17624 36360 "GET /merchant/aggregation/inventory-analysis/ HTTP/1.1" 500 129373
+INFO 2025-10-17 01:54:46,764 autoreload 17624 35976 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-17 01:54:48,803 autoreload 30908 32148 Watching for file changes with StatReloader
+INFO 2025-10-17 01:57:26,880 autoreload 30908 32148 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-17 01:57:29,015 autoreload 14904 29328 Watching for file changes with StatReloader
+INFO 2025-10-17 01:57:34,776 autoreload 14904 29328 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-17 01:57:36,607 autoreload 15196 22800 Watching for file changes with StatReloader
+INFO 2025-10-17 01:57:42,405 autoreload 15196 22800 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-17 01:57:44,075 autoreload 15804 4492 Watching for file changes with StatReloader
+INFO 2025-10-17 01:57:51,110 autoreload 15804 4492 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-17 01:57:53,469 autoreload 6692 10944 Watching for file changes with StatReloader
+INFO 2025-10-17 01:57:58,281 autoreload 6692 10944 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-17 01:58:00,303 autoreload 31392 25700 Watching for file changes with StatReloader
+INFO 2025-10-17 01:58:11,570 autoreload 31392 25700 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-17 01:58:13,037 autoreload 12212 27836 Watching for file changes with StatReloader
+ERROR 2025-10-17 01:58:14,180 log 12212 36504 Internal Server Error: /merchant/aggregation/
+Traceback (most recent call last):
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\views\decorators\http.py", line 43, in inner
+    return func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py", line 590, in aggregation_dashboard
+    return inventory_aggregate_analysis(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py", line 1371, in inventory_aggregate_analysis
+    merchant_profile = MerchantProfile.objects.get(user=request.user)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\db\models\query.py", line 623, in get
+    clone = self._chain() if self.query.combinator else self.filter(*args, **kwargs)
+                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\db\models\query.py", line 1436, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\db\models\query.py", line 1454, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\db\models\query.py", line 1461, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\db\models\sql\query.py", line 1545, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\db\models\sql\query.py", line 1576, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\db\models\sql\query.py", line 1426, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\db\models\sql\query.py", line 1236, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\db\models\sql\query.py", line 1724, in names_to_path
+    raise FieldError(
+django.core.exceptions.FieldError: Cannot resolve keyword 'user' into field. Choices are: allow_direct_contact, allow_public_advertising, annual_capacity, brand_colors, business_description, business_type, certifications, company_banner, company_logo, created_at, custom_css, dashboard_layout, delivery_regions, email_business, email_notifications, enable_ai_recommendations, enable_custom_grades, enable_inter_merchant_trading, enable_inventory_management, enable_order_management, enable_risk_assessment, encrypted_business_data, facebook_url, founding_year, headquarters_address, id, linkedin_url, merchant, merchant_id, minimum_order_value, number_of_employees, payment_terms, phone_primary, phone_secondary, preferred_grades, price_alert_threshold, profile_visibility, quality_standards, show_business_stats, show_certifications, show_contact_info, sms_notifications, theme_customization, theme_preference, twitter_url, updated_at, website_url, widget_preferences
+ERROR 2025-10-17 01:58:14,197 basehttp 12212 36504 "GET /merchant/aggregation/ HTTP/1.1" 500 148841
+INFO 2025-10-17 02:04:35,310 autoreload 12212 27836 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-17 02:04:42,515 autoreload 24184 32268 Watching for file changes with StatReloader
+INFO 2025-10-17 02:04:57,993 autoreload 24184 32268 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\ai_models\views.py changed, reloading.
+INFO 2025-10-17 02:05:03,990 autoreload 28812 26856 Watching for file changes with StatReloader
+INFO 2025-10-17 02:06:04,868 autoreload 28812 26856 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-17 02:06:07,051 autoreload 33356 36288 Watching for file changes with StatReloader
+INFO 2025-10-17 02:06:34,186 autoreload 33356 36288 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-17 02:06:35,427 autoreload 22400 35980 Watching for file changes with StatReloader
+ERROR 2025-10-17 02:06:55,367 log 22400 35752 Internal Server Error: /merchant/aggregation/
+Traceback (most recent call last):
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\views\decorators\http.py", line 43, in inner
+    return func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py", line 590, in aggregation_dashboard
+    return inventory_aggregate_analysis(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py", line 1429, in inventory_aggregate_analysis
+    suggestions = _generate_aggregate_suggestions(inventory_summary, categories)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py", line 1461, in _generate_aggregate_suggestions
+    'estimated_price': _calculate_blend_price(premium_grades),
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py", line 1524, in _calculate_blend_price
+    weighted_price += weight * price
+                      ~~~~~~~^~~~~~~
+TypeError: unsupported operand type(s) for *: 'decimal.Decimal' and 'float'
+ERROR 2025-10-17 02:06:55,372 basehttp 22400 35752 "GET /merchant/aggregation/ HTTP/1.1" 500 120205
+ERROR 2025-10-17 02:06:58,449 log 22400 35752 Internal Server Error: /merchant/aggregation/
+Traceback (most recent call last):
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\views\decorators\http.py", line 43, in inner
+    return func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py", line 590, in aggregation_dashboard
+    return inventory_aggregate_analysis(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_env\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py", line 1429, in inventory_aggregate_analysis
+    suggestions = _generate_aggregate_suggestions(inventory_summary, categories)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py", line 1461, in _generate_aggregate_suggestions
+    'estimated_price': _calculate_blend_price(premium_grades),
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py", line 1524, in _calculate_blend_price
+    weighted_price += weight * price
+                      ~~~~~~~^~~~~~~
+TypeError: unsupported operand type(s) for *: 'decimal.Decimal' and 'float'
+ERROR 2025-10-17 02:06:58,452 basehttp 22400 35752 "GET /merchant/aggregation/ HTTP/1.1" 500 120205
+INFO 2025-10-17 02:07:27,242 autoreload 22400 35980 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-17 02:07:29,148 autoreload 9484 24812 Watching for file changes with StatReloader
+INFO 2025-10-17 02:07:36,745 autoreload 9484 24812 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-17 02:07:38,626 autoreload 31092 25008 Watching for file changes with StatReloader
+INFO 2025-10-17 02:07:46,230 autoreload 31092 25008 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-17 02:07:48,677 autoreload 36240 36608 Watching for file changes with StatReloader
+INFO 2025-10-17 02:07:56,525 autoreload 36240 36608 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-17 02:07:59,158 autoreload 13464 33732 Watching for file changes with StatReloader
+INFO 2025-10-17 02:08:05,844 autoreload 13464 33732 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-17 02:08:08,000 autoreload 34508 22360 Watching for file changes with StatReloader
+INFO 2025-10-17 02:10:00,616 autoreload 34508 22360 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-17 02:10:02,165 autoreload 34904 12036 Watching for file changes with StatReloader
+INFO 2025-10-17 02:10:02,883 basehttp 34904 30640 "GET /merchant/aggregation/ HTTP/1.1" 200 43983
+INFO 2025-10-17 02:12:45,880 basehttp 34904 30640 "GET /merchant/aggregation/ HTTP/1.1" 200 43983
+INFO 2025-10-17 02:12:54,669 basehttp 34904 30640 "GET /merchant/aggregation/ HTTP/1.1" 200 43983
+INFO 2025-10-17 02:13:11,008 basehttp 34904 30640 "GET /merchant/ HTTP/1.1" 200 52205
+INFO 2025-10-17 02:13:11,148 basehttp 34904 30640 "GET /merchant/api/grades/ HTTP/1.1" 200 35393
+WARNING 2025-10-17 02:13:11,154 log 34904 32232 Not Found: /ws/inventory/
+WARNING 2025-10-17 02:13:11,161 basehttp 34904 32232 "GET /ws/inventory/ HTTP/1.1" 404 3146
+INFO 2025-10-17 02:15:04,462 basehttp 34904 30640 "GET /merchant/aggregation/ HTTP/1.1" 200 43983
+INFO 2025-10-17 02:19:44,204 basehttp 34904 30640 "GET /merchant/aggregation/ HTTP/1.1" 200 22602
+INFO 2025-10-17 02:23:41,552 basehttp 34904 30640 "GET /merchant/aggregation/ HTTP/1.1" 200 27161
+INFO 2025-10-17 02:25:42,529 autoreload 34904 12036 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-17 02:25:44,589 autoreload 28844 6372 Watching for file changes with StatReloader
+INFO 2025-10-17 02:25:48,972 autoreload 28844 6372 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-17 02:25:50,792 autoreload 36512 31656 Watching for file changes with StatReloader
+INFO 2025-10-17 02:25:57,207 autoreload 36512 31656 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-17 02:25:59,174 autoreload 29280 36280 Watching for file changes with StatReloader
+INFO 2025-10-17 02:26:10,627 autoreload 29280 36280 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-17 02:26:12,032 autoreload 35952 36068 Watching for file changes with StatReloader
+INFO 2025-10-17 02:32:04,632 autoreload 35952 36068 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-17 02:32:06,472 autoreload 29444 31252 Watching for file changes with StatReloader
+INFO 2025-10-17 02:32:11,783 autoreload 29444 31252 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-17 02:32:13,546 autoreload 34252 31088 Watching for file changes with StatReloader
+INFO 2025-10-17 02:32:31,819 autoreload 34252 31088 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-17 02:32:33,749 autoreload 4232 26928 Watching for file changes with StatReloader
+INFO 2025-10-17 02:33:01,637 autoreload 4232 26928 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-17 02:33:02,810 autoreload 20560 21412 Watching for file changes with StatReloader
+INFO 2025-10-17 02:37:10,381 autoreload 19940 27764 Watching for file changes with StatReloader
+INFO 2025-10-17 02:39:24,765 autoreload 19940 27764 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-17 02:39:25,206 autoreload 20560 21412 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-17 02:39:26,248 autoreload 12932 32128 Watching for file changes with StatReloader
+INFO 2025-10-17 02:39:27,404 autoreload 29512 30564 Watching for file changes with StatReloader
+INFO 2025-10-17 02:39:34,540 autoreload 12932 32128 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-17 02:39:34,871 autoreload 29512 30564 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-17 02:39:35,936 autoreload 13940 28208 Watching for file changes with StatReloader
+INFO 2025-10-17 02:39:36,716 autoreload 22244 34764 Watching for file changes with StatReloader
+INFO 2025-10-17 02:39:41,811 autoreload 13940 28208 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-17 02:39:42,754 autoreload 22244 34764 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-17 02:39:43,981 autoreload 22012 32680 Watching for file changes with StatReloader
+INFO 2025-10-17 02:39:44,616 autoreload 11900 21288 Watching for file changes with StatReloader
+INFO 2025-10-17 02:39:52,017 autoreload 22012 32680 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-17 02:39:52,619 autoreload 11900 21288 C:\Users\Administrator\Documents\tobac_env\Tobacco\tobacco_trading_system\merchant_app\views.py changed, reloading.
+INFO 2025-10-17 02:39:53,734 autoreload 7316 26796 Watching for file changes with StatReloader
+INFO 2025-10-17 02:39:54,329 autoreload 26136 36676 Watching for file changes with StatReloader
+INFO 2025-10-17 02:41:32,329 basehttp 26136 25436 "GET /merchant/aggregation/ HTTP/1.1" 200 222161

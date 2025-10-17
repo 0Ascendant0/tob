@@ -19,7 +19,7 @@ from .models import (
     MerchantProfile, MerchantInventory, CustomGrade, GradeComponent,
     ClientOrder, FarmerRiskAssessment, PurchaseRecommendation,
     DashboardWidget, InterMerchantCommunication, InterMerchantTrade,
-    AggregationRuleSet, AggregatedGrade
+    AggregationRuleSet, AggregatedGrade, AggregatedGradeComponent
 )
 
 # AI integration
@@ -582,21 +582,12 @@ def orders_management(request):
 @login_required
 @require_http_methods(["GET"])  # List rule sets and latest outputs
 def aggregation_dashboard(request):
+    """Aggregation dashboard for merchants - now shows inventory analysis"""
     if not request.user.is_merchant:
         return redirect('home')
-    try:
-        merchant = request.user.merchant_profile
-        rules = AggregationRuleSet.objects.filter(merchant=merchant).order_by('-created_at')
-        outputs = AggregatedGrade.objects.filter(merchant=merchant).select_related('rule_set').order_by('-computed_at')[:20]
-    except Exception:
-        merchant = None
-        rules = AggregationRuleSet.objects.none()
-        outputs = AggregatedGrade.objects.none()
-    return render(request, 'merchant_app/aggregation.html', {
-        'merchant': merchant,
-        'rules': rules,
-        'outputs': outputs,
-    })
+    
+    # Redirect to inventory aggregate analysis
+    return inventory_aggregate_analysis(request)
 
 
 @login_required
@@ -1367,3 +1358,332 @@ def api_price_alerts(request):
     ]
     
     return JsonResponse({'success': True, 'alerts': alerts})
+
+
+@login_required
+def inventory_aggregate_analysis(request):
+    """Analyze merchant inventory and suggest aggregate grades based on TIMB grades CSV"""
+    if not request.user.is_merchant:
+        return redirect('merchant_dashboard')
+    
+    # Get the merchant object for this user
+    try:
+        # The user should have a merchant relationship
+        merchant = request.user.merchant
+    except:
+        # If no merchant relationship, try to get from MerchantProfile
+        try:
+            merchant_profile = MerchantProfile.objects.get(merchant__user=request.user)
+            merchant = merchant_profile.merchant
+        except:
+            # Fallback: return empty inventory
+            # Get all TIMB grades from the database
+            from timb_dashboard.models import TobaccoGrade
+            timb_grades = TobaccoGrade.objects.all().order_by('grade_code')
+            
+            context = {
+                'merchant': request.user,
+                'inventory': [],
+                'inventory_summary': {},
+                'suggestions': [],
+                'total_inventory': 0,
+                'has_inventory': False,
+                'timb_grades': timb_grades
+            }
+            return render(request, 'merchant_app/aggregation.html', context)
+    
+    # Get merchant's inventory - fix the query
+    inventory = MerchantInventory.objects.filter(merchant=merchant).select_related('grade')
+    
+    if not inventory.exists():
+        # Get all TIMB grades from the database
+        from timb_dashboard.models import TobaccoGrade
+        timb_grades = TobaccoGrade.objects.all().order_by('grade_code')
+        
+        context = {
+            'merchant': request.user,  # Use the user object for template compatibility
+            'inventory': [],
+            'inventory_summary': {},
+            'suggestions': [],
+            'total_inventory': 0,
+            'has_inventory': False,
+            'timb_grades': timb_grades
+        }
+        return render(request, 'merchant_app/aggregation.html', context)
+    
+    # Create inventory summary
+    inventory_summary = {}
+    total_inventory = Decimal('0')
+    
+    for item in inventory:
+        grade_code = item.grade.grade_code
+        quantity = item.available_quantity
+        inventory_summary[grade_code] = {
+            'quantity': quantity,
+            'grade_name': item.grade.grade_name,
+            'category': item.grade.category,
+            'base_price': item.grade.base_price,
+            'quality_level': item.grade.quality_level
+        }
+        total_inventory += quantity
+    
+    # Group inventory by category
+    categories = {}
+    for grade_code, data in inventory_summary.items():
+        category = data['category']
+        if category not in categories:
+            categories[category] = []
+        categories[category].append((grade_code, data))
+    
+    # Generate aggregate grade suggestions based on TIMB mapping
+    suggestions = _generate_aggregate_suggestions(inventory_summary, categories)
+    
+    # Generate aggregate grades based on TIMB mapping
+    aggregate_grades = _generate_timb_aggregate_grades(inventory_summary)
+    
+    # Get all TIMB grades from the database
+    from timb_dashboard.models import TobaccoGrade
+    timb_grades = TobaccoGrade.objects.all().order_by('grade_code')
+    
+    context = {
+        'merchant': request.user,  # Use the user object for template compatibility
+        'inventory': inventory,
+        'inventory_summary': inventory_summary,
+        'categories': categories,
+        'suggestions': suggestions,
+        'aggregate_grades': aggregate_grades,
+        'total_inventory': total_inventory,
+        'has_inventory': True,
+        'timb_grades': timb_grades
+    }
+    
+    return render(request, 'merchant_app/aggregation.html', context)
+
+
+def _generate_aggregate_suggestions(inventory_summary, categories):
+    """Generate aggregate grade suggestions based on inventory"""
+    suggestions = []
+    
+    # Suggestion 1: Premium Blend (Grade 1 tobacco)
+    premium_grades = []
+    for grade_code, data in inventory_summary.items():
+        if data['quality_level'] == 1 and data['quantity'] > 0:
+            premium_grades.append((grade_code, data))
+    
+    if len(premium_grades) >= 2:
+        total_premium = sum(float(data['quantity']) for _, data in premium_grades)
+        suggestions.append({
+            'name': 'Premium Blend',
+            'description': 'High-quality blend of Grade 1 tobacco',
+            'grades': premium_grades,
+            'total_quantity': total_premium,
+            'estimated_price': _calculate_blend_price(premium_grades),
+            'feasibility': 'HIGH' if total_premium > 1000 else 'MEDIUM'
+        })
+    
+    # Suggestion 2: Standard Blend (Grade 2 tobacco)
+    standard_grades = []
+    for grade_code, data in inventory_summary.items():
+        if data['quality_level'] == 2 and data['quantity'] > 0:
+            standard_grades.append((grade_code, data))
+    
+    if len(standard_grades) >= 2:
+        total_standard = sum(float(data['quantity']) for _, data in standard_grades)
+        suggestions.append({
+            'name': 'Standard Blend',
+            'description': 'Standard quality blend of Grade 2 tobacco',
+            'grades': standard_grades,
+            'total_quantity': total_standard,
+            'estimated_price': _calculate_blend_price(standard_grades),
+            'feasibility': 'HIGH' if total_standard > 1000 else 'MEDIUM'
+        })
+    
+    # Suggestion 3: Category-specific blends
+    for category, grades in categories.items():
+        if len(grades) >= 2:
+            total_category = sum(float(data['quantity']) for _, data in grades)
+            suggestions.append({
+                'name': f'{category} Blend',
+                'description': f'Blend of {category} tobacco grades',
+                'grades': grades,
+                'total_quantity': total_category,
+                'estimated_price': _calculate_blend_price(grades),
+                'feasibility': 'HIGH' if total_category > 500 else 'MEDIUM'
+            })
+    
+    # Suggestion 4: Mixed Quality Blend (all available grades)
+    if len(inventory_summary) >= 3:
+        all_grades = [(code, data) for code, data in inventory_summary.items() if data['quantity'] > 0]
+        total_all = sum(float(data['quantity']) for _, data in all_grades)
+        suggestions.append({
+            'name': 'Mixed Quality Blend',
+            'description': 'Blend of all available tobacco grades',
+            'grades': all_grades,
+            'total_quantity': total_all,
+            'estimated_price': _calculate_blend_price(all_grades),
+            'feasibility': 'HIGH'
+        })
+    
+    return suggestions
+
+
+def _calculate_blend_price(grades):
+    """Calculate estimated price for a blend based on component grades"""
+    if not grades:
+        return 0.0
+    
+    total_quantity = sum(float(data['quantity']) for _, data in grades)
+    if total_quantity == 0:
+        return 0.0
+    
+    weighted_price = 0.0
+    for grade_code, data in grades:
+        weight = float(data['quantity']) / total_quantity
+        price = float(data['base_price']) if data['base_price'] else 0.0
+        weighted_price += weight * price
+    
+    return weighted_price
+
+
+def _generate_timb_aggregate_grades(inventory_summary):
+    """Generate aggregate grades based on TIMB mapping from the dataset"""
+    
+    # TIMB to Aggregate Grade mapping from your dataset
+    timb_aggregate_mapping = {
+        'C1L': ['P1L', 'P1LA', 'P1LF', 'P1LFA', 'P1LV', 'P1LVA'],
+        'C1O': ['P1O', 'P1OA', 'P1OF', 'P1OFA', 'P1OV', 'P1OVA'],
+        'C2L': ['P2L', 'P2LD', 'P2LA', 'P2LAD', 'P2LAQ', 'P2LF', 'P2LFA', 'P2LV', 'P2LQ', 'P2LVD', 'P2LVA', 'P2LVQ', 'P2LG', 'P2LGA', 'P2LGD'],
+        'C2O': ['P2O', 'P2OD', 'P2OA', 'P2OAD', 'P2OAQ', 'P2OF', 'P2OFA', 'P2OV', 'P2OQ', 'P2OVD', 'P2OVA', 'P2OVQ', 'P2OG', 'P2OGA', 'P2OGD'],
+        'C2R': ['P2R', 'P2RD', 'P2RA', 'P2RAQ', 'P2RF', 'P2RFA', 'P2RV', 'P2RQ', 'P2RVD', 'P2RVA', 'P2RVQ', 'P2RG'],
+        'C3L': ['P3L', 'P3LD', 'P3LA', 'P3LAD', 'P3LAQ', 'P3LF', 'P3LFA', 'P3LV', 'P3LQ', 'P3LVD', 'P3LVA', 'P3LVQ', 'P3LG', 'P3LGA', 'P3LGD'],
+        'C3O': ['P3O', 'P3OD', 'P3OA', 'P3OAD', 'P3OAQ', 'P3OF', 'P3OFA', 'P3OV', 'P3OQ', 'P3OVD', 'P3OVA', 'P3OVQ', 'P3OG', 'P3OGA', 'P3OGD'],
+        'C3R': ['P3R', 'P3RD', 'P3RA', 'P3RAQ', 'P3RF', 'P3RFA', 'P3RV', 'P3RQ', 'P3RVD', 'P3RVA', 'P3RVQ', 'P3RG'],
+        'C4G': ['P4G', 'P4GD', 'P4GA', 'P4GAD', 'P4GAQ', 'P4GF', 'P4GFA', 'P4GV', 'P4GQ', 'P4GVD', 'P4GVA', 'P4GVQ', 'P4GG', 'P4GGA', 'P4GGD'],
+        'C4L': ['P4L', 'P4LD', 'P4LA', 'P4LAD', 'P4LAQ', 'P4LF', 'P4LFA', 'P4LV', 'P4LQ', 'P4LVD', 'P4LVA', 'P4LVQ', 'P4LG', 'P4LGA', 'P4LGD']
+    }
+    
+    aggregate_grades = []
+    
+    for aggregate_code, timb_grades in timb_aggregate_mapping.items():
+        # Check which TIMB grades from this aggregate are in inventory
+        available_grades = []
+        total_quantity = 0.0
+        total_value = 0.0
+        
+        for timb_grade in timb_grades:
+            if timb_grade in inventory_summary:
+                grade_data = inventory_summary[timb_grade]
+                available_grades.append({
+                    'grade_code': timb_grade,
+                    'quantity': float(grade_data['quantity']),
+                    'price': float(grade_data['base_price']) if grade_data['base_price'] else 0.0,
+                    'grade_name': grade_data['grade_name']
+                })
+                total_quantity += float(grade_data['quantity'])
+                total_value += float(grade_data['quantity']) * float(grade_data['base_price'] if grade_data['base_price'] else 0.0)
+        
+        # Only include if we have some of the required grades
+        if available_grades:
+            avg_price = total_value / total_quantity if total_quantity > 0 else 0.0
+            coverage = len(available_grades) / len(timb_grades) * 100
+            
+            aggregate_grades.append({
+                'aggregate_code': aggregate_code,
+                'available_grades': available_grades,
+                'total_quantity': total_quantity,
+                'average_price': avg_price,
+                'coverage_percentage': coverage,
+                'required_grades': timb_grades,
+                'missing_grades': [grade for grade in timb_grades if grade not in inventory_summary]
+            })
+    
+    # Sort by coverage percentage (highest first)
+    aggregate_grades.sort(key=lambda x: x['coverage_percentage'], reverse=True)
+    
+    return aggregate_grades
+
+
+@login_required
+@require_http_methods(["POST"])
+def create_aggregate_grade(request):
+    """Create an aggregate grade based on suggestion"""
+    if not request.user.is_merchant:
+        return JsonResponse({'success': False, 'error': 'Access denied'})
+    
+    try:
+        data = json.loads(request.body)
+        name = data.get('name')
+        description = data.get('description')
+        grades_data = data.get('grades', [])
+        
+        if not name or not grades_data:
+            return JsonResponse({'success': False, 'error': 'Missing required data'})
+        
+        merchant = request.user
+        
+        # Create or get aggregation rule set
+        rule_set, created = AggregationRuleSet.objects.get_or_create(
+            merchant=merchant,
+            name=f"Auto-generated for {name}",
+            defaults={
+                'description': f"Auto-generated rule set for {name}",
+                'is_active': True
+            }
+        )
+        
+        # Create aggregated grade
+        with transaction.atomic():
+            aggregated_grade = AggregatedGrade.objects.create(
+                merchant=merchant,
+                rule_set=rule_set,
+                name=name,
+                label=name,
+                characteristics={
+                    'description': description,
+                    'estimated_nicotine_min': 2.0,
+                    'estimated_nicotine_max': 3.5,
+                    'color': 'Mixed',
+                    'created_from': 'inventory_analysis'
+                },
+                total_quantity_kg=0  # Will be calculated from components
+            )
+            
+            total_quantity = Decimal('0')
+            
+            # Create components
+            for grade_data in grades_data:
+                grade_code = grade_data.get('grade_code')
+                quantity = Decimal(str(grade_data.get('quantity', 0)))
+                
+                try:
+                    grade = TobaccoGrade.objects.get(grade_code=grade_code)
+                    
+                    # Calculate percentage
+                    if total_quantity == 0:
+                        total_quantity = sum(Decimal(str(g.get('quantity', 0))) for g in grades_data)
+                    
+                    percentage = (quantity / total_quantity) * 100 if total_quantity > 0 else 0
+                    
+                    AggregatedGradeComponent.objects.create(
+                        aggregated_grade=aggregated_grade,
+                        base_grade=grade,
+                        percentage=percentage,
+                        kilograms=quantity,
+                        notes=f"Auto-generated from inventory analysis"
+                    )
+                    
+                except TobaccoGrade.DoesNotExist:
+                    continue
+            
+            # Update total quantity
+            aggregated_grade.total_quantity_kg = total_quantity
+            aggregated_grade.save()
+        
+        return JsonResponse({
+            'success': True,
+            'message': f'Aggregate grade "{name}" created successfully',
+            'aggregate_id': aggregated_grade.id
+        })
+        
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
